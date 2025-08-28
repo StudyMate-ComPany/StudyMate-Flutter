@@ -275,38 +275,59 @@ class DailyContentService {
         allTopics = List.generate(days, (index) => '학습 주제 ${index + 1}');
       }
       
-      print('📋 추출된 주제: ${allTopics.length}개 - ${allTopics.take(3).join(', ')}...');
+      if (allTopics.isNotEmpty) {
+        print('📋 추출된 주제: ${allTopics.length}개 - ${allTopics.take(3).join(', ')}${allTopics.length > 3 ? '...' : ''}');
+      } else {
+        print('⚠️ 주제가 비어있어 기본 주제 생성');
+      }
       
-      // 일별로 균등 분배
+      // 일별로 균등 분배 (개선됨)
       for (int i = 0; i < days; i++) {
-        if (i < allTopics.length) {
-          // 각 일자에 1-2개 주제 할당
-          final topicsForDay = <String>[];
-          
+        final topicsForDay = <String>[];
+        
+        if (allTopics.isNotEmpty) {
           // 기본 주제
           topicsForDay.add(allTopics[i % allTopics.length]);
           
-          // 추가 주제 (복습 또는 심화)
+          // 추가 주제 (복습 또는 심화) - 2일차부터
           if (i > 0 && allTopics.length > 1) {
             final reviewTopicIndex = (i - 1) % allTopics.length;
             if (reviewTopicIndex != i % allTopics.length) {
               topicsForDay.add('${allTopics[reviewTopicIndex]} 복습');
             }
           }
-          
-          distributed.add(topicsForDay);
-        } else {
-          // 주제가 부족한 경우 이전 주제 복습
-          final reviewIndex = i % allTopics.length;
-          distributed.add(['${allTopics[reviewIndex]} 심화']);
         }
+        
+        // 빈 주제 리스트 방지
+        if (topicsForDay.isEmpty) {
+          topicsForDay.add('Day ${i + 1} 학습');
+        }
+        
+        distributed.add(topicsForDay);
       }
       
       print('📅 ${days}일간 주제 분배 완료');
       
+      // 분배 결과 로그 출력
+      for (int i = 0; i < distributed.length && i < 3; i++) {
+        print('  Day ${i + 1}: ${distributed[i].join(", ")}');
+      }
+      if (distributed.length > 3) {
+        print('  ... 총 ${distributed.length}일');
+      }
+      
     } catch (e) {
       print('❌ 주제 분배 오류: $e');
       // 오류 발생 시 기본 주제 생성
+      distributed.clear();
+      for (int i = 0; i < days; i++) {
+        distributed.add(['Day ${i + 1} 학습']);
+      }
+    }
+    
+    // 빈 결과 방지
+    if (distributed.isEmpty) {
+      print('⚠️ 분배 결과가 비어있어 기본값 생성');
       for (int i = 0; i < days; i++) {
         distributed.add(['Day ${i + 1} 학습']);
       }

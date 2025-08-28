@@ -182,48 +182,19 @@ Return as JSON:
         };
       } catch (e) {
         debugPrint('❌ JSON 파싱 실패: $e');
-        // API 실패 시 모의 응답 사용
-        final mockResponse = _getMockResponse(prompt);
-        try {
-          final mockAnalysis = json.decode(mockResponse);
-          return {
-            'success': true,
-            'analysis': mockAnalysis,
-          };
-        } catch (e2) {
-          return {
-            'success': false,
-            'error': 'Failed to parse analysis',
-            'raw_response': response,
-          };
-        }
+        return {
+          'success': false,
+          'error': 'Failed to parse analysis',
+          'raw_response': response,
+        };
       }
     } catch (e) {
       print('\n⚠️ ChatGPT API 호출 중 예외 발생!');
       print('에러: $e');
-      print('📎 모의 응답으로 대체합니다...');
-      // API 실패 시 모의 응답 사용
-      final mockPrompt = '''
-You are an AI that analyzes user input for creating personalized study plans.
-Be VERY flexible and understand various expressions in Korean, English, and mixed languages.
-
-User input: "$userInput"
-      ''';
-      final mockResponse = _getMockResponse(mockPrompt);
-      try {
-        final mockAnalysis = json.decode(mockResponse);
-        return {
-          'success': true,
-          'analysis': mockAnalysis,
-          'usingMock': true, // 모의 응답 사용 표시
-        };
-      } catch (e2) {
-        debugPrint('모의 응답 파싱 실패: $e2');
-        return {
-          'success': false,
-          'error': e.toString(),
-        };
-      }
+      return {
+        'success': false,
+        'error': e.toString(),
+      };
     }
   }
 
@@ -417,7 +388,7 @@ $subject 과목의 "$topic"에 대해 $level 수준으로 설명해주세요.
     }
   }
 
-  /// OpenAI API 요청 전송  
+  /// OpenAI API 요청 전송 (재시도 로직 포함)
   Future<String> _sendRequest(String prompt, {String model = 'gpt-3.5-turbo'}) async {
     print('\n' + '━' * 60);
     print('🚀 _sendRequest 호출 - OpenAI API 직접 호출 시도');
@@ -427,11 +398,11 @@ $subject 과목의 "$topic"에 대해 $level 수준으로 설명해주세요.
     print('🔑 API 키 상태:');
     print('  - 존재 여부: ${apiKey.isNotEmpty}');
     if (apiKey.isNotEmpty) {
-      print('  - 키 시작: ${apiKey.substring(0, 30)}...');
+      print('  - 키 시작: ${apiKey.substring(0, 30 > apiKey.length ? apiKey.length : 30)}...');
       print('  - 키 길이: ${apiKey.length}자');
     }
     
-    // API 키 유효성 검증 강화
+    // API 키 유효성 검증
     if (apiKey.isEmpty || 
         apiKey == 'YOUR_OPENAI_API_KEY' || 
         !apiKey.startsWith('sk-') ||
@@ -441,33 +412,36 @@ $subject 과목의 "$topic"에 대해 $level 수준으로 설명해주세요.
       print('  - 기본값: ${apiKey == 'YOUR_OPENAI_API_KEY'}');
       print('  - sk- 시작 안함: ${!apiKey.startsWith('sk-')}');
       print('  - 길이 부족: ${apiKey.length < 50}');
-      print('📄 모의 응답으로 대체합니다.');
-      print('━' * 60);
-      return _getMockResponse(prompt);
+      throw Exception('유효하지 않은 API 키입니다. .env 파일을 확인해주세요.');
     }
     
     print('✅ API 키 확인 완료 - 실제 OpenAI API 호출 진행');
     print('━' * 60);
 
-    try {
-      print('\n📡 HTTP POST 요청 전송 중...');
-      print('URL: $_apiUrl');
-      print('Model: $model');
-      
-      final response = await _dio.post(
-        _apiUrl,
-        options: Options(
-          headers: {
-            'Authorization': 'Bearer $apiKey',
-            'Content-Type': 'application/json',
-          },
-        ),
-        data: {
-          'model': model,
-          'messages': [
-            {
-              'role': 'system',
-              'content': '''You are StudyMate, an intelligent learning assistant that understands natural language flexibly.
+    // 재시도 로직 구현
+    const maxRetries = 3;
+    const baseDelay = 1000; // 1초
+    
+    for (int attempt = 1; attempt <= maxRetries; attempt++) {
+      try {
+        print('\n📡 API 호출 시도 $attempt/$maxRetries');
+        print('URL: $_apiUrl');
+        print('Model: $model');
+        
+        final response = await _dio.post(
+          _apiUrl,
+          options: Options(
+            headers: {
+              'Authorization': 'Bearer $apiKey',
+              'Content-Type': 'application/json',
+            },
+          ),
+          data: {
+            'model': model,
+            'messages': [
+              {
+                'role': 'system',
+                'content': '''You are StudyMate, an intelligent learning assistant that understands natural language flexibly.
 
 CORE CAPABILITIES:
 1. Understand mixed Korean/English input naturally
@@ -495,74 +469,131 @@ FLEXIBILITY:
 
 Always respond appropriately based on the extracted information.
 Default to Korean responses unless English is more appropriate.''',
-            },
-            {
-              'role': 'user',
-              'content': prompt,
-            },
-          ],
-          'temperature': 0.7,
-          'max_completion_tokens': 4000,
-        },
-      );
+              },
+              {
+                'role': 'user',
+                'content': prompt,
+              },
+            ],
+            'temperature': 0.7,
+            'max_completion_tokens': 4000,
+          },
+        );
 
-      print('\n✅ HTTP 응답 수신!');
-      print('상태 코드: ${response.statusCode}');
-      
-      if (response.data['choices'] != null && response.data['choices'].isNotEmpty) {
-        final content = response.data['choices'][0]['message']['content'];
-        print('✅ ChatGPT 응답 성공!');
-        print('응답 길이: ${content.length}자');
-        print('모델 사용: ${response.data['model'] ?? 'unknown'}');
-        print('토큰 사용: ${response.data['usage']?.toString() ?? 'unknown'}');
-        return content;
-      }
-
-      throw Exception('Invalid response from OpenAI');
-    } on DioException catch (e) {
-      print('\n❌ OpenAI API 네트워크 에러 발생!');
-      print('━' * 60);
-      print('📊 에러 상세 정보:');
-      print('  - 상태 코드: ${e.response?.statusCode}');
-      print('  - 에러 메시지: ${e.response?.data}');
-      print('  - 에러 타입: ${e.type}');
-      print('  - 요청 URL: ${e.requestOptions.path}');
-      print('  - 요청 메서드: ${e.requestOptions.method}');
-      
-      // 구체적인 에러 분석
-      String errorReason = '';
-      if (e.response?.statusCode == 401) {
-        errorReason = 'API 키가 유효하지 않습니다. .env 파일을 확인하세요.';
-        print('🔑 API 키 문제: $errorReason');
-      } else if (e.response?.statusCode == 429) {
-        errorReason = 'API 사용량 제한에 도달했습니다. 잠시 후 다시 시도하세요.';
-        print('⏳ 요청 한도 초과: $errorReason');
-      } else if (e.response?.statusCode == 400) {
-        errorReason = '잘못된 요청입니다. 모델명($model) 또는 요청 파라미터를 확인하세요.';
-        print('⚠️ 요청 오류: $errorReason');
-        if (e.response?.data?.toString().contains('model') == true) {
-          print('🤖 모델 관련 오류가 감지되었습니다. 사용 가능한 모델을 확인하세요.');
+        print('\n✅ HTTP 응답 수신!');
+        print('상태 코드: ${response.statusCode}');
+        
+        if (response.data['choices'] != null && response.data['choices'].isNotEmpty) {
+          final content = response.data['choices'][0]['message']['content'];
+          print('✅ ChatGPT 응답 성공! (시도 $attempt/$maxRetries)');
+          print('응답 길이: ${content.length}자');
+          print('모델 사용: ${response.data['model'] ?? 'unknown'}');
+          print('토큰 사용: ${response.data['usage']?.toString() ?? 'unknown'}');
+          return content;
         }
-      } else if (e.response?.statusCode == 500) {
-        errorReason = 'OpenAI 서버 내부 오류입니다. 잠시 후 다시 시도하세요.';
-        print('🔧 서버 오류: $errorReason');
-      } else {
-        errorReason = '알 수 없는 네트워크 오류입니다.';
-        print('❓ 기타 오류: $errorReason');
+
+        throw Exception('Invalid response from OpenAI');
+      } on DioException catch (e) {
+        print('\n❌ API 호출 실패 (시도 $attempt/$maxRetries)');
+        print('━' * 60);
+        print('📊 에러 상세 정보:');
+        print('  - 상태 코드: ${e.response?.statusCode}');
+        print('  - 에러 메시지: ${e.response?.data}');
+        print('  - 에러 타입: ${e.type}');
+        
+        // 재시도 가능한 에러인지 확인
+        bool shouldRetry = _shouldRetryError(e);
+        
+        if (!shouldRetry) {
+          print('재시도 불가능한 에러입니다.');
+          throw Exception('API 호출 실패: ${_getErrorMessage(e)}');
+        }
+        
+        if (attempt == maxRetries) {
+          print('최대 재시도 횟수에 도달했습니다.');
+          throw Exception('API 호출 실패 (최대 재시도 횟수 초과): ${_getErrorMessage(e)}');
+        }
+        
+        // Exponential backoff: 1초, 2초, 3초
+        final delay = baseDelay * attempt;
+        print('🔄 ${delay}ms 후 재시도합니다... (${attempt + 1}/$maxRetries)');
+        await Future.delayed(Duration(milliseconds: delay));
+        
+      } catch (e) {
+        print('\n❌ 일반 예외 발생 (시도 $attempt/$maxRetries)');
+        print('예외 타입: ${e.runtimeType}');
+        print('예외 메시지: $e');
+        
+        if (attempt == maxRetries) {
+          throw Exception('API 호출 실패 (최대 재시도 횟수 초과): $e');
+        }
+        
+        final delay = baseDelay * attempt;
+        print('🔄 ${delay}ms 후 재시도합니다... (${attempt + 1}/$maxRetries)');
+        await Future.delayed(Duration(milliseconds: delay));
       }
-      
-      print('━' * 60);
-      print('💡 모의 응답으로 대체합니다.');
-      return _getMockResponse(prompt);
-    } catch (e) {
-      print('\n❌ OpenAI API 일반 예외 발생!');
-      print('━' * 60);
-      print('예외 타입: ${e.runtimeType}');
-      print('예외 메시지: $e');
-      print('스택 추적: ${StackTrace.current}');
-      print('━' * 60);
-      print('💡 모의 응답으로 대체합니다.');
-      return _getMockResponse(prompt);
+    }
+    
+    throw Exception('예상치 못한 오류가 발생했습니다.');
+  }
+  
+  /// 재시도 가능한 에러인지 확인
+  bool _shouldRetryError(DioException e) {
+    final statusCode = e.response?.statusCode;
+    
+    // 재시도 가능한 상태 코드
+    if (statusCode != null) {
+      switch (statusCode) {
+        case 429: // Too Many Requests
+        case 500: // Internal Server Error
+        case 502: // Bad Gateway
+        case 503: // Service Unavailable
+        case 504: // Gateway Timeout
+          return true;
+        case 400: // Bad Request
+        case 401: // Unauthorized
+        case 403: // Forbidden
+        case 404: // Not Found
+          return false;
+        default:
+          return statusCode >= 500; // 5xx 에러는 재시도 가능
+      }
+    }
+    
+    // 네트워크 연결 에러는 재시도 가능
+    return e.type == DioExceptionType.connectionTimeout ||
+           e.type == DioExceptionType.receiveTimeout ||
+           e.type == DioExceptionType.connectionError;
+  }
+  
+  /// 에러 메시지 생성
+  String _getErrorMessage(DioException e) {
+    final statusCode = e.response?.statusCode;
+    
+    if (statusCode != null) {
+      switch (statusCode) {
+        case 401:
+          return 'API 키가 유효하지 않습니다. .env 파일을 확인하세요.';
+        case 429:
+          return 'API 사용량 제한에 도달했습니다. 잠시 후 다시 시도하세요.';
+        case 400:
+          return '잘못된 요청입니다. 요청 파라미터를 확인하세요.';
+        case 500:
+          return 'OpenAI 서버 내부 오류입니다.';
+        default:
+          return 'HTTP 오류 ($statusCode): ${e.response?.data?.toString() ?? e.message}';
+      }
+    }
+    
+    switch (e.type) {
+      case DioExceptionType.connectionTimeout:
+        return '연결 시간이 초과되었습니다.';
+      case DioExceptionType.receiveTimeout:
+        return '응답 시간이 초과되었습니다.';
+      case DioExceptionType.connectionError:
+        return '네트워크 연결 오류가 발생했습니다.';
+      default:
+        return '알 수 없는 오류: ${e.message}';
     }
   }
 
@@ -650,343 +681,4 @@ Default to Korean responses unless English is more appropriate.''',
     return response.trim();
   }
 
-  /// 모의 응답 생성 (API 키가 없을 때)
-  String _getMockResponse(String prompt) {
-    print('\n' + '🎭' * 30);
-    print('⚠️ 모의 응답 생성 중 (실제 ChatGPT 미사용)');
-    print('🎭' * 30 + '\n');
-    // 사용자 입력 분석 요청 (영어 또는 한글 프롬프트 체크)
-    if (prompt.contains('User input:') || prompt.contains('사용자의 다음 입력을 분석')) {
-      // 프롬프트에서 사용자 입력 추출
-      final userInputMatch = RegExp(r'"([^"]*)"').firstMatch(prompt);
-      final userInput = userInputMatch?.group(1) ?? '';
-      final lowerInput = userInput.toLowerCase();
-      
-      // 자유로운 분석 - 사용자 입력에서 키워드를 유연하게 추출
-      String subject = '';
-      String goal = '';
-      String level = 'beginner';
-      int days = 30;
-      String studyType = 'general';
-      
-      // 스마트한 과목 추출 - 정확한 패턴 매칭
-      // koreahistory를 한 단어로 먼저 체크
-      if (lowerInput.contains('koreahistory')) {
-        subject = '한국사';
-      } else if (lowerInput.contains('korean history')) {
-        subject = '한국사';
-      } else if (lowerInput.contains('korea history')) {
-        subject = '한국사';
-      } else if (lowerInput.contains('toeic') || lowerInput.contains('토익')) {
-        subject = 'TOEIC';
-      } else if (lowerInput.contains('toefl') || lowerInput.contains('토플')) {
-        subject = 'TOEFL';
-      } else if (lowerInput.contains('ielts') || lowerInput.contains('아이엘츠')) {
-        subject = 'IELTS';
-      } else if (lowerInput.contains('한국사')) {
-        subject = '한국사';
-      } else if (lowerInput.contains('영어') || lowerInput.contains('english')) {
-        subject = '영어';
-      } else if (lowerInput.contains('수학') || lowerInput.contains('math')) {
-        subject = '수학';
-      } else if (lowerInput.contains('과학') || lowerInput.contains('science')) {
-        subject = '과학';
-      } else if (lowerInput.contains('physics') || lowerInput.contains('물리')) {
-        subject = '물리학';
-      } else if (lowerInput.contains('chemistry') || lowerInput.contains('화학')) {
-        subject = '화학';
-      } else if (lowerInput.contains('biology') || lowerInput.contains('생물')) {
-        subject = '생물학';
-      } else if (lowerInput.contains('history')) {
-        subject = '역사';
-      } else if (lowerInput.contains('programming') || lowerInput.contains('coding') || lowerInput.contains('프로그래밍') || lowerInput.contains('코딩')) {
-        subject = '프로그래밍';
-      } else if (lowerInput.contains('python') || lowerInput.contains('파이썬')) {
-        subject = 'Python';
-      } else if (lowerInput.contains('java')) {
-        if (lowerInput.contains('script')) {
-          subject = 'JavaScript';
-        } else {
-          subject = 'Java';
-        }
-      } else if (lowerInput.contains('web') || lowerInput.contains('웹')) {
-        subject = '웹개발';
-      } else {
-        // 첫 단어를 과목으로 추정
-        final words = userInput.split(RegExp(r'\s+'));
-        if (words.isNotEmpty) {
-          final firstWord = words[0].toLowerCase();
-          // 일반적인 학습 단어가 아니면 첫 단어를 과목으로
-          if (!['learn', 'study', 'master', 'prepare', '공부', '학습'].contains(firstWord)) {
-            subject = words[0];
-          } else {
-            subject = '일반 학습';
-          }
-        } else {
-          subject = '일반 학습';
-        }
-      }
-      
-      // 텍스트 숫자를 실제 숫자로 변환
-      final textNumbers = {
-        'one': 1, 'two': 2, 'three': 3, 'four': 4, 'five': 5,
-        'six': 6, 'seven': 7, 'eight': 8, 'nine': 9, 'ten': 10,
-        'eleven': 11, 'twelve': 12, 'thirteen': 13, 'fourteen': 14, 'fifteen': 15,
-        'sixteen': 16, 'seventeen': 17, 'eighteen': 18, 'nineteen': 19, 'twenty': 20,
-        'thirty': 30, 'forty': 40, 'fifty': 50, 'sixty': 60, 'seventy': 70,
-        'eighty': 80, 'ninety': 90, 'hundred': 100,
-        '하나': 1, '둘': 2, '셋': 3, '넷': 4, '다섯': 5,
-        '여섯': 6, '일곱': 7, '여덟': 8, '아홉': 9, '열': 10,
-        '스무': 20, '서른': 30, '마흔': 40, '쉰': 50, '예순': 60,
-      };
-      
-      // 텍스트 숫자를 실제 숫자로 치환
-      String processedInput = lowerInput;
-      textNumbers.forEach((text, number) {
-        processedInput = processedInput.replaceAll(RegExp('\\b$text\\b'), number.toString());
-      });
-      
-      // 학습 기간 추출 (더 유연하게)
-      final durationPatterns = [
-        (RegExp(r'(\d+)\s*year'), (match) => int.parse(match.group(1)!) * 365),
-        (RegExp(r'(\d+)\s*month'), (match) => int.parse(match.group(1)!) * 30),
-        (RegExp(r'(\d+)\s*week'), (match) => int.parse(match.group(1)!) * 7),
-        (RegExp(r'(\d+)\s*day'), (match) => int.parse(match.group(1)!)),
-        (RegExp(r'(\d+)년'), (match) => int.parse(match.group(1)!) * 365),
-        (RegExp(r'(\d+)개월'), (match) => int.parse(match.group(1)!) * 30),
-        (RegExp(r'(\d+)주'), (match) => int.parse(match.group(1)!) * 7),
-        (RegExp(r'(\d+)일'), (match) => int.parse(match.group(1)!)),
-      ];
-      
-      for (final pattern in durationPatterns) {
-        final match = pattern.$1.firstMatch(processedInput);
-        if (match != null) {
-          days = pattern.$2(match);
-          break;
-        }
-      }
-      
-      // 급수 처리 (first grade, 1급 등)
-      bool hasGrade = false;
-      String gradeLevel = '';
-      
-      if (lowerInput.contains('first grade') || lowerInput.contains('1급') || lowerInput.contains('일급')) {
-        gradeLevel = '1급';
-        hasGrade = true;
-      } else if (lowerInput.contains('second grade') || lowerInput.contains('2급') || lowerInput.contains('이급')) {
-        gradeLevel = '2급';
-        hasGrade = true;
-      } else if (lowerInput.contains('third grade') || lowerInput.contains('3급') || lowerInput.contains('삼급')) {
-        gradeLevel = '3급';
-        hasGrade = true;
-      } else if (lowerInput.contains('fourth grade') || lowerInput.contains('4급') || lowerInput.contains('사급')) {
-        gradeLevel = '4급';
-        hasGrade = true;
-      } else if (lowerInput.contains('fifth grade') || lowerInput.contains('5급') || lowerInput.contains('오급')) {
-        gradeLevel = '5급';
-        hasGrade = true;
-      }
-      
-      // 한국사 급수 목표 설정
-      if (subject == '한국사' && hasGrade) {
-        goal = '한국사 $gradeLevel 합격';
-        level = '$gradeLevel 수준';
-      }
-      
-      // 목표 점수나 레벨 추출 및 목표 설정 (급수가 없는 경우)
-      if (!hasGrade) {
-        final scoreMatch = RegExp(r'(\d{2,4})\s*(점|point|score)?').firstMatch(lowerInput);
-        if (scoreMatch != null) {
-          final score = scoreMatch.group(1)!;
-          level = '$score점 목표';
-          
-          // 과목과 점수를 조합하여 목표 생성
-          if (subject == 'TOEIC' || subject == 'TOEFL' || subject == 'IELTS') {
-            goal = '$subject ${score}점 달성';
-          } else if (scoreMatch != null) {
-            goal = '${score}점 달성';
-          }
-        }
-      }
-      
-      // 목표가 아직 설정되지 않은 경우
-      if (goal.isEmpty) {
-        if (subject == 'TOEIC' || subject == 'TOEFL' || subject == 'IELTS') {
-          goal = '$subject 고득점 달성';
-        } else if (subject == '한국사') {
-          goal = '한국사 자격증 취득';
-        } else if (subject.isNotEmpty && subject != userInput) {
-          goal = '$subject 실력 향상';
-        } else {
-          // 학습 관련 키워드로 목표 추론
-          if (lowerInput.contains('master') || lowerInput.contains('마스터')) {
-            goal = '완벽 마스터';
-          } else if (lowerInput.contains('pass') || lowerInput.contains('합격')) {
-            goal = '시험 합격';
-          } else if (lowerInput.contains('improve') || lowerInput.contains('향상')) {
-            goal = '실력 향상';
-          } else {
-            goal = '학습 목표 달성';
-          }
-        }
-      }
-      
-      // 학습 유형 추론
-      if (lowerInput.contains('exam') || lowerInput.contains('test') || lowerInput.contains('시험') || 
-          lowerInput.contains('examination') || lowerInput.contains('quiz')) {
-        studyType = 'exam_prep';
-      } else if (lowerInput.contains('certificate') || lowerInput.contains('certification') || 
-                 lowerInput.contains('자격증') || lowerInput.contains('license')) {
-        studyType = 'certification';
-      } else if (lowerInput.contains('hobby') || lowerInput.contains('취미') || 
-                 lowerInput.contains('fun') || lowerInput.contains('casual')) {
-        studyType = 'hobby';
-      } else if (lowerInput.contains('professional') || lowerInput.contains('career') || 
-                 lowerInput.contains('job') || lowerInput.contains('직업') || lowerInput.contains('전문')) {
-        studyType = 'professional';
-      } else if (lowerInput.contains('academic') || lowerInput.contains('university') || 
-                 lowerInput.contains('college') || lowerInput.contains('대학') || lowerInput.contains('학술')) {
-        studyType = 'academic';
-      }
-      
-      // 난이도 추출
-      if (lowerInput.contains('beginner') || lowerInput.contains('초급') || lowerInput.contains('입문') ||
-          lowerInput.contains('basic') || lowerInput.contains('elementary') || lowerInput.contains('starter')) {
-        level = 'beginner';
-      } else if (lowerInput.contains('intermediate') || lowerInput.contains('중급') || 
-                 lowerInput.contains('medium') || lowerInput.contains('moderate')) {
-        level = 'intermediate';
-      } else if (lowerInput.contains('advanced') || lowerInput.contains('고급') || lowerInput.contains('상급') ||
-                 lowerInput.contains('expert') || lowerInput.contains('professional') || lowerInput.contains('high')) {
-        level = 'advanced';
-      }
-      
-      // 토픽은 과목명으로 설정
-      String topic = subject;
-      
-      return '''
-{
-  "subject": "$subject",
-  "topic": "$topic",
-  "goal": "$goal",
-  "currentLevel": "$level",
-  "daysAvailable": $days,
-  "hoursPerDay": 2,
-  "studyType": "$studyType",
-  "additionalInfo": "사용자 맞춤 분석 결과"
-}
-''';
-    } else if (prompt.contains('문제를 생성')) {
-      return '''
-[
-  {
-    "question": "다음 중 광합성에 필요한 요소가 아닌 것은?",
-    "type": "multiple_choice",
-    "options": ["이산화탄소", "물", "빛", "산소"],
-    "answer": "산소",
-    "explanation": "광합성은 이산화탄소, 물, 빛을 이용해 포도당과 산소를 생성하는 과정입니다. 산소는 광합성의 결과물이지 필요 요소가 아닙니다.",
-    "difficulty": "medium",
-    "points": 10
-  },
-  {
-    "question": "세포의 에너지 공장이라 불리는 세포소기관은?",
-    "type": "short_answer",
-    "answer": "미토콘드리아",
-    "explanation": "미토콘드리아는 ATP를 생산하여 세포에 에너지를 공급하는 역할을 합니다.",
-    "difficulty": "medium",
-    "points": 10
-  },
-  {
-    "question": "DNA는 이중나선 구조를 가지고 있다.",
-    "type": "true_false",
-    "answer": "true",
-    "explanation": "DNA는 왓슨과 크릭이 발견한 이중나선(double helix) 구조를 가지고 있습니다.",
-    "difficulty": "easy",
-    "points": 5
-  }
-]
-''';
-    } else if (prompt.contains('학습 계획')) {
-      // 프롬프트에서 과목과 기간 추출
-      String subject = "일반 학습";
-      String goal = "학습 목표 달성";
-      int days = 30;
-      
-      final lowerPrompt = prompt.toLowerCase();
-      if (prompt.contains('한국사')) {
-        subject = "한국사";
-        goal = "한국사 시험 대비";
-      } else if (lowerPrompt.contains('toeic') || lowerPrompt.contains('토익')) {
-        subject = "토익";
-        goal = "토익 점수 향상";
-        // 점수 추출
-        final scoreMatch = RegExp(r'\d{3,4}').firstMatch(prompt);
-        if (scoreMatch != null) {
-          goal = "토익 ${scoreMatch.group(0)}점 달성";
-        }
-      } else if (prompt.contains('영어')) {
-        subject = "영어";
-        goal = "영어 실력 향상";
-      } else if (prompt.contains('수학')) {
-        subject = "수학";
-        goal = "수학 개념 마스터";
-      } else if (prompt.contains('과학') || prompt.contains('생물')) {
-        subject = "과학";
-        goal = "과학 기초 다지기";
-      }
-      
-      // 영어 기간 처리 추가
-      if (lowerPrompt.contains('year')) {
-        if (lowerPrompt.contains('two') || lowerPrompt.contains('2')) days = 730;
-        else if (lowerPrompt.contains('three') || lowerPrompt.contains('3')) days = 1095;
-        else days = 365;
-      } else if (lowerPrompt.contains('two month') || lowerPrompt.contains('2 month')) days = 60;
-      else if (lowerPrompt.contains('three month') || lowerPrompt.contains('3 month')) days = 90;
-      else if (prompt.contains('7일') || prompt.contains('일주일')) days = 7;
-      else if (prompt.contains('14일') || prompt.contains('2주')) days = 14;
-      else if (prompt.contains('30일') || prompt.contains('한달')) days = 30;
-      else if (prompt.contains('60일') || prompt.contains('2개월') || prompt.contains('두달')) days = 60;
-      else if (prompt.contains('90일') || prompt.contains('3개월')) days = 90;
-      
-      return '''
-{
-  "title": "$subject 마스터 플랜",
-  "overview": "${days}일간 $subject 체계적 학습 계획",
-  "totalDays": $days,
-  "hoursPerDay": 2,
-  "schedule": [
-    {
-      "day": 1,
-      "date": "2024-01-01",
-      "topics": ["$subject 기초 개념", "$subject 핵심 내용"],
-      "activities": [
-        {
-          "time": "09:00-10:00",
-          "activity": "$subject 기본 개념 학습",
-          "type": "lecture"
-        },
-        {
-          "time": "10:00-11:00",
-          "activity": "$subject 연습 문제 풀기",
-          "type": "practice"
-        }
-      ],
-      "goals": ["$subject 기본 개념 이해", "$subject 핵심 내용 숙지"],
-      "resources": ["$subject 교재", "$subject 온라인 강의"]
-    }
-  ],
-  "milestones": [
-    {
-      "day": 3,
-      "title": "$subject 기초 단원 완료",
-      "description": "$subject 기본 개념 완벽 이해"
-    }
-  ],
-  "tips": ["매일 복습 노트 작성하기", "그림으로 개념 정리하기", "실생활 예시와 연결하기"]
-}
-''';
-    } else {
-      return '모의 응답입니다. 실제 사용을 위해서는 AI API 키를 설정해주세요.';
-    }
-  }
 }

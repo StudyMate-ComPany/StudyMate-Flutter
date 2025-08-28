@@ -100,38 +100,25 @@ quiz 타입의 경우 questions 배열의 각 문제는 다음 형식을 따라�
     return formatted.isEmpty ? '맞춤형 학습 계획을 진행합니다.' : formatted;
   }
   
-  // 요약본 생성 요청
+  // 요약본 생성 요청 (재시도 로직 포함)
   Future<Map<String, dynamic>> generateSummary(
     String planId,
     String topic,
     String timeOfDay,
   ) async {
+    print('📖 요약본 생성 중: $topic ($timeOfDay)');
+    
+    // 세션에 사용자 요청 추가
     final session = _sessions[planId] ?? [];
-    
-    final userMessage = {
+    session.add({
       'role': 'user',
-      'content': '''
-${_getTimeKorean(timeOfDay)} 학습 콘텐츠를 생성해주세요.
-
-요청 내용:
-- 시간대: $timeOfDay (${_getTimeKorean(timeOfDay)})
-- 오늘의 주제: $topic
-- 콘텐츠 타입: summary (핵심 내용 요약)
-- 예상 학습 시간: 10-15분
-- 요구사항: 
-  * 학습자의 목표와 수준에 맞춘 내용
-  * 실제 시험이나 평가에 도움이 되는 핵심 포인트
-  * 이해하기 쉬운 설명과 예시
-  * 다음 학습으로 연결되는 내용
-
-학습자가 집중할 수 있도록 명확하고 구조화된 내용으로 작성해주세요.
-'''
-    };
-    
-    session.add(userMessage);
+      'content': '${_getTimeKorean(timeOfDay)} $topic 학습 콘텐츠 요청',
+    });
     
     try {
+      // API 호출 (재시도 로직 포함)
       final response = await _sendChatGPTRequest(session);
+      final responseData = json.decode(response);
       
       // 세션에 응답 추가
       session.add({
@@ -141,50 +128,40 @@ ${_getTimeKorean(timeOfDay)} 학습 콘텐츠를 생성해주세요.
       
       await _saveSession(planId);
       
-      return json.decode(response);
+      print('✅ 요약본 생성 완료');
+      return responseData;
     } catch (e) {
-      print('요약본 생성 실패: $e');
-      return _generateMockSummary(topic, timeOfDay);
+      print('❌ 요약본 생성 실패: $e');
+      // 세션에서 실패한 사용자 요청 제거
+      if (session.isNotEmpty && session.last['role'] == 'user') {
+        session.removeLast();
+      }
+      throw Exception('요약본 생성에 실패했습니다: $e');
     }
   }
   
-  // 문제 생성 요청
+  // 문제 생성 요청 (재시도 로직 포함)
   Future<Map<String, dynamic>> generateQuiz(
     String planId,
     String topic,
     String timeOfDay,
     int questionCount,
   ) async {
+    print('❓ 퀴즈 생성 중: $topic ($timeOfDay, ${questionCount}문제)');
+    
+    // 세션에 사용자 요청 추가
     final session = _sessions[planId] ?? [];
-    
-    final userMessage = {
+    session.add({
       'role': 'user',
-      'content': '''
-${_getTimeKorean(timeOfDay)} 학습 문제를 생성해주세요.
-
-요청 내용:
-- 시간대: $timeOfDay (${_getTimeKorean(timeOfDay)})
-- 오늘의 주제: $topic
-- 콘텐츠 타입: quiz (문제 풀이)
-- 문제 개수: $questionCount개
-- 문제 형태: 4지선다형
-- 난이도: 학습자의 현재 수준(${_getTimeKorean(timeOfDay)} 시간대에 적합)
-- 요구사항:
-  * 실제 시험이나 평가에서 나올 수 있는 실용적인 문제
-  * 오늘 학습한 내용과 연관성 있는 문제
-  * 각 문제마다 상세한 해설과 학습 포인트 제공
-  * 오답 선택지도 교육적 가치가 있도록 구성
-  * 난이도는 점진적으로 증가
-
-학습자가 실력을 확실히 점검할 수 있는 양질의 문제를 만들어주세요.
-'''
-    };
-    
-    session.add(userMessage);
+      'content': '${_getTimeKorean(timeOfDay)} $topic 퀴즈 ${questionCount}문제 요청',
+    });
     
     try {
+      // API 호출 (재시도 로직 포함)
       final response = await _sendChatGPTRequest(session);
+      final responseData = json.decode(response);
       
+      // 세션에 응답 추가
       session.add({
         'role': 'assistant',
         'content': response,
@@ -192,35 +169,102 @@ ${_getTimeKorean(timeOfDay)} 학습 문제를 생성해주세요.
       
       await _saveSession(planId);
       
-      return json.decode(response);
+      print('✅ 퀴즈 생성 완료');
+      return responseData;
     } catch (e) {
-      print('문제 생성 실패: $e');
-      return _generateMockQuiz(topic, timeOfDay, questionCount);
+      print('❌ 퀴즈 생성 실패: $e');
+      // 세션에서 실패한 사용자 요청 제거
+      if (session.isNotEmpty && session.last['role'] == 'user') {
+        session.removeLast();
+      }
+      throw Exception('퀴즈 생성에 실패했습니다: $e');
     }
   }
   
-  // ChatGPT API 호출
+  // ChatGPT API 호출 (재시도 로직 포함)
   Future<String> _sendChatGPTRequest(List<Map<String, dynamic>> messages) async {
-    final response = await http.post(
-      Uri.parse('$_baseUrl/chat/completions'),
-      headers: {
-        'Authorization': 'Bearer $apiKey',
-        'Content-Type': 'application/json',
-      },
-      body: json.encode({
-        'model': 'gpt-4',
-        'messages': messages,
-        'temperature': 0.7,
-        'max_completion_tokens': 1000,
-        'response_format': {'type': 'json_object'},
-      }),
-    );
+    // API 키 유효성 검사
+    if (apiKey.isEmpty || apiKey == 'YOUR_OPENAI_API_KEY') {
+      throw Exception('유효하지 않은 API 키입니다. API 키를 확인해주세요.');
+    }
     
-    if (response.statusCode == 200) {
-      final data = json.decode(response.body);
-      return data['choices'][0]['message']['content'];
-    } else {
-      throw Exception('ChatGPT API 오류: ${response.statusCode}');
+    const maxRetries = 3;
+    const baseDelay = 1000; // 1초
+    
+    for (int attempt = 1; attempt <= maxRetries; attempt++) {
+      try {
+        print('🔄 ChatGPT API 호출 시도 $attempt/$maxRetries');
+        
+        final response = await http.post(
+          Uri.parse('$_baseUrl/chat/completions'),
+          headers: {
+            'Authorization': 'Bearer $apiKey',
+            'Content-Type': 'application/json',
+          },
+          body: json.encode({
+            'model': 'gpt-4',
+            'messages': messages,
+            'temperature': 0.7,
+            'max_completion_tokens': 1000,
+            'response_format': {'type': 'json_object'},
+          }),
+        );
+        
+        if (response.statusCode == 200) {
+          final data = json.decode(response.body);
+          final content = data['choices'][0]['message']['content'];
+          print('✅ ChatGPT API 호출 성공! (시도 $attempt/$maxRetries)');
+          return content;
+        }
+        
+        // HTTP 에러 처리
+        final shouldRetry = _shouldRetryHttpError(response.statusCode);
+        if (!shouldRetry) {
+          throw Exception('ChatGPT API 오류 (재시도 불가): ${response.statusCode} - ${response.body}');
+        }
+        
+        if (attempt == maxRetries) {
+          throw Exception('ChatGPT API 오류 (최대 재시도 횟수 초과): ${response.statusCode} - ${response.body}');
+        }
+        
+        // Exponential backoff: 1초, 2초, 3초
+        final delay = baseDelay * attempt;
+        print('🔄 ${delay}ms 후 재시도합니다... (${attempt + 1}/$maxRetries)');
+        await Future.delayed(Duration(milliseconds: delay));
+        
+      } catch (e) {
+        print('❌ ChatGPT API 호출 실패 (시도 $attempt/$maxRetries): $e');
+        
+        if (attempt == maxRetries) {
+          throw Exception('ChatGPT API 호출 실패 (최대 재시도 횟수 초과): $e');
+        }
+        
+        // 네트워크 오류인 경우 재시도
+        final delay = baseDelay * attempt;
+        print('🔄 ${delay}ms 후 재시도합니다... (${attempt + 1}/$maxRetries)');
+        await Future.delayed(Duration(milliseconds: delay));
+      }
+    }
+    
+    throw Exception('예상치 못한 오류가 발생했습니다.');
+  }
+  
+  /// HTTP 에러 코드에 따른 재시도 여부 결정
+  bool _shouldRetryHttpError(int statusCode) {
+    switch (statusCode) {
+      case 429: // Too Many Requests
+      case 500: // Internal Server Error
+      case 502: // Bad Gateway
+      case 503: // Service Unavailable
+      case 504: // Gateway Timeout
+        return true;
+      case 400: // Bad Request
+      case 401: // Unauthorized
+      case 403: // Forbidden
+      case 404: // Not Found
+        return false;
+      default:
+        return statusCode >= 500; // 5xx 에러는 재시도 가능
     }
   }
   
@@ -248,60 +292,10 @@ ${_getTimeKorean(timeOfDay)} 학습 문제를 생성해주세요.
     _sessions.remove(planId);
   }
   
-  // Mock 데이터 생성 (API 실패 시 대체)
-  Map<String, dynamic> _generateMockSummary(String topic, String timeOfDay) {
-    final timeKorean = _getTimeKorean(timeOfDay);
-    
-    return {
-      'type': 'summary',
-      'title': '$topic - $timeKorean 핵심 요약',
-      'content': '''
-📚 오늘의 학습 포인트
-
-1. 핵심 개념 정리
-   - $topic의 기본 원리를 이해합니다
-   - 관련 용어와 정의를 숙지합니다
-   
-2. 주요 내용
-   - 기본 개념과 응용 방법
-   - 실제 문제에서의 적용 사례
-   - 자주 출제되는 유형 파악
-   
-3. 학습 팁
-   - 반복 학습을 통한 암기
-   - 문제 풀이를 통한 응용력 향상
-   - 오답 노트 정리의 중요성
-
-💡 기억할 점: 꾸준한 학습이 가장 중요합니다!
-''',
-      'encouragement': '오늘도 열심히 공부하는 당신, 정말 대단해요! 🎯',
-    };
-  }
   
-  Map<String, dynamic> _generateMockQuiz(String topic, String timeOfDay, int count) {
-    final timeKorean = _getTimeKorean(timeOfDay);
-    
-    final questions = List.generate(count, (index) => {
-      'id': 'q_${index + 1}',
-      'question': '$topic 관련 문제 ${index + 1}: 다음 중 옳은 것은?',
-      'options': [
-        '첫 번째 선택지',
-        '두 번째 선택지',
-        '세 번째 선택지',
-        '네 번째 선택지',
-      ],
-      'correct_answer': index % 4,
-      'explanation': '이 문제의 정답은 ${(index % 4) + 1}번입니다. 핵심 개념을 이해하면 쉽게 풀 수 있습니다.',
-    });
-    
-    return {
-      'type': 'quiz',
-      'title': '$topic - $timeKorean 확인 문제',
-      'content': '오늘 학습한 내용을 확인해보세요!',
-      'questions': questions,
-      'encouragement': '문제를 풀면서 실력이 향상되고 있어요! 💪',
-    };
-  }
+  
+  
+  
   
   String _getTimeKorean(String timeOfDay) {
     switch (timeOfDay.toLowerCase()) {
