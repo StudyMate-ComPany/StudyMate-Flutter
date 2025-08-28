@@ -21,7 +21,7 @@ class _SubscriptionScreenState extends State<SubscriptionScreen> {
       originalPrice: 9900,
       discount: 0,
       features: [
-        '✨ AI 맞춤 학습 플랜',
+        '✨ 스마트 맞춤 학습 플랜',
         '📚 무제한 학습 콘텐츠',
         '🎯 일일 퀴즈 & 복습',
         '📊 학습 분석 리포트',
@@ -36,7 +36,7 @@ class _SubscriptionScreenState extends State<SubscriptionScreen> {
       originalPrice: 29700,
       discount: 16,
       features: [
-        '✨ AI 맞춤 학습 플랜',
+        '✨ 스마트 맞춤 학습 플랜',
         '📚 무제한 학습 콘텐츠',
         '🎯 일일 퀴즈 & 복습',
         '📊 학습 분석 리포트',
@@ -52,13 +52,13 @@ class _SubscriptionScreenState extends State<SubscriptionScreen> {
       originalPrice: 118800,
       discount: 33,
       features: [
-        '✨ AI 맞춤 학습 플랜',
+        '✨ 스마트 맞춤 학습 플랜',
         '📚 무제한 학습 콘텐츠',
         '🎯 일일 퀴즈 & 복습',
         '📊 학습 분석 리포트',
         '⏰ 맞춤 알림 설정',
         '🎁 프리미엄 학습 자료',
-        '💎 1:1 AI 튜터링',
+        '💎 1:1 스마트 튜터링',
         '🏆 수료증 발급',
       ],
       isPopular: false,
@@ -131,7 +131,7 @@ class _SubscriptionScreenState extends State<SubscriptionScreen> {
                           .fadeIn(delay: 200.ms),
                         const SizedBox(height: 10),
                         Text(
-                          'AI와 함께 더 효과적으로 학습하세요',
+                          '스마트 기술과 함께 더 효과적으로 학습하세요',
                           style: TextStyle(
                             fontSize: 14,
                             color: ModernTheme.textSecondary,

@@ -467,7 +467,7 @@ $subject 과목의 "$topic"에 대해 $level 수준으로 설명해주세요.
           'messages': [
             {
               'role': 'system',
-              'content': '''You are StudyMate AI, an intelligent learning assistant that understands natural language flexibly.
+              'content': '''You are StudyMate, an intelligent learning assistant that understands natural language flexibly.
 
 CORE CAPABILITIES:
 1. Understand mixed Korean/English input naturally

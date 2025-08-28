@@ -30,6 +30,6 @@ void main() {
 
     // 로그인 화면이 로드되는지 확인
     expect(find.text('스터디메이트'), findsOneWidget);
-    expect(find.text('AI 기반 학습 도우미'), findsOneWidget);
+    expect(find.text('스마트 학습 도우미'), findsOneWidget);
   });
 }

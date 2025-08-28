@@ -39,8 +39,8 @@ void main() {
       // 앱바가 존재하는지 확인
       expect(find.byType(AppBar), findsOneWidget);
       
-      // StudyMate AI 타이틀이 표시되는지 확인
-      expect(find.text('StudyMate AI'), findsOneWidget);
+      // StudyMate 타이틀이 표시되는지 확인
+      expect(find.text('StudyMate'), findsOneWidget);
       
       // 학교 아이콘이 표시되는지 확인
       expect(find.byIcon(Icons.school), findsOneWidget);

@@ -126,7 +126,7 @@ class _ModernAIAssistantScreenState extends State<ModernAIAssistantScreen>
             ),
             const SizedBox(width: 12),
             const Text(
-              'AI 학습 도우미',
+              '스마트 학습 도우미',
               style: TextStyle(
                 color: ModernTheme.textPrimary,
                 fontWeight: FontWeight.w700,
@@ -318,7 +318,7 @@ class _ModernAIAssistantScreenState extends State<ModernAIAssistantScreen>
             const SizedBox(height: 24),
             
             const Text(
-              'AI 학습 도우미입니다',
+              '스마트 학습 도우미입니다',
               style: TextStyle(
                 fontSize: 22,
                 fontWeight: FontWeight.w700,

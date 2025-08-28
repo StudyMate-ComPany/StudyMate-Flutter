@@ -27,7 +27,7 @@ class AITab extends StatelessWidget {
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
                           Text(
-                            'AI 도우미',
+                            '스마트 도우미',
                             style: Theme.of(context).textTheme.headlineSmall?.copyWith(
                               fontWeight: FontWeight.bold,
                             ),
@@ -102,7 +102,7 @@ class AITab extends StatelessWidget {
                         ),
                         const SizedBox(height: 8),
                         Text(
-                          'AI 학습 도우미와 대화를 시작해보세요',
+                          '스마트 학습 도우미와 대화를 시작해보세요',
                           style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                             color: Colors.grey[500],
                           ),

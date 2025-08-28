@@ -445,7 +445,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                             applicationVersion: '1.0.0',
                             applicationIcon: const Icon(Icons.school),
                             children: const [
-                              Text('AI 기반 학습 도우미로 학습 목표 달성을 도와드립니다.'),
+                              Text('스마트 학습 도우미로 학습 목표 달성을 도와드립니다.'),
                             ],
                           );
                         },

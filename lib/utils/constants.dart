@@ -6,7 +6,7 @@ class AppConstants {
   // App Info
   static const String appName = '스터디메이트';
   static const String appVersion = '1.0.0';
-  static const String appDescription = 'AI 기반 학습 도우미';
+  static const String appDescription = '스마트 학습 도우미';
   
   // Storage Keys
   static const String authTokenKey = 'auth_token';

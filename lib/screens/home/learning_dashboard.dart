@@ -35,7 +35,7 @@ class _LearningDashboardState extends State<LearningDashboard>
     WidgetsBinding.instance.addPostFrameCallback((_) {
       Future.delayed(const Duration(milliseconds: 1500), () {
         if (mounted) {
-          print('🚀 자동으로 AI 학습 설정 화면으로 이동');
+          print('🚀 자동으로 스마트 학습 설정 화면으로 이동');
           Navigator.push(
             context,
             MaterialPageRoute(
@@ -146,7 +146,7 @@ class _LearningDashboardState extends State<LearningDashboard>
             const SizedBox(height: 32),
             
             const Text(
-              'AI 학습 플래너와\n시작해보세요!',
+              '스마트 학습 플래너와\n시작해보세요!',
               textAlign: TextAlign.center,
               style: TextStyle(
                 fontSize: 28,

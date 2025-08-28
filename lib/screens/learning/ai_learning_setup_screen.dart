@@ -43,7 +43,7 @@ class _AILearningSetupScreenState extends State<AILearningSetupScreen>
     
     // 초기 환영 메시지
     _addAIMessage(
-      '안녕하세요! AI 학습 플래너입니다 📚\n\n'
+      '안녕하세요! 스마트 학습 플래너입니다 📚\n\n'
       '무엇을 공부하고 싶으신가요? 목표와 기간을 자유롭게 말씀해주세요.\n\n'
       '예시:\n'
       '• "토익 900점을 2달 안에 달성하고 싶어요"\n'
@@ -503,7 +503,7 @@ class _AILearningSetupScreenState extends State<AILearningSetupScreen>
             ),
             const SizedBox(width: 12),
             const Text(
-              'AI 학습 플래너',
+              '스마트 학습 플래너',
               style: TextStyle(
                 color: ModernTheme.textPrimary,
                 fontWeight: FontWeight.w700,

@@ -73,7 +73,7 @@ class _NewHomeScreenState extends State<NewHomeScreen>
             ),
             const SizedBox(width: 12),
             const Text(
-              'StudyMate AI',
+              'StudyMate',
               style: TextStyle(
                 fontSize: 20,
                 fontWeight: FontWeight.w700,
