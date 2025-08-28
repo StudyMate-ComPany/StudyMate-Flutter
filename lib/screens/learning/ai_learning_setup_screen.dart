@@ -417,17 +417,10 @@ class _AILearningSetupScreenState extends State<AILearningSetupScreen>
       
       final provider = Provider.of<LearningPlanProvider>(context, listen: false);
       
-      // 학습 플랜 생성
+      // 학습 플랜 생성 (새로운 메서드 사용)
       print('\n📝 Provider로 학습 플랜 생성 시도...');
-      final success = await provider.createLearningPlan(
-        goal: _generatedPlan!['goal']?.toString() ?? '',
-        subject: _generatedPlan!['subject']?.toString() ?? '',
-        level: _generatedPlan!['level']?.toString() ?? 'beginner',
-        durationDays: (_generatedPlan!['duration'] is int) 
-            ? _generatedPlan!['duration'] 
-            : int.tryParse(_generatedPlan!['duration']?.toString() ?? '30') ?? 30,
-        curriculum: _generatedPlan!['curriculum'] ?? {},
-      );
+      final plan = await provider.createLearningPlan(_generatedPlan!);
+      final success = plan != null;
       
       print('📊 학습 플랜 생성 결과: ${success ? '✅ 성공' : '❌ 실패'}');
       

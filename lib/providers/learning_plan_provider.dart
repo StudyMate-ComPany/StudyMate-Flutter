@@ -1,20 +1,64 @@
 import 'package:flutter/foundation.dart';
 import 'package:dio/dio.dart';
 import 'dart:convert';
+import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import '../models/learning_plan.dart';
 import '../services/api_service.dart';
 import '../services/local_storage_service.dart';
 import '../services/notification_service.dart';
+import '../services/chatgpt_session_service.dart';
+import '../services/daily_content_service.dart';
 
 enum LearningPlanState { initial, loading, loaded, error }
 
 class LearningPlanProvider extends ChangeNotifier {
   final ApiService _apiService = ApiService();
   final Dio _dio = Dio();
+  late final ChatGPTSessionService _chatGPTService;
+  late final DailyContentService _dailyContentService;
+  late final FlutterLocalNotificationsPlugin _notifications;
   
   // OpenAI API 설정 (실제 운영시 서버에서 관리)
   static const String _openAIApiKey = 'YOUR_OPENAI_API_KEY';
   static const String _openAIEndpoint = 'https://api.openai.com/v1/chat/completions';
+  
+  LearningPlanProvider() {
+    _initializeServices();
+  }
+  
+  Future<void> _initializeServices() async {
+    // ChatGPT 서비스 초기화
+    _chatGPTService = ChatGPTSessionService(apiKey: _openAIApiKey);
+    
+    // 알림 초기화
+    _notifications = FlutterLocalNotificationsPlugin();
+    const androidSettings = AndroidInitializationSettings('@mipmap/ic_launcher');
+    const iosSettings = DarwinInitializationSettings();
+    const settings = InitializationSettings(
+      android: androidSettings,
+      iOS: iosSettings,
+    );
+    await _notifications.initialize(
+      settings,
+      onDidReceiveNotificationResponse: _handleNotificationResponse,
+    );
+    
+    // 일일 콘텐츠 서비스 초기화
+    _dailyContentService = DailyContentService(
+      chatGPTService: _chatGPTService,
+      notifications: _notifications,
+    );
+  }
+  
+  void _handleNotificationResponse(NotificationResponse response) {
+    // 알림 클릭 시 처리
+    final payload = response.payload;
+    if (payload != null) {
+      // 해당 콘텐츠로 이동
+      print('🔔 알림 클릭: $payload');
+      // TODO: 라우팅 처리
+    }
+  }
   
   LearningPlanState _state = LearningPlanState.initial;
   LearningPlanState get state => _state;
@@ -27,6 +71,72 @@ class LearningPlanProvider extends ChangeNotifier {
   
   String? _errorMessage;
   String? get errorMessage => _errorMessage;
+  
+  // 학습 플랜 생성 및 콘텐츠 초기화
+  Future<LearningPlan?> createLearningPlan(Map<String, dynamic> planData) async {
+    try {
+      _state = LearningPlanState.loading;
+      notifyListeners();
+      
+      // 플랜 생성
+      final plan = LearningPlan(
+        id: DateTime.now().millisecondsSinceEpoch.toString(),
+        userId: 'current_user',
+        goal: planData['goal'],
+        subject: planData['subject'],
+        level: planData['level'],
+        durationDays: planData['duration'],
+        startDate: DateTime.now(),
+        endDate: DateTime.now().add(Duration(days: planData['duration'])),
+        status: PlanStatus.active,
+        planType: PlanType.free,
+        curriculum: planData['curriculum'] ?? {},
+        dailyTasks: [],
+        metadata: planData,
+      );
+      
+      // ChatGPT 세션 초기화
+      await _chatGPTService.initializeSession(plan.id, planData);
+      
+      // 첫 주 콘텐츠 생성
+      final weeklyContent = await _dailyContentService.generateWeeklyContent(
+        plan,
+        DateTime.now(),
+      );
+      
+      // 플랜에 일일 태스크 추가
+      final updatedPlan = LearningPlan(
+        id: plan.id,
+        userId: plan.userId,
+        goal: plan.goal,
+        subject: plan.subject,
+        level: plan.level,
+        durationDays: plan.durationDays,
+        startDate: plan.startDate,
+        endDate: plan.endDate,
+        status: plan.status,
+        planType: plan.planType,
+        curriculum: plan.curriculum,
+        dailyTasks: weeklyContent,
+        metadata: plan.metadata,
+      );
+      
+      // 플랜 저장
+      _plans.add(updatedPlan);
+      _activePlan = updatedPlan;
+      await _savePlansLocally();
+      
+      _state = LearningPlanState.loaded;
+      notifyListeners();
+      
+      return updatedPlan;
+    } catch (e) {
+      _errorMessage = e.toString();
+      _state = LearningPlanState.error;
+      notifyListeners();
+      return null;
+    }
+  }
   
   // ChatGPT를 사용한 학습 플랜 생성
   Future<Map<String, dynamic>> generatePlanWithAI(String userInput) async {
@@ -524,6 +634,151 @@ Make sure to:
       debugPrint('Daily task completed!');
     }
     
+    notifyListeners();
+    await _savePlansLocally();
+  }
+  
+  // 작업 완료 업데이트 (quiz_screen에서 사용)
+  Future<void> updateTaskCompletion(
+    String planId,
+    DateTime date,
+    String timeOfDay,
+    bool completed,
+  ) async {
+    if (_activePlan == null || _activePlan!.id != planId) return;
+    
+    // 해당 날짜의 태스크 찾기
+    final taskIndex = _activePlan!.dailyTasks.indexWhere((task) =>
+      task.date.year == date.year &&
+      task.date.month == date.month &&
+      task.date.day == date.day
+    );
+    
+    if (taskIndex == -1) return;
+    
+    // 시간대별 완료 상태 업데이트
+    _activePlan!.dailyTasks[taskIndex].completionStatus[timeOfDay] = completed;
+    
+    // 전체 완료 체크
+    final allCompleted = _activePlan!.dailyTasks[taskIndex]
+        .completionStatus.values.every((v) => v == true);
+    
+    if (allCompleted) {
+      debugPrint('✅ 오늘의 모든 학습이 완료되었습니다!');
+    }
+    
+    notifyListeners();
+    await _savePlansLocally();
+  }
+  
+  // 다음 주 콘텐츠 생성
+  Future<void> generateNextWeekContent() async {
+    if (_activePlan == null) return;
+    
+    try {
+      _state = LearningPlanState.loading;
+      notifyListeners();
+      
+      // 마지막 태스크의 날짜 확인
+      if (_activePlan!.dailyTasks.isEmpty) return;
+      
+      final lastTask = _activePlan!.dailyTasks.last;
+      final nextWeekStart = lastTask.date.add(const Duration(days: 1));
+      
+      // 다음 주 콘텐츠 생성
+      final nextWeekContent = await _dailyContentService.generateWeeklyContent(
+        _activePlan!,
+        nextWeekStart,
+      );
+      
+      // 플랜에 추가
+      _activePlan!.dailyTasks.addAll(nextWeekContent);
+      
+      await _savePlansLocally();
+      
+      _state = LearningPlanState.loaded;
+      notifyListeners();
+      
+      debugPrint('📅 다음 주 학습 콘텐츠가 준비되었습니다!');
+    } catch (e) {
+      _errorMessage = '콘텐츠 생성 실패: $e';
+      _state = LearningPlanState.error;
+      notifyListeners();
+    }
+  }
+  
+  // 알림 권한 요청
+  Future<bool> requestNotificationPermissions() async {
+    return await _dailyContentService.requestNotificationPermissions();
+  }
+  
+  // 플랜 일시정지
+  Future<void> pausePlan(String planId) async {
+    final planIndex = _plans.indexWhere((p) => p.id == planId);
+    if (planIndex == -1) return;
+    
+    // 알림 취소
+    await _dailyContentService.cancelPlanNotifications(planId);
+    
+    // 상태 업데이트
+    _plans[planIndex] = LearningPlan(
+      id: _plans[planIndex].id,
+      userId: _plans[planIndex].userId,
+      goal: _plans[planIndex].goal,
+      subject: _plans[planIndex].subject,
+      level: _plans[planIndex].level,
+      durationDays: _plans[planIndex].durationDays,
+      startDate: _plans[planIndex].startDate,
+      endDate: _plans[planIndex].endDate,
+      status: PlanStatus.paused,
+      planType: _plans[planIndex].planType,
+      curriculum: _plans[planIndex].curriculum,
+      dailyTasks: _plans[planIndex].dailyTasks,
+      metadata: _plans[planIndex].metadata,
+    );
+    
+    if (_activePlan?.id == planId) {
+      _activePlan = _plans[planIndex];
+    }
+    
+    await _savePlansLocally();
+    notifyListeners();
+  }
+  
+  // 플랜 재개
+  Future<void> resumePlan(String planId) async {
+    final planIndex = _plans.indexWhere((p) => p.id == planId);
+    if (planIndex == -1) return;
+    
+    // 알림 재스케줄
+    for (final task in _plans[planIndex].dailyTasks) {
+      if (task.date.isAfter(DateTime.now())) {
+        await _dailyContentService.scheduleNotifications(task, task.date);
+      }
+    }
+    
+    // 상태 업데이트
+    _plans[planIndex] = LearningPlan(
+      id: _plans[planIndex].id,
+      userId: _plans[planIndex].userId,
+      goal: _plans[planIndex].goal,
+      subject: _plans[planIndex].subject,
+      level: _plans[planIndex].level,
+      durationDays: _plans[planIndex].durationDays,
+      startDate: _plans[planIndex].startDate,
+      endDate: _plans[planIndex].endDate,
+      status: PlanStatus.active,
+      planType: _plans[planIndex].planType,
+      curriculum: _plans[planIndex].curriculum,
+      dailyTasks: _plans[planIndex].dailyTasks,
+      metadata: _plans[planIndex].metadata,
+    );
+    
+    if (_activePlan?.id == planId) {
+      _activePlan = _plans[planIndex];
+    }
+    
+    await _savePlansLocally();
     notifyListeners();
   }
   
