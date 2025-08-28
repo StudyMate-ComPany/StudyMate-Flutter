@@ -418,7 +418,7 @@ $subject 과목의 "$topic"에 대해 $level 수준으로 설명해주세요.
   }
 
   /// OpenAI API 요청 전송  
-  Future<String> _sendRequest(String prompt, {String model = 'gpt-5-nano'}) async {
+  Future<String> _sendRequest(String prompt, {String model = 'gpt-3.5-turbo'}) async {
     print('\n' + '━' * 60);
     print('🚀 _sendRequest 호출 - OpenAI API 직접 호출 시도');
     print('모델: $model');
@@ -502,7 +502,7 @@ Default to Korean responses unless English is more appropriate.''',
             },
           ],
           'temperature': 0.7,
-          'max_tokens': 4000,
+          'max_completion_tokens': 4000,
         },
       );
 

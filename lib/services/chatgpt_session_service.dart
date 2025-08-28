@@ -211,7 +211,7 @@ ${_getTimeKorean(timeOfDay)} 학습 문제를 생성해주세요.
         'model': 'gpt-4',
         'messages': messages,
         'temperature': 0.7,
-        'max_tokens': 1000,
+        'max_completion_tokens': 1000,
         'response_format': {'type': 'json_object'},
       }),
     );
