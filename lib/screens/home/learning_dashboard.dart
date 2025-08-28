@@ -30,21 +30,6 @@ class _LearningDashboardState extends State<LearningDashboard>
       duration: const Duration(seconds: 2),
     )..repeat(reverse: true);
     _loadData();
-    
-    // 자동으로 AI 학습 설정 화면으로 이동 (버튼 클릭 문제 임시 해결)
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      Future.delayed(const Duration(milliseconds: 1500), () {
-        if (mounted) {
-          print('🚀 자동으로 스마트 학습 설정 화면으로 이동');
-          Navigator.push(
-            context,
-            MaterialPageRoute(
-              builder: (context) => const AILearningSetupScreen(),
-            ),
-          );
-        }
-      });
-    });
   }
   
   @override

@@ -210,16 +210,9 @@ class _AILearningSetupScreenState extends State<AILearningSetupScreen>
       '⏰ **하루 학습 시간**: ${analysis['hoursPerDay']}시간\n'
       '📚 **학습 유형**: ${_getStudyTypeKorean(analysis['studyType'])}\n'
       '━━━━━━━━━━━━━━━━━━━━━━━━━━\n\n'
-      '이 정보를 바탕으로 맞춤형 학습 플랜을 생성하고 있습니다...\n'
-      '잠시 후 메인 화면으로 자동 이동됩니다! 🚀',
+      '이 정보를 바탕으로 맞춤형 학습 플랜을 생성했습니다!\n'
+      '아래 "학습 시작하기" 버튼을 눌러 시작하세요! 🚀',
     );
-
-    // 자동으로 학습 플랜 생성 및 메인 화면 이동
-    Future.delayed(const Duration(seconds: 2), () {
-      if (mounted && _planGenerated && _generatedPlan != null) {
-        _startLearningPlan();
-      }
-    });
   }
   
   String _getLevelKorean(String level) {
