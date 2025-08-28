@@ -217,7 +217,7 @@ Make sure to:
               'content': userInput
             }
           ],
-          'temperature': 0.7,
+          'temperature': 1,
           'max_completion_tokens': 2000,
           'response_format': { 'type': 'json_object' }
         },

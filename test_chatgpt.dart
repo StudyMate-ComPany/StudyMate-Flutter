@@ -33,8 +33,9 @@ void main() async {
             'content': 'Analyze: "koreahistory first grade three year" and extract subject, goal, and duration in JSON format',
           },
         ],
-        'temperature': 0.7,
+        'temperature': 1,
         'max_completion_tokens': 200,
+        'response_format': {'type': 'json_object'},
       },
     );
     
