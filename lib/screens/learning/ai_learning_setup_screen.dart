@@ -31,6 +31,10 @@ class _AILearningSetupScreenState extends State<AILearningSetupScreen>
   @override
   void initState() {
     super.initState();
+    print('\n🔷 AILearningSetupScreen initState() 호출됨!');
+    print('  - 화면이 새로 생성되었습니다');
+    print('━' * 50);
+    
     _animationController = AnimationController(
       vsync: this,
       duration: const Duration(seconds: 2),
@@ -55,6 +59,9 @@ class _AILearningSetupScreenState extends State<AILearningSetupScreen>
   
   @override
   void dispose() {
+    print('\n🔶 AILearningSetupScreen dispose() 호출됨!');
+    print('  - 화면이 제거됩니다');
+    print('━' * 50);
     _messageController.dispose();
     _scrollController.dispose();
     _animationController.dispose();
@@ -428,7 +435,9 @@ class _AILearningSetupScreenState extends State<AILearningSetupScreen>
         if (success) {
           print('🏠 메인 화면으로 이동...');
           // 현재 화면을 닫고 이전 화면(홈 화면)으로 돌아감
+          print('\n🔸 Navigator.pop() 호출 - AI 학습 설정 화면을 닫습니다');
           Navigator.of(context).pop();
+          print('🔸 Navigator.pop() 호출 완료');
           
           // 성공 메시지 표시
           ScaffoldMessenger.of(context).showSnackBar(

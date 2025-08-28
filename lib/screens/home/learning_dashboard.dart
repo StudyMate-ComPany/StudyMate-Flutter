@@ -25,6 +25,8 @@ class _LearningDashboardState extends State<LearningDashboard>
   @override
   void initState() {
     super.initState();
+    print('\n🎆 LearningDashboard initState() 호출됨!');
+    print('━' * 50);
     _animationController = AnimationController(
       vsync: this,
       duration: const Duration(seconds: 2),
@@ -34,6 +36,8 @@ class _LearningDashboardState extends State<LearningDashboard>
   
   @override
   void dispose() {
+    print('\n🎆 LearningDashboard dispose() 호출됨!');
+    print('━' * 50);
     _animationController.dispose();
     super.dispose();
   }
@@ -158,14 +162,20 @@ class _LearningDashboardState extends State<LearningDashboard>
             
             ElevatedButton.icon(
               onPressed: () {
-                print('🚀 학습 플랜 만들기 버튼 클릭됨!');
+                print('\n🚀 [학습 플랜 만들기] 버튼 클릭됨!');
+                print('  - AILearningSetupScreen으로 이동합니다');
+                print('━' * 50);
                 HapticFeedback.mediumImpact();
                 Navigator.push(
                   context,
                   MaterialPageRoute(
                     builder: (context) => const AILearningSetupScreen(),
                   ),
-                );
+                ).then((value) {
+                  print('\n🎆 AILearningSetupScreen에서 돌아옴');
+                  print('  - 반환값: $value');
+                  print('━' * 50);
+                });
               },
               icon: const Icon(Icons.rocket_launch, color: Colors.white),
               label: const Text(
