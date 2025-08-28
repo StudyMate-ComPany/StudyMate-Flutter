@@ -34,7 +34,7 @@ void main() async {
           },
         ],
         'temperature': 1,
-        'max_completion_tokens': 200,
+        'max_completion_tokens': 2000,
         'response_format': {'type': 'json_object'},
       },
     );

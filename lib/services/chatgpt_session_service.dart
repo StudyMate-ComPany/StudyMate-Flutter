@@ -205,7 +205,7 @@ quiz 타입의 경우 questions 배열의 각 문제는 다음 형식을 따라�
             'model': 'gpt-5-nano',
             'messages': messages,
             'temperature': 1,
-            'max_completion_tokens': 1000,
+            'max_completion_tokens': 2000,
             'response_format': {'type': 'json_object'},
           }),
         );
@@ -214,6 +214,8 @@ quiz 타입의 경우 questions 배열의 각 문제는 다음 형식을 따라�
           final data = json.decode(response.body);
           final content = data['choices'][0]['message']['content'];
           print('✅ ChatGPT API 호출 성공! (시도 $attempt/$maxRetries)');
+          print('📥 응답 내용: $content');
+          print('📊 응답 길이: ${content.length}');
           return content;
         }
         

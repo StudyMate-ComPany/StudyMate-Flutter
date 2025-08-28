@@ -9,6 +9,7 @@ import '../services/local_storage_service.dart';
 import '../services/notification_service.dart';
 import '../services/chatgpt_session_service.dart';
 import '../services/daily_content_service.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 
 enum LearningPlanState { initial, loading, loaded, error }
 
@@ -20,10 +21,8 @@ class LearningPlanProvider extends ChangeNotifier {
   late final FlutterLocalNotificationsPlugin _notifications;
   
   // OpenAI API 설정 (실제 운영시 서버에서 관리하거나 env 파일 사용)
-  static const String _openAIApiKey = String.fromEnvironment(
-    'OPENAI_API_KEY', 
-    defaultValue: 'YOUR_OPENAI_API_KEY'
-  );
+  // API 키는 dotenv에서 직접 가져옴
+  String get _openAIApiKey => dotenv.env['OPENAI_API_KEY'] ?? '';
   static const String _openAIEndpoint = 'https://api.openai.com/v1/chat/completions';
   
   LearningPlanProvider() {
@@ -32,6 +31,7 @@ class LearningPlanProvider extends ChangeNotifier {
   
   Future<void> _initializeServices() async {
     // ChatGPT 서비스 초기화
+    print('🔑 LearningPlanProvider API Key: ${_openAIApiKey.substring(0, 20)}...');
     _chatGPTService = ChatGPTSessionService(apiKey: _openAIApiKey);
     
     // 알림 초기화
