@@ -7,24 +7,29 @@
 
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:provider/provider.dart';
 
-import 'package:studymate_flutter/main.dart';
+import 'package:studymate/main.dart';
+import 'package:studymate/providers/auth_provider.dart';
+import 'package:studymate/providers/study_provider.dart';
+import 'package:studymate/providers/ai_provider.dart';
 
 void main() {
-  testWidgets('Counter increments smoke test', (WidgetTester tester) async {
-    // Build our app and trigger a frame.
-    await tester.pumpWidget(const MyApp());
+  testWidgets('스터디메이트 앱 스모크 테스트', (WidgetTester tester) async {
+    // 앱 빌드 및 프레임 트리거
+    await tester.pumpWidget(
+      MultiProvider(
+        providers: [
+          ChangeNotifierProvider(create: (_) => AuthProvider()),
+          ChangeNotifierProvider(create: (_) => StudyProvider()),
+          ChangeNotifierProvider(create: (_) => AIProvider()),
+        ],
+        child: const StudyMateApp(),
+      ),
+    );
 
-    // Verify that our counter starts at 0.
-    expect(find.text('0'), findsOneWidget);
-    expect(find.text('1'), findsNothing);
-
-    // Tap the '+' icon and trigger a frame.
-    await tester.tap(find.byIcon(Icons.add));
-    await tester.pump();
-
-    // Verify that our counter has incremented.
-    expect(find.text('0'), findsNothing);
-    expect(find.text('1'), findsOneWidget);
+    // 로그인 화면이 로드되는지 확인
+    expect(find.text('스터디메이트'), findsOneWidget);
+    expect(find.text('AI 기반 학습 도우미'), findsOneWidget);
   });
 }

@@ -1,219 +1,192 @@
-# StudyMate Flutter App
+# 📱 StudyMate Flutter - iOS 앱 실행 가이드
 
-AI-powered learning platform mobile application built with Flutter.
+## 🎯 프로젝트 정보
+- **앱 이름**: 스터디메이트
+- **Bundle ID**: com.studymate.app
+- **최소 iOS 버전**: iOS 13.0
+- **Flutter SDK**: 3.5.4+
 
-## 📱 Overview
+## 📋 사전 요구사항
 
-StudyMate is a comprehensive learning management platform that helps students enhance their learning experience through AI-powered features. This Flutter application provides a mobile interface for both iOS and Android platforms.
-
-## ✨ Features
-
-### Core Features (MVP)
-- **User Authentication**
-  - Login/Register
-  - Guest mode (Skip)
-  - Secure token management
-
-- **Home Dashboard**
-  - Learning statistics
-  - Daily goals tracking
-  - Progress visualization
-  - Quick actions menu
-
-- **AI-Powered Learning**
-  - Generate summaries from text/links
-  - Create personalized quizzes
-  - Intelligent content recommendations
-
-- **Live Collaboration**
-  - Create/Join quiz rooms
-  - Real-time multiplayer quizzes
-  - Live chat during sessions
-  - Instant rankings
-
-- **Statistics & Analytics**
-  - Learning patterns analysis
-  - Strength/weakness identification
-  - Peer comparison
-  - Progress tracking
-
-## 🚀 Getting Started
-
-### Prerequisites
-- Flutter SDK (3.0 or higher)
-- Dart SDK (3.0 or higher)
-- iOS development setup (for iOS builds)
-  - Xcode 14.0 or higher
-  - iOS 12.0 or higher
-- Android development setup (for Android builds)
-  - Android Studio
-  - Android SDK
-  - Minimum SDK: API 21 (Android 5.0)
-
-### Installation
-
-1. **Clone the repository**
+### 필수 설치 항목
 ```bash
-git clone https://github.com/StudyMate-Company/StudyMate-Flutter.git
-cd StudyMate-Flutter
+# Xcode (App Store에서 설치)
+# Flutter SDK
+# CocoaPods
+brew install cocoapods
 ```
 
-2. **Install dependencies**
+## 🚀 빠른 시작
+
+### 1. 의존성 설치
 ```bash
+# Flutter 패키지 설치
 flutter pub get
+
+# iOS 의존성 설치
+cd ios
+pod install
+cd ..
 ```
 
-3. **Configure API endpoint**
-
-Update the API base URL in `lib/core/constants/api_constants.dart`:
-```dart
-static const String baseUrl = 'http://your-api-url/api';
-```
-
-4. **Run the app**
+### 2. iOS 시뮬레이터 실행
 ```bash
-# For iOS
-flutter run -d ios
+# 사용 가능한 시뮬레이터 확인
+flutter devices
 
-# For Android
-flutter run -d android
+# iOS 시뮬레이터 실행
+flutter run -d iphone
+```
 
-# For all available devices
+### 3. 실제 기기에서 실행
+```bash
+# 기기 연결 후
+flutter run -d <device-id>
+```
+
+## 🛠️ 개발 명령어
+
+### 빌드 및 실행
+```bash
+# Debug 모드 실행
+flutter run
+
+# Release 모드 실행
+flutter run --release
+
+# 프로필 모드 실행
+flutter run --profile
+```
+
+### 빌드만 하기
+```bash
+# iOS 앱 빌드 (시뮬레이터용)
+flutter build ios --simulator
+
+# iOS 앱 빌드 (실제 기기용)
+flutter build ios --no-codesign
+```
+
+### 정리 및 재빌드
+```bash
+# 캐시 정리
+flutter clean
+
+# iOS 관련 정리
+cd ios
+pod deintegrate
+pod cache clean --all
+rm -rf ~/Library/Developer/Xcode/DerivedData
+cd ..
+
+# 재설치
+flutter pub get
+cd ios && pod install && cd ..
+```
+
+## 📱 Xcode에서 실행
+
+1. Xcode 열기
+```bash
+open ios/Runner.xcworkspace
+```
+
+2. 상단 툴바에서 시뮬레이터 또는 실제 기기 선택
+3. ▶️ 버튼 클릭하여 실행
+
+## 🔧 일반적인 문제 해결
+
+### CocoaPods 관련 오류
+```bash
+cd ios
+rm -rf Pods Podfile.lock
+pod install --repo-update
+cd ..
+```
+
+### 빌드 오류
+```bash
+flutter clean
+flutter pub get
+cd ios
+pod install
+cd ..
 flutter run
 ```
 
-## 📂 Project Structure
-
-```
-lib/
-├── core/               # Core functionality
-│   ├── constants/      # App constants
-│   ├── services/       # API services
-│   └── utils/          # Utility functions
-├── models/             # Data models
-├── providers/          # State management
-├── screens/            # UI screens
-│   ├── auth/          # Authentication screens
-│   ├── home/          # Home dashboard
-│   ├── study/         # Study features
-│   ├── quiz/          # Quiz screens
-│   ├── collaboration/ # Live quiz rooms
-│   └── stats/         # Statistics
-├── widgets/            # Reusable widgets
-└── main.dart          # App entry point
-```
-
-## 🛠️ Technologies Used
-
-- **Flutter**: Cross-platform mobile framework
-- **Dart**: Programming language
-- **Provider**: State management
-- **Dio**: HTTP client
-- **flutter_secure_storage**: Secure storage for tokens
-- **shared_preferences**: Local storage
-- **intl**: Internationalization
-
-## 🔧 Configuration
-
-### API Configuration
-The app connects to the StudyMate API backend. Configure the endpoints in:
-- `lib/core/constants/api_constants.dart`
-
-### Authentication
-The app uses JWT tokens for authentication. Tokens are securely stored using flutter_secure_storage.
-
-## 📱 Screens
-
-### Authentication Flow
-1. **Splash Screen**: App introduction
-2. **Login Screen**: User authentication
-3. **Register Screen**: New user registration
-4. **Guest Mode**: Skip authentication
-
-### Main Features
-1. **Home Dashboard**: Overview and quick actions
-2. **Study Summary**: AI-generated summaries
-3. **Quiz Center**: Create and take quizzes
-4. **Live Rooms**: Multiplayer quiz rooms
-5. **Statistics**: Learning analytics
-6. **Profile**: User settings
-
-## 🎨 UI/UX Design
-
-The app follows Material Design 3 guidelines with:
-- Clean and intuitive interface
-- Consistent color scheme
-- Responsive layouts
-- Smooth animations
-- Dark mode support (planned)
-
-## 🧪 Testing
-
-Run tests using:
+### 시뮬레이터가 안 보일 때
 ```bash
-flutter test
+# Xcode 열기
+open -a Simulator
+
+# 시뮬레이터 리셋
+xcrun simctl shutdown all
+xcrun simctl erase all
 ```
 
-## 📦 Building for Production
+## 📝 프로젝트 구조
 
-### Android
+```
+studymate/
+├── lib/                    # Dart 소스 코드
+│   └── main.dart          # 앱 진입점
+├── ios/                   # iOS 플랫폼 코드
+│   ├── Runner/           # iOS 앱 설정
+│   │   ├── Info.plist   # 앱 권한 및 설정
+│   │   └── Assets.xcassets # 앱 아이콘 및 리소스
+│   └── Podfile          # CocoaPods 의존성
+├── android/              # Android 플랫폼 코드
+└── pubspec.yaml         # Flutter 의존성
+
+```
+
+## 🔑 주요 기능
+
+- **AI 학습 도우미**: 24시간 실시간 질의응답
+- **스마트 분석**: 학습 패턴 분석 및 리포트
+- **스터디 그룹**: 온라인 스터디룸 및 화면 공유
+- **맞춤형 문제**: 수준별 문제 자동 생성
+
+## 📦 사용된 주요 패키지
+
+- **네트워킹**: dio, http
+- **상태 관리**: provider
+- **저장소**: shared_preferences, path_provider
+- **UI/UX**: shimmer, lottie, cached_network_image
+- **유틸리티**: intl, url_launcher, connectivity_plus
+- **권한**: permission_handler
+- **이미지**: image_picker
+
+## 🚨 권한 설정
+
+앱에서 요청하는 권한:
+- 📷 카메라: 프로필 사진 촬영
+- 🖼️ 사진 라이브러리: 프로필 사진 선택
+- 🎤 마이크: 음성 녹음 기능
+- 📊 사용자 추적: 맞춤형 학습 추천
+
+## 🔄 업데이트 방법
+
 ```bash
-flutter build apk --release
-# or for app bundle
-flutter build appbundle --release
+# Flutter SDK 업데이트
+flutter upgrade
+
+# 패키지 업데이트
+flutter pub upgrade
+
+# iOS 의존성 업데이트
+cd ios
+pod update
+cd ..
 ```
 
-### iOS
-```bash
-flutter build ios --release
-```
+## 📞 지원
 
-## 🚀 Deployment
+문제가 발생하면:
+1. `flutter doctor -v` 실행하여 환경 확인
+2. GitHub Issues에 문제 제보
+3. 개발팀 문의: dev@studymate.app
 
-### Android
-1. Build the release APK/AAB
-2. Upload to Google Play Console
-3. Configure app details and screenshots
-4. Submit for review
+---
 
-### iOS
-1. Build the release IPA
-2. Upload to App Store Connect
-3. Configure app details and screenshots
-4. Submit for review
-
-## 🤝 Contributing
-
-1. Fork the repository
-2. Create your feature branch (`git checkout -b feature/AmazingFeature`)
-3. Commit your changes (`git commit -m 'Add some AmazingFeature'`)
-4. Push to the branch (`git push origin feature/AmazingFeature`)
-5. Open a Pull Request
-
-## 📄 License
-
-This project is proprietary and confidential.
-
-## 📞 Support
-
-For support, email support@studymate.com
-
-## 🔗 Related Projects
-
-- [StudyMate API](https://github.com/StudyMate-Company/StudyMate-API) - Backend API server
-- StudyMate Web (Coming soon) - Web application
-
-## 📱 Screenshots
-
-(Screenshots will be added soon)
-
-## 🎯 Roadmap
-
-- [ ] Push notifications
-- [ ] Offline mode
-- [ ] Dark theme
-- [ ] Multi-language support
-- [ ] Social features
-- [ ] Advanced analytics
-- [ ] Voice input
-- [ ] AR features
+마지막 업데이트: 2025-08-22
