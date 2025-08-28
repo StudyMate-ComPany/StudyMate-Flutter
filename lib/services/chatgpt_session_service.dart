@@ -202,7 +202,7 @@ quiz 타입의 경우 questions 배열의 각 문제는 다음 형식을 따라�
             'Content-Type': 'application/json',
           },
           body: json.encode({
-            'model': 'gpt-4',
+            'model': 'gpt-5-nano',
             'messages': messages,
             'temperature': 0.7,
             'max_completion_tokens': 1000,

@@ -156,32 +156,40 @@ class _AILearningSetupScreenState extends State<AILearningSetupScreen>
         print('  - 기간: ${analysis['duration']}일');
         print('  - 수준: ${analysis['level']}');
       } else {
-        // ChatGPT 실패 시 기본값 사용
-        print('\n⚠️ ChatGPT 분석 실패 - 기본값 사용');
-        analysis = {
-          'subject': '자유 학습',
-          'goal': userInput,
-          'level': 'beginner',
-          'duration': 30,
-          'hoursPerDay': 2,
-          'studyType': 'general',
-        };
+        // ChatGPT 실패 시 에러 표시
+        print('\n❌ ChatGPT 분석 실패');
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text('ChatGPT 분석에 실패했습니다. 다시 시도해주세요.'),
+              backgroundColor: Colors.red,
+            ),
+          );
+        }
+        setState(() {
+          _isTyping = false;
+          _planGenerated = false;
+        });
+        return; // 기본값 사용하지 않고 종료
       }
     } catch (e) {
       print('\n❌ analyzeUserInput 예외 발생!');
       print('예외: $e');
-      print('📎 기본 분석 결과로 대체합니다.');
       
-      // 오류 시 사용자 입력 그대로 사용하되, 필요한 필드를 모두 포함
-      analysis = {
-        'goal': userInput,
-        'subject': '자유 학습',
-        'level': 'beginner',
-        'duration': 30,
-        'hoursPerDay': 2,
-        'studyType': 'general',
-        'additionalInfo': '기본 설정으로 생성됨 (ChatGPT 분석 실패)',
-      };
+      // 오류 시 에러 표시하고 종료
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('오류가 발생했습니다: ${e.toString()}'),
+            backgroundColor: Colors.red,
+          ),
+        );
+      }
+      setState(() {
+        _isTyping = false;
+        _planGenerated = false;
+      });
+      return; // 기본값 사용하지 않고 종료
     }
     
     setState(() {

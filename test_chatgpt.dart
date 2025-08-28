@@ -26,7 +26,7 @@ void main() async {
         },
       ),
       data: {
-        'model': 'gpt-3.5-turbo',
+        'model': 'gpt-5-nano',
         'messages': [
           {
             'role': 'user',

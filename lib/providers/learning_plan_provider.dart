@@ -172,7 +172,7 @@ class LearningPlanProvider extends ChangeNotifier {
           },
         ),
         data: {
-          'model': 'gpt-4',
+          'model': 'gpt-5-nano',
           'messages': [
             {
               'role': 'system',
