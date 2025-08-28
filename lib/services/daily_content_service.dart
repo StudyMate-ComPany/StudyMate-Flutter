@@ -125,7 +125,12 @@ class DailyContentService {
     );
   }
   
-  // 알림 스케줄링
+  // 알림 스케줄링 (public 메소드)
+  Future<void> scheduleNotifications(DailyTask task, DateTime date) async {
+    return _scheduleNotifications(task, date);
+  }
+
+  // 알림 스케줄링 (internal)
   Future<void> _scheduleNotifications(DailyTask task, DateTime date) async {
     // 오전 9시 알림
     await _scheduleNotification(
@@ -187,7 +192,7 @@ class DailyContentService {
       sound: 'default',
     );
     
-    const details = NotificationDetails(
+    final details = NotificationDetails(
       android: androidDetails,
       iOS: iosDetails,
     );
@@ -232,32 +237,78 @@ class DailyContentService {
     return tasks;
   }
   
-  // 주제 분배
+  // 주제 분배 (개선된 버전)
   List<List<String>> _distributeTopics(
     Map<String, dynamic> curriculum,
     int days,
   ) {
-    final allTopics = <String>[];
-    
-    // 커리큘럼에서 모든 주제 추출
-    curriculum.forEach((week, topics) {
-      if (topics is List) {
-        allTopics.addAll(topics.map((t) => t.toString()));
-      }
-    });
-    
-    // 일별로 균등 분배
-    final topicsPerDay = (allTopics.length / days).ceil();
     final distributed = <List<String>>[];
     
-    for (int i = 0; i < days; i++) {
-      final start = i * topicsPerDay;
-      final end = min((i + 1) * topicsPerDay, allTopics.length);
+    try {
+      // 커리큘럼에서 주제 추출
+      List<String> allTopics = [];
       
-      if (start < allTopics.length) {
-        distributed.add(allTopics.sublist(start, end));
-      } else {
-        distributed.add([]);
+      // weekly_breakdown에서 주제 추출
+      if (curriculum['weekly_breakdown'] != null) {
+        final weeks = curriculum['weekly_breakdown'] as List;
+        for (var week in weeks) {
+          if (week is Map && week['topics'] is List) {
+            final topics = (week['topics'] as List).map((t) => t.toString()).toList();
+            allTopics.addAll(topics);
+          }
+        }
+      }
+      
+      // 다른 형태의 커리큘럼에서 주제 추출
+      if (allTopics.isEmpty) {
+        curriculum.forEach((key, value) {
+          if (value is List && key != 'weekly_breakdown') {
+            allTopics.addAll(value.map((t) => t.toString()));
+          } else if (value is Map && value['topics'] is List) {
+            allTopics.addAll((value['topics'] as List).map((t) => t.toString()));
+          }
+        });
+      }
+      
+      // 기본 주제가 없는 경우 생성
+      if (allTopics.isEmpty) {
+        allTopics = List.generate(days, (index) => '학습 주제 ${index + 1}');
+      }
+      
+      print('📋 추출된 주제: ${allTopics.length}개 - ${allTopics.take(3).join(', ')}...');
+      
+      // 일별로 균등 분배
+      for (int i = 0; i < days; i++) {
+        if (i < allTopics.length) {
+          // 각 일자에 1-2개 주제 할당
+          final topicsForDay = <String>[];
+          
+          // 기본 주제
+          topicsForDay.add(allTopics[i % allTopics.length]);
+          
+          // 추가 주제 (복습 또는 심화)
+          if (i > 0 && allTopics.length > 1) {
+            final reviewTopicIndex = (i - 1) % allTopics.length;
+            if (reviewTopicIndex != i % allTopics.length) {
+              topicsForDay.add('${allTopics[reviewTopicIndex]} 복습');
+            }
+          }
+          
+          distributed.add(topicsForDay);
+        } else {
+          // 주제가 부족한 경우 이전 주제 복습
+          final reviewIndex = i % allTopics.length;
+          distributed.add(['${allTopics[reviewIndex]} 심화']);
+        }
+      }
+      
+      print('📅 ${days}일간 주제 분배 완료');
+      
+    } catch (e) {
+      print('❌ 주제 분배 오류: $e');
+      // 오류 발생 시 기본 주제 생성
+      for (int i = 0; i < days; i++) {
+        distributed.add(['Day ${i + 1} 학습']);
       }
     }
     

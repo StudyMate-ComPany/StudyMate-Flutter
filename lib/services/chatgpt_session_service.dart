@@ -29,28 +29,75 @@ class ChatGPTSessionService {
   // 시스템 프롬프트 생성
   String _generateSystemPrompt(Map<String, dynamic> planDetails) {
     return '''
-당신은 ${planDetails['subject']} 전문 교육 AI입니다.
-학생의 목표: ${planDetails['goal']}
-현재 수준: ${planDetails['level']}
-학습 기간: ${planDetails['duration']}일
-학습 유형: ${planDetails['studyType']}
+당신은 ${planDetails['subject'] ?? '학습'} 전문 교육 AI입니다.
+
+학습자 프로필:
+- 학습 목표: ${planDetails['goal'] ?? '학습 목표 달성'}
+- 과목: ${planDetails['subject'] ?? '일반 학습'}
+- 수준: ${planDetails['level'] ?? '중급'}
+- 학습 기간: ${planDetails['duration_days'] ?? planDetails['duration'] ?? '30'}일
+- 학습 유형: ${planDetails['studyType'] ?? '개인 학습'}
+
+커리큘럼 정보:
+${_formatCurriculumForPrompt(planDetails['curriculum'])}
 
 당신의 역할:
 1. 매일 오전, 오후, 저녁에 맞춤형 학습 콘텐츠 제공
-2. 핵심 내용을 간결하게 요약
-3. 이해도를 확인하는 문제 출제
-4. 학생의 진도와 수준에 맞춘 점진적 난이도 조정
-5. 격려와 동기부여 메시지 포함
+2. 학습자의 목표와 수준을 고려한 체계적인 내용 구성
+3. 커리큘럼에 따른 순차적이고 연계성 있는 학습 진행
+4. 핵심 내용을 간결하면서도 포괄적으로 요약
+5. 이해도를 확인하는 실제적이고 유용한 문제 출제
+6. 학생의 진도와 수준에 맞춘 점진적 난이도 조정
+7. 구체적이고 실용적인 격려와 동기부여 메시지 제공
 
 응답 형식은 항상 JSON으로 다음 구조를 따라주세요:
 {
   "type": "summary" or "quiz",
-  "title": "콘텐츠 제목",
-  "content": "요약 내용 또는 설명",
-  "questions": [퀴즈 문제 배열 - quiz 타입인 경우],
-  "encouragement": "격려 메시지"
+  "title": "구체적이고 명확한 콘텐츠 제목",
+  "content": "상세하고 실용적인 요약 내용 또는 설명",
+  "questions": [퀴즈 문제 배열 - quiz 타입인 경우만],
+  "encouragement": "개인화된 격려 메시지"
+}
+
+quiz 타입의 경우 questions 배열의 각 문제는 다음 형식을 따라주세요:
+{
+  "question": "명확하고 구체적인 문제",
+  "options": ["선택지1", "선택지2", "선택지3", "선택지4"],
+  "correct_answer": 정답_인덱스(0-3),
+  "explanation": "정답에 대한 자세한 설명과 학습 포인트"
 }
 ''';
+  }
+
+  // 커리큘럼 정보를 프롬프트에 맞게 포맷팅
+  String _formatCurriculumForPrompt(Map<String, dynamic>? curriculum) {
+    if (curriculum == null) return '기본 학습 과정을 따릅니다.';
+    
+    String formatted = '';
+    
+    if (curriculum['overview'] != null) {
+      formatted += '- 과정 개요: ${curriculum['overview']}\n';
+    }
+    
+    if (curriculum['weekly_breakdown'] != null) {
+      formatted += '- 주차별 계획:\n';
+      List<dynamic> weeks = curriculum['weekly_breakdown'];
+      for (var week in weeks) {
+        if (week is Map) {
+          formatted += '  ${week['week']}주차: ${week['focus']} (${(week['topics'] as List?)?.join(', ') ?? ''})\n';
+        }
+      }
+    }
+    
+    if (curriculum['daily_schedule'] != null) {
+      Map<String, dynamic> schedule = curriculum['daily_schedule'];
+      formatted += '- 일일 스케줄:\n';
+      formatted += '  오전: ${schedule['morning'] ?? ''}\n';
+      formatted += '  오후: ${schedule['afternoon'] ?? ''}\n';
+      formatted += '  저녁: ${schedule['evening'] ?? ''}\n';
+    }
+    
+    return formatted.isEmpty ? '맞춤형 학습 계획을 진행합니다.' : formatted;
   }
   
   // 요약본 생성 요청
@@ -64,10 +111,20 @@ class ChatGPTSessionService {
     final userMessage = {
       'role': 'user',
       'content': '''
-$timeOfDay 학습 콘텐츠를 생성해주세요.
-오늘의 주제: $topic
-타입: summary (핵심 내용 요약)
-분량: 5-10분 분량으로 읽을 수 있는 내용
+${_getTimeKorean(timeOfDay)} 학습 콘텐츠를 생성해주세요.
+
+요청 내용:
+- 시간대: $timeOfDay (${_getTimeKorean(timeOfDay)})
+- 오늘의 주제: $topic
+- 콘텐츠 타입: summary (핵심 내용 요약)
+- 예상 학습 시간: 10-15분
+- 요구사항: 
+  * 학습자의 목표와 수준에 맞춘 내용
+  * 실제 시험이나 평가에 도움이 되는 핵심 포인트
+  * 이해하기 쉬운 설명과 예시
+  * 다음 학습으로 연결되는 내용
+
+학습자가 집중할 수 있도록 명확하고 구조화된 내용으로 작성해주세요.
 '''
     };
     
@@ -103,12 +160,23 @@ $timeOfDay 학습 콘텐츠를 생성해주세요.
     final userMessage = {
       'role': 'user',
       'content': '''
-$timeOfDay 학습 문제를 생성해주세요.
-오늘의 주제: $topic
-타입: quiz
-문제 개수: $questionCount개
-난이도: 학생의 현재 수준에 맞춰서
-각 문제는 4지선다형으로, 정답과 해설을 포함해주세요.
+${_getTimeKorean(timeOfDay)} 학습 문제를 생성해주세요.
+
+요청 내용:
+- 시간대: $timeOfDay (${_getTimeKorean(timeOfDay)})
+- 오늘의 주제: $topic
+- 콘텐츠 타입: quiz (문제 풀이)
+- 문제 개수: $questionCount개
+- 문제 형태: 4지선다형
+- 난이도: 학습자의 현재 수준(${_getTimeKorean(timeOfDay)} 시간대에 적합)
+- 요구사항:
+  * 실제 시험이나 평가에서 나올 수 있는 실용적인 문제
+  * 오늘 학습한 내용과 연관성 있는 문제
+  * 각 문제마다 상세한 해설과 학습 포인트 제공
+  * 오답 선택지도 교육적 가치가 있도록 구성
+  * 난이도는 점진적으로 증가
+
+학습자가 실력을 확실히 점검할 수 있는 양질의 문제를 만들어주세요.
 '''
     };
     
@@ -140,7 +208,7 @@ $timeOfDay 학습 문제를 생성해주세요.
         'Content-Type': 'application/json',
       },
       body: json.encode({
-        'model': 'gpt-4-turbo-preview',
+        'model': 'gpt-4',
         'messages': messages,
         'temperature': 0.7,
         'max_tokens': 1000,
