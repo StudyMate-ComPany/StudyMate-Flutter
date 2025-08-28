@@ -434,12 +434,16 @@ class _AILearningSetupScreenState extends State<AILearningSetupScreen>
       if (mounted) {
         if (success) {
           print('🏠 메인 화면으로 이동...');
-          // 메인 화면으로 이동 (스낵바 없이 바로 이동)
-          Navigator.of(context).pushAndRemoveUntil(
-            MaterialPageRoute(
-              builder: (context) => const NewHomeScreen(),
+          // 현재 화면을 닫고 이전 화면(홈 화면)으로 돌아감
+          Navigator.of(context).pop();
+          
+          // 성공 메시지 표시
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text('✅ 학습 플랜이 성공적으로 생성되었습니다!'),
+              backgroundColor: Colors.green,
+              duration: Duration(seconds: 2),
             ),
-            (route) => false, // 모든 이전 화면을 스택에서 제거
           );
         } else {
           // 실패 메시지
