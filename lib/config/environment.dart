@@ -16,12 +16,12 @@ class Environment {
   static String get apiBaseUrl {
     switch (env) {
       case 'production':
-        return 'https://api.studymate.app';
+        return 'http://54.161.77.144';
       case 'staging':
-        return 'https://staging-api.studymate.app';
+        return 'http://54.161.77.144';
       case 'development':
       default:
-        return 'https://54.161.77.144';
+        return 'http://54.161.77.144';
     }
   }
 

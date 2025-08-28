@@ -21,7 +21,7 @@ class ApiException implements Exception {
 
 class ApiService {
   // EC2 프로덕션 서버 사용
-  static const String baseUrl = 'https://54.161.77.144';
+  static const String baseUrl = 'http://54.161.77.144';
   static const Duration timeout = Duration(seconds: 30);
   
   // Singleton instance
