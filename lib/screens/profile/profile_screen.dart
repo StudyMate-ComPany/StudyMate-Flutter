@@ -27,10 +27,14 @@ class _ProfileScreenState extends State<ProfileScreen> {
   @override
   void initState() {
     super.initState();
-    final user = context.read<AuthProvider>().user;
-    _nameController = TextEditingController(text: user?.name ?? '');
-    _emailController = TextEditingController(text: user?.email ?? '');
-    _bioController = TextEditingController(text: user?.bio ?? '');
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      final user = context.read<AuthProvider>().user;
+      setState(() {
+        _nameController = TextEditingController(text: user?.name ?? '');
+        _emailController = TextEditingController(text: user?.email ?? '');
+        _bioController = TextEditingController(text: user?.bio ?? '');
+      });
+    });
   }
   
   @override

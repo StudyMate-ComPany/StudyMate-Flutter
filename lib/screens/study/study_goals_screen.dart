@@ -15,7 +15,9 @@ class _StudyGoalsScreenState extends State<StudyGoalsScreen> {
   @override
   void initState() {
     super.initState();
-    _loadGoals();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _loadGoals();
+    });
   }
 
   Future<void> _loadGoals() async {

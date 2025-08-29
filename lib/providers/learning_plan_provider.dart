@@ -30,28 +30,41 @@ class LearningPlanProvider extends ChangeNotifier {
   }
   
   Future<void> _initializeServices() async {
-    // ChatGPT 서비스 초기화
-    print('🔑 LearningPlanProvider API Key: ${_openAIApiKey.substring(0, 20)}...');
-    _chatGPTService = ChatGPTSessionService(apiKey: _openAIApiKey);
-    
-    // 알림 초기화
-    _notifications = FlutterLocalNotificationsPlugin();
-    const androidSettings = AndroidInitializationSettings('@mipmap/ic_launcher');
-    const iosSettings = DarwinInitializationSettings();
-    const settings = InitializationSettings(
-      android: androidSettings,
-      iOS: iosSettings,
-    );
-    await _notifications.initialize(
-      settings,
-      onDidReceiveNotificationResponse: _handleNotificationResponse,
-    );
-    
-    // 일일 콘텐츠 서비스 초기화
-    _dailyContentService = DailyContentService(
-      chatGPTService: _chatGPTService,
-      notifications: _notifications,
-    );
+    try {
+      // ChatGPT 서비스 초기화
+      print('🔑 LearningPlanProvider API Key: ${_openAIApiKey.isNotEmpty ? '${_openAIApiKey.substring(0, 20)}...' : 'Not provided'}');
+      _chatGPTService = ChatGPTSessionService(apiKey: _openAIApiKey);
+      
+      // 알림 초기화
+      _notifications = FlutterLocalNotificationsPlugin();
+      const androidSettings = AndroidInitializationSettings('@mipmap/ic_launcher');
+      const iosSettings = DarwinInitializationSettings();
+      const settings = InitializationSettings(
+        android: androidSettings,
+        iOS: iosSettings,
+      );
+      
+      try {
+        await _notifications.initialize(
+          settings,
+          onDidReceiveNotificationResponse: _handleNotificationResponse,
+        );
+      } catch (notificationError) {
+        print('⚠️ 알림 초기화 실패 (계속 진행): $notificationError');
+      }
+      
+      // 일일 콘텐츠 서비스 초기화
+      _dailyContentService = DailyContentService(
+        chatGPTService: _chatGPTService,
+        notifications: _notifications,
+      );
+      
+      print('✅ LearningPlanProvider 초기화 완료');
+    } catch (e) {
+      print('❌ LearningPlanProvider 초기화 실패: $e');
+      // 초기화 실패해도 앱이 실행될 수 있도록 기본값 설정
+      _errorMessage = '서비스 초기화 실패: $e';
+    }
   }
   
   void _handleNotificationResponse(NotificationResponse response) {
@@ -681,6 +694,11 @@ Make sure to:
       _state = LearningPlanState.loading;
       notifyListeners();
       
+      // 서비스가 초기화되지 않았다면 기다리기
+      if (_chatGPTService == null || _dailyContentService == null) {
+        await _initializeServices();
+      }
+      
       // 먼저 로컬 스토리지에서 불러오기
       await _loadPlansFromLocal();
       
@@ -702,6 +720,7 @@ Make sure to:
       _errorMessage = '플랜 불러오기 실패: $e';
       _state = LearningPlanState.error;
       notifyListeners();
+      print('❌ 플랜 로딩 오류: $e');
     }
   }
   
@@ -913,6 +932,12 @@ Make sure to:
       _plans = [];
       _activePlan = null;
     }
+  }
+
+  // 상태 강제 변경 (타임아웃이나 에러 처리용)
+  void forceSetState(LearningPlanState newState) {
+    _state = newState;
+    notifyListeners();
   }
 
   // 시스템 상태 체크 (디버깅용)

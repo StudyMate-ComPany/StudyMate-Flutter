@@ -3,7 +3,7 @@ import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import '../../providers/learning_plan_provider.dart';
-import '../../theme/modern_theme.dart';
+import '../../theme/studymate_theme.dart';
 import '../../models/learning_plan.dart';
 import '../learning/ai_learning_setup_screen.dart';
 import '../learning/daily_content_screen.dart';
@@ -31,7 +31,9 @@ class _LearningDashboardState extends State<LearningDashboard>
       vsync: this,
       duration: const Duration(seconds: 2),
     )..repeat(reverse: true);
-    _loadData();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _loadData();
+    });
   }
   
   @override
@@ -43,14 +45,34 @@ class _LearningDashboardState extends State<LearningDashboard>
   }
   
   Future<void> _loadData() async {
-    final provider = Provider.of<LearningPlanProvider>(context, listen: false);
-    await provider.loadPlans();
+    try {
+      final provider = Provider.of<LearningPlanProvider>(context, listen: false);
+      // 최대 5초 타임아웃 설정
+      await provider.loadPlans().timeout(
+        const Duration(seconds: 5),
+        onTimeout: () {
+          print('⏰ 데이터 로딩 타임아웃 - 기본 상태로 진행');
+          // 타임아웃 시에도 UI를 표시할 수 있도록 상태 변경
+          if (provider.state == LearningPlanState.loading) {
+            provider.forceSetState(LearningPlanState.loaded);
+          }
+        },
+      );
+      print('🎯 LearningDashboard 데이터 로딩 완료');
+    } catch (e) {
+      print('❌ LearningDashboard 데이터 로딩 실패: $e');
+      // 로딩 실패해도 UI는 표시되도록 처리
+      final provider = Provider.of<LearningPlanProvider>(context, listen: false);
+      if (provider.state == LearningPlanState.loading) {
+        provider.forceSetState(LearningPlanState.loaded);
+      }
+    }
   }
   
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: ModernTheme.backgroundColor,
+      backgroundColor: StudyMateTheme.lightBlue,
       body: Consumer<LearningPlanProvider>(
         builder: (context, provider, child) {
           if (provider.state == LearningPlanState.loading) {
@@ -81,8 +103,8 @@ class _LearningDashboardState extends State<LearningDashboard>
                 decoration: BoxDecoration(
                   gradient: LinearGradient(
                     colors: [
-                      ModernTheme.primaryColor,
-                      ModernTheme.secondaryColor,
+                      StudyMateTheme.primaryBlue,
+                      StudyMateTheme.accentPink,
                     ],
                     transform: GradientRotation(_animationController.value * 3.14),
                   ),
@@ -101,7 +123,7 @@ class _LearningDashboardState extends State<LearningDashboard>
             '학습 플랜을 불러오는 중...',
             style: TextStyle(
               fontSize: 16,
-              color: ModernTheme.textSecondary,
+              color: StudyMateTheme.grayText,
             ),
           ),
         ],
@@ -120,7 +142,7 @@ class _LearningDashboardState extends State<LearningDashboard>
               width: 150,
               height: 150,
               decoration: BoxDecoration(
-                gradient: ModernTheme.primaryGradient,
+                gradient: StudyMateTheme.buttonGradient,
                 borderRadius: BorderRadius.circular(40),
               ),
               child: const Icon(
@@ -140,7 +162,7 @@ class _LearningDashboardState extends State<LearningDashboard>
               style: TextStyle(
                 fontSize: 28,
                 fontWeight: FontWeight.w700,
-                color: ModernTheme.textPrimary,
+                color: StudyMateTheme.darkNavy,
               ),
             ).animate()
               .fadeIn(delay: 200.ms),
@@ -152,7 +174,7 @@ class _LearningDashboardState extends State<LearningDashboard>
               textAlign: TextAlign.center,
               style: TextStyle(
                 fontSize: 16,
-                color: ModernTheme.textSecondary,
+                color: StudyMateTheme.grayText,
                 height: 1.5,
               ),
             ).animate()
@@ -187,7 +209,7 @@ class _LearningDashboardState extends State<LearningDashboard>
                 ),
               ),
               style: ElevatedButton.styleFrom(
-                backgroundColor: ModernTheme.primaryColor,
+                backgroundColor: StudyMateTheme.primaryBlue,
                 foregroundColor: Colors.white,
                 padding: const EdgeInsets.symmetric(horizontal: 48, vertical: 20),
                 shape: RoundedRectangleBorder(
@@ -206,7 +228,7 @@ class _LearningDashboardState extends State<LearningDashboard>
                   child: _buildQuickActionButton(
                     icon: Icons.quiz,
                     label: 'AI 퀴즈',
-                    color: ModernTheme.secondaryColor,
+                    color: StudyMateTheme.accentPink,
                     onTap: () {
                       HapticFeedback.lightImpact();
                       Navigator.push(
@@ -228,7 +250,7 @@ class _LearningDashboardState extends State<LearningDashboard>
                   child: _buildQuickActionButton(
                     icon: Icons.timer,
                     label: '포모도로',
-                    color: ModernTheme.accentColor,
+                    color: StudyMateTheme.accentPink,
                     onTap: () {
                       HapticFeedback.lightImpact();
                       Navigator.push(
@@ -257,7 +279,7 @@ class _LearningDashboardState extends State<LearningDashboard>
     
     return RefreshIndicator(
       onRefresh: _loadData,
-      color: ModernTheme.primaryColor,
+      color: StudyMateTheme.primaryBlue,
       child: CustomScrollView(
         slivers: [
           // Header
@@ -269,7 +291,7 @@ class _LearningDashboardState extends State<LearningDashboard>
             flexibleSpace: FlexibleSpaceBar(
               background: Container(
                 decoration: BoxDecoration(
-                  gradient: ModernTheme.primaryGradient,
+                  gradient: StudyMateTheme.buttonGradient,
                 ),
                 child: SafeArea(
                   child: Padding(
@@ -383,7 +405,13 @@ class _LearningDashboardState extends State<LearningDashboard>
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(20),
-        boxShadow: ModernTheme.cardShadow,
+        boxShadow: [
+          BoxShadow(
+            color: StudyMateTheme.primaryBlue.withOpacity(0.08),
+            blurRadius: 20,
+            offset: const Offset(0, 4),
+          ),
+        ],
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -398,7 +426,7 @@ class _LearningDashboardState extends State<LearningDashboard>
                     '전체 진행률',
                     style: TextStyle(
                       fontSize: 14,
-                      color: ModernTheme.textSecondary,
+                      color: StudyMateTheme.grayText,
                     ),
                   ),
                   const SizedBox(height: 4),
@@ -407,7 +435,7 @@ class _LearningDashboardState extends State<LearningDashboard>
                     style: const TextStyle(
                       fontSize: 32,
                       fontWeight: FontWeight.w700,
-                      color: ModernTheme.primaryColor,
+                      color: StudyMateTheme.primaryBlue,
                     ),
                   ),
                 ],
@@ -418,8 +446,8 @@ class _LearningDashboardState extends State<LearningDashboard>
                 child: CircularProgressIndicator(
                   value: plan.progressPercentage / 100,
                   strokeWidth: 8,
-                  backgroundColor: ModernTheme.primaryColor.withOpacity(0.1),
-                  valueColor: const AlwaysStoppedAnimation<Color>(ModernTheme.primaryColor),
+                  backgroundColor: StudyMateTheme.primaryBlue.withOpacity(0.1),
+                  valueColor: const AlwaysStoppedAnimation<Color>(StudyMateTheme.primaryBlue),
                 ),
               ),
             ],
@@ -428,8 +456,8 @@ class _LearningDashboardState extends State<LearningDashboard>
           LinearProgressIndicator(
             value: plan.progressPercentage / 100,
             minHeight: 8,
-            backgroundColor: ModernTheme.primaryColor.withOpacity(0.1),
-            valueColor: const AlwaysStoppedAnimation<Color>(ModernTheme.primaryColor),
+            backgroundColor: StudyMateTheme.primaryBlue.withOpacity(0.1),
+            valueColor: const AlwaysStoppedAnimation<Color>(StudyMateTheme.primaryBlue),
           ),
           const SizedBox(height: 12),
           Row(
@@ -439,14 +467,14 @@ class _LearningDashboardState extends State<LearningDashboard>
                 '시작: ${_formatDate(plan.startDate)}',
                 style: const TextStyle(
                   fontSize: 12,
-                  color: ModernTheme.textSecondary,
+                  color: StudyMateTheme.grayText,
                 ),
               ),
               Text(
                 '목표: ${_formatDate(plan.endDate)}',
                 style: const TextStyle(
                   fontSize: 12,
-                  color: ModernTheme.textSecondary,
+                  color: StudyMateTheme.grayText,
                 ),
               ),
             ],
@@ -467,7 +495,7 @@ class _LearningDashboardState extends State<LearningDashboard>
           title: task.morningContent.title,
           description: '${task.morningContent.estimatedMinutes}분 소요',
           icon: Icons.wb_sunny,
-          color: ModernTheme.secondaryColor,
+          color: StudyMateTheme.accentPink,
           completed: task.completionStatus['morning'] ?? false,
           onTap: () => _openContent(task, 'morning'),
         ),
@@ -479,7 +507,7 @@ class _LearningDashboardState extends State<LearningDashboard>
           title: task.afternoonContent.title,
           description: '퀴즈 ${task.afternoonContent.questions?.length ?? 0}문제',
           icon: Icons.quiz,
-          color: ModernTheme.primaryColor,
+          color: StudyMateTheme.primaryBlue,
           completed: task.completionStatus['afternoon'] ?? false,
           onTap: () => _openContent(task, 'afternoon'),
         ),
@@ -491,7 +519,7 @@ class _LearningDashboardState extends State<LearningDashboard>
           title: task.eveningContent.title,
           description: '${task.eveningContent.estimatedMinutes}분 소요',
           icon: Icons.nights_stay,
-          color: ModernTheme.accentColor,
+          color: StudyMateTheme.accentPink,
           completed: task.completionStatus['evening'] ?? false,
           onTap: () => _openContent(task, 'evening'),
         ),
@@ -520,7 +548,13 @@ class _LearningDashboardState extends State<LearningDashboard>
             color: completed ? color : Colors.grey[200]!,
             width: completed ? 2 : 1,
           ),
-          boxShadow: completed ? [] : ModernTheme.cardShadow,
+          boxShadow: completed ? [] : [
+          BoxShadow(
+            color: StudyMateTheme.primaryBlue.withOpacity(0.08),
+            blurRadius: 20,
+            offset: const Offset(0, 4),
+          ),
+        ],
         ),
         child: Row(
           children: [
@@ -564,7 +598,7 @@ class _LearningDashboardState extends State<LearningDashboard>
                         Container(
                           padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
                           decoration: BoxDecoration(
-                            color: ModernTheme.successColor,
+                            color: StudyMateTheme.primaryBlue,
                             borderRadius: BorderRadius.circular(8),
                           ),
                           child: const Text(
@@ -584,7 +618,7 @@ class _LearningDashboardState extends State<LearningDashboard>
                     style: TextStyle(
                       fontSize: 16,
                       fontWeight: FontWeight.w600,
-                      color: ModernTheme.textPrimary,
+                      color: StudyMateTheme.darkNavy,
                       decoration: completed ? TextDecoration.lineThrough : null,
                     ),
                   ),
@@ -593,7 +627,7 @@ class _LearningDashboardState extends State<LearningDashboard>
                     description,
                     style: const TextStyle(
                       fontSize: 14,
-                      color: ModernTheme.textSecondary,
+                      color: StudyMateTheme.grayText,
                     ),
                   ),
                 ],
@@ -601,7 +635,7 @@ class _LearningDashboardState extends State<LearningDashboard>
             ),
             Icon(
               completed ? Icons.check_circle : Icons.arrow_forward_ios,
-              color: completed ? color : ModernTheme.textLight,
+              color: completed ? color : StudyMateTheme.grayText,
               size: 20,
             ),
           ],
@@ -619,7 +653,7 @@ class _LearningDashboardState extends State<LearningDashboard>
           child: _buildQuickActionButton(
             icon: Icons.history,
             label: '학습 기록',
-            color: ModernTheme.primaryColor,
+            color: StudyMateTheme.primaryBlue,
             onTap: () {
               // 학습 기록 화면으로 이동
             },
@@ -630,7 +664,7 @@ class _LearningDashboardState extends State<LearningDashboard>
           child: _buildQuickActionButton(
             icon: Icons.analytics,
             label: '통계',
-            color: ModernTheme.accentColor,
+            color: StudyMateTheme.accentPink,
             onTap: () {
               // 통계 화면으로 이동
             },
@@ -641,7 +675,7 @@ class _LearningDashboardState extends State<LearningDashboard>
           child: _buildQuickActionButton(
             icon: Icons.settings,
             label: '설정',
-            color: ModernTheme.secondaryColor,
+            color: StudyMateTheme.accentPink,
             onTap: () {
               // 설정 화면으로 이동
             },
@@ -665,7 +699,13 @@ class _LearningDashboardState extends State<LearningDashboard>
         decoration: BoxDecoration(
           color: Colors.white,
           borderRadius: BorderRadius.circular(16),
-          boxShadow: ModernTheme.cardShadow,
+          boxShadow: [
+          BoxShadow(
+            color: StudyMateTheme.primaryBlue.withOpacity(0.08),
+            blurRadius: 20,
+            offset: const Offset(0, 4),
+          ),
+        ],
         ),
         child: Column(
           children: [
@@ -688,7 +728,7 @@ class _LearningDashboardState extends State<LearningDashboard>
               style: const TextStyle(
                 fontSize: 12,
                 fontWeight: FontWeight.w600,
-                color: ModernTheme.textPrimary,
+                color: StudyMateTheme.darkNavy,
               ),
             ),
           ],
@@ -706,7 +746,13 @@ class _LearningDashboardState extends State<LearningDashboard>
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(16),
-        boxShadow: ModernTheme.cardShadow,
+        boxShadow: [
+          BoxShadow(
+            color: StudyMateTheme.primaryBlue.withOpacity(0.08),
+            blurRadius: 20,
+            offset: const Offset(0, 4),
+          ),
+        ],
       ),
       child: Column(
         children: [
@@ -731,7 +777,7 @@ class _LearningDashboardState extends State<LearningDashboard>
                     _getWeekdayLabel(index + 1),
                     style: TextStyle(
                       fontSize: 12,
-                      color: isToday ? ModernTheme.primaryColor : ModernTheme.textSecondary,
+                      color: isToday ? StudyMateTheme.primaryBlue : StudyMateTheme.grayText,
                       fontWeight: isToday ? FontWeight.w600 : FontWeight.w400,
                     ),
                   ),
@@ -741,9 +787,9 @@ class _LearningDashboardState extends State<LearningDashboard>
                     height: 36,
                     decoration: BoxDecoration(
                       color: isToday 
-                        ? ModernTheme.primaryColor 
+                        ? StudyMateTheme.primaryBlue 
                         : completed >= 100 
-                          ? ModernTheme.successColor 
+                          ? StudyMateTheme.primaryBlue 
                           : Colors.grey[200],
                       shape: BoxShape.circle,
                     ),
@@ -752,7 +798,7 @@ class _LearningDashboardState extends State<LearningDashboard>
                         date.day.toString(),
                         style: TextStyle(
                           fontSize: 14,
-                          color: isToday || completed >= 100 ? Colors.white : ModernTheme.textSecondary,
+                          color: isToday || completed >= 100 ? Colors.white : StudyMateTheme.grayText,
                           fontWeight: FontWeight.w600,
                         ),
                       ),
@@ -764,7 +810,7 @@ class _LearningDashboardState extends State<LearningDashboard>
                       width: 4,
                       height: 4,
                       decoration: BoxDecoration(
-                        color: ModernTheme.warningColor,
+                        color: StudyMateTheme.accentPink,
                         shape: BoxShape.circle,
                       ),
                     ),
@@ -783,7 +829,7 @@ class _LearningDashboardState extends State<LearningDashboard>
       style: const TextStyle(
         fontSize: 18,
         fontWeight: FontWeight.w700,
-        color: ModernTheme.textPrimary,
+        color: StudyMateTheme.darkNavy,
       ),
     );
   }

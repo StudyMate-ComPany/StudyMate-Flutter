@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_animate/flutter_animate.dart';
 import 'package:provider/provider.dart';
 import '../../providers/auth_provider.dart';
-import '../../theme/app_theme.dart';
+import '../../theme/studymate_theme.dart';
 import '../../widgets/common/loading_overlay.dart';
 import '../../widgets/korean_text_field.dart';
 import 'register_screen.dart';
+import '../home/main_navigation_screen.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -18,6 +20,7 @@ class _LoginScreenState extends State<LoginScreen> {
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
   bool _isLoading = false;
+  bool _isPasswordVisible = false;
 
   @override
   void initState() {
@@ -49,7 +52,7 @@ class _LoginScreenState extends State<LoginScreen> {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text(authProvider.errorMessage ?? '로그인에 실패했습니다'),
-            backgroundColor: AppTheme.errorColor,
+            backgroundColor: const Color(0xFFFF6B6B),
           ),
         );
       }
@@ -62,111 +65,129 @@ class _LoginScreenState extends State<LoginScreen> {
     return LoadingOverlay(
       isLoading: _isLoading,
       child: Scaffold(
-        backgroundColor: AppTheme.backgroundColor,
+        backgroundColor: StudyMateTheme.lightBlue,
         body: SafeArea(
           child: SingleChildScrollView(
             child: Padding(
-              padding: const EdgeInsets.all(24.0),
+              padding: const EdgeInsets.symmetric(horizontal: 24),
               child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  const SizedBox(height: 40),
+                  const SizedBox(height: 60),
                   
-                  // 로고와 타이틀
-                  Center(
-                    child: Column(
-                      children: [
-                        Container(
-                          width: 120,
-                          height: 120,
-                          decoration: BoxDecoration(
-                            gradient: AppTheme.primaryGradient,
-                            borderRadius: BorderRadius.circular(35),
-                            boxShadow: [
-                              BoxShadow(
-                                color: AppTheme.primaryColor.withOpacity(0.3),
-                                blurRadius: 20,
-                                offset: const Offset(0, 5),
-                              ),
-                            ],
-                          ),
-                          child: const Icon(
-                            Icons.school_rounded,
-                            size: 60,
-                            color: Colors.white,
-                          ),
-                        ),
-                        
-                        const SizedBox(height: 24),
-                        
-                        const Text(
-                          '스터디메이트',
-                          style: TextStyle(
-                            fontSize: 28,
-                            fontWeight: FontWeight.bold,
-                            color: AppTheme.primaryColor,
-                          ),
-                        ),
-                        
-                        const SizedBox(height: 8),
-                        
-                        Text(
-                          '다시 만나서 반가워요! 😊',
-                          style: TextStyle(
-                            fontSize: 16,
-                            color: Colors.grey[600],
-                          ),
-                        ),
-                      ],
+                  // STUDYMATE 로고
+                  Text(
+                    'STUDY\nMATE',
+                    style: TextStyle(
+                      fontSize: 48,
+                      fontWeight: FontWeight.w900,
+                      height: 1.1,
+                      color: StudyMateTheme.primaryBlue,
+                      letterSpacing: -1,
                     ),
-                  ),
+                    textAlign: TextAlign.center,
+                  ).animate()
+                    .fadeIn(duration: 600.ms)
+                    .scale(begin: const Offset(0.8, 0.8), end: const Offset(1, 1)),
                   
-                  const SizedBox(height: 48),
+                  const SizedBox(height: 60),
                   
                   // 로그인 폼
                   Form(
                     key: _formKey,
                     child: Column(
                       children: [
-                        // 이메일 필드
-                        KoreanTextField(
+                        // 이메일 입력 필드
+                        TextFormField(
                           controller: _emailController,
-                          labelText: '이메일',
-                          hintText: '이메일을 입력하세요',
-                          prefixIcon: const Icon(
-                            Icons.email_outlined,
-                            color: AppTheme.primaryColor,
-                          ),
                           keyboardType: TextInputType.emailAddress,
-                          autofocus: false,
+                          style: StudyMateTheme.bodyLarge,
+                          decoration: InputDecoration(
+                            hintText: '이메일 또는 아이디',
+                            filled: true,
+                            fillColor: Colors.white,
+                            contentPadding: const EdgeInsets.symmetric(
+                              horizontal: 20,
+                              vertical: 18,
+                            ),
+                            border: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(16),
+                              borderSide: BorderSide.none,
+                            ),
+                            enabledBorder: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(16),
+                              borderSide: BorderSide.none,
+                            ),
+                            focusedBorder: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(16),
+                              borderSide: const BorderSide(
+                                color: StudyMateTheme.primaryBlue,
+                                width: 2,
+                              ),
+                            ),
+                          ),
                           validator: (value) {
                             if (value == null || value.isEmpty) {
                               return '이메일을 입력해주세요';
                             }
                             return null;
                           },
-                        ),
+                        ).animate()
+                          .fadeIn(delay: 200.ms, duration: 500.ms)
+                          .slideY(begin: 0.2, end: 0),
                         
                         const SizedBox(height: 16),
                         
-                        // 비밀번호 필드
-                        KoreanTextField(
+                        // 비밀번호 입력 필드
+                        TextFormField(
                           controller: _passwordController,
-                          labelText: '비밀번호',
-                          hintText: '비밀번호를 입력하세요',
-                          obscureText: true,
-                          prefixIcon: const Icon(
-                            Icons.lock_outline,
-                            color: AppTheme.primaryColor,
+                          obscureText: !_isPasswordVisible,
+                          style: StudyMateTheme.bodyLarge,
+                          decoration: InputDecoration(
+                            hintText: '비밀번호',
+                            filled: true,
+                            fillColor: Colors.white,
+                            contentPadding: const EdgeInsets.symmetric(
+                              horizontal: 20,
+                              vertical: 18,
+                            ),
+                            border: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(16),
+                              borderSide: BorderSide.none,
+                            ),
+                            enabledBorder: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(16),
+                              borderSide: BorderSide.none,
+                            ),
+                            focusedBorder: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(16),
+                              borderSide: const BorderSide(
+                                color: StudyMateTheme.primaryBlue,
+                                width: 2,
+                              ),
+                            ),
+                            suffixIcon: IconButton(
+                              icon: Icon(
+                                _isPasswordVisible
+                                    ? Icons.visibility_outlined
+                                    : Icons.visibility_off_outlined,
+                                color: StudyMateTheme.grayText,
+                              ),
+                              onPressed: () {
+                                setState(() {
+                                  _isPasswordVisible = !_isPasswordVisible;
+                                });
+                              },
+                            ),
                           ),
-                          autofocus: false,
                           validator: (value) {
                             if (value == null || value.isEmpty) {
                               return '비밀번호를 입력해주세요';
                             }
                             return null;
                           },
-                        ),
+                        ).animate()
+                          .fadeIn(delay: 300.ms, duration: 500.ms)
+                          .slideY(begin: 0.2, end: 0),
                         
                         const SizedBox(height: 32),
                         
@@ -177,12 +198,11 @@ class _LoginScreenState extends State<LoginScreen> {
                           child: ElevatedButton(
                             onPressed: _isLoading ? null : _login,
                             style: ElevatedButton.styleFrom(
-                              backgroundColor: AppTheme.primaryColor,
+                              backgroundColor: StudyMateTheme.primaryBlue,
                               shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(28),
+                                borderRadius: BorderRadius.circular(16),
                               ),
-                              elevation: 8,
-                              shadowColor: AppTheme.primaryColor.withOpacity(0.4),
+                              elevation: 2,
                             ),
                             child: _isLoading
                               ? const SizedBox(
@@ -193,95 +213,197 @@ class _LoginScreenState extends State<LoginScreen> {
                                     strokeWidth: 2,
                                   ),
                                 )
-                              : const Text(
-                                  '로그인',
-                                  style: TextStyle(
-                                    fontSize: 18,
-                                    fontWeight: FontWeight.bold,
-                                    color: Colors.white,
-                                  ),
+                              : Text(
+                                  '로그인하기',
+                                  style: StudyMateTheme.buttonText,
                                 ),
                           ),
-                        ),
+                        ).animate()
+                          .fadeIn(delay: 400.ms, duration: 500.ms)
+                          .slideY(begin: 0.2, end: 0),
                       ],
                     ),
                   ),
                   
-                  const SizedBox(height: 24),
+                  const SizedBox(height: 16),
                   
-                  // 회원가입 링크
-                  Center(
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Text(
-                          '아직 계정이 없으신가요?',
-                          style: TextStyle(
-                            color: Colors.grey[600],
-                            fontSize: 14,
+                  // 비밀번호 찾기 & 회원가입
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      TextButton(
+                        onPressed: () {
+                          // 비밀번호 찾기 로직
+                        },
+                        child: Text(
+                          '비밀번호 찾기',
+                          style: StudyMateTheme.bodyMedium.copyWith(
+                            color: StudyMateTheme.grayText,
                           ),
                         ),
-                        TextButton(
-                          onPressed: () {
-                            Navigator.of(context).push(
-                              MaterialPageRoute(
-                                builder: (context) => const RegisterScreen(),
-                              ),
-                            );
-                          },
-                          child: const Text(
-                            '회원가입',
-                            style: TextStyle(
-                              color: AppTheme.primaryColor,
-                              fontWeight: FontWeight.bold,
-                              fontSize: 14,
+                      ),
+                      Container(
+                        width: 1,
+                        height: 12,
+                        color: StudyMateTheme.grayText.withOpacity(0.3),
+                        margin: const EdgeInsets.symmetric(horizontal: 8),
+                      ),
+                      TextButton(
+                        onPressed: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => const RegisterScreen(),
                             ),
+                          );
+                        },
+                        child: Text(
+                          '이메일로 회원가입',
+                          style: StudyMateTheme.bodyMedium.copyWith(
+                            color: StudyMateTheme.grayText,
                           ),
                         ),
-                      ],
-                    ),
-                  ),
+                      ),
+                    ],
+                  ).animate()
+                    .fadeIn(delay: 500.ms, duration: 500.ms),
                   
                   const SizedBox(height: 40),
                   
-                  // 귀여운 일러스트 또는 메시지
-                  Center(
-                    child: Container(
-                      padding: const EdgeInsets.all(16),
-                      decoration: BoxDecoration(
-                        color: AppTheme.secondaryColor.withOpacity(0.1),
-                        borderRadius: BorderRadius.circular(20),
-                      ),
-                      child: Row(
-                        mainAxisSize: MainAxisSize.min,
+                  // SNS 로그인
+                  Column(
+                    children: [
+                      Text(
+                        'SNS 계정으로 로그인하기',
+                        style: StudyMateTheme.bodyMedium.copyWith(
+                          color: StudyMateTheme.grayText,
+                        ),
+                      ).animate()
+                        .fadeIn(delay: 600.ms, duration: 500.ms),
+                      const SizedBox(height: 20),
+                      
+                      // SNS 버튼들
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
                         children: [
-                          const Text(
-                            '🌟',
-                            style: TextStyle(fontSize: 24),
-                          ),
-                          const SizedBox(width: 8),
-                          Text(
-                            '오늘도 화이팅!',
-                            style: TextStyle(
-                              color: Colors.grey[700],
-                              fontSize: 14,
-                              fontWeight: FontWeight.w500,
+                          // 카카오톡
+                          _buildSocialButton(
+                            onTap: () => _handleSocialLogin('kakao'),
+                            backgroundColor: StudyMateTheme.kakaoYellow,
+                            child: const Text(
+                              'TALK',
+                              style: TextStyle(
+                                color: Colors.black,
+                                fontWeight: FontWeight.bold,
+                                fontSize: 12,
+                              ),
                             ),
-                          ),
-                          const SizedBox(width: 8),
-                          const Text(
-                            '💪',
-                            style: TextStyle(fontSize: 24),
-                          ),
+                          ).animate()
+                            .fadeIn(delay: 700.ms, duration: 500.ms)
+                            .scale(begin: const Offset(0.8, 0.8), end: const Offset(1, 1)),
+                          
+                          const SizedBox(width: 16),
+                          
+                          // 네이버
+                          _buildSocialButton(
+                            onTap: () => _handleSocialLogin('naver'),
+                            backgroundColor: StudyMateTheme.naverGreen,
+                            child: const Text(
+                              'N',
+                              style: TextStyle(
+                                color: Colors.white,
+                                fontWeight: FontWeight.bold,
+                                fontSize: 20,
+                              ),
+                            ),
+                          ).animate()
+                            .fadeIn(delay: 800.ms, duration: 500.ms)
+                            .scale(begin: const Offset(0.8, 0.8), end: const Offset(1, 1)),
+                          
+                          const SizedBox(width: 16),
+                          
+                          // 구글
+                          _buildSocialButton(
+                            onTap: () => _handleSocialLogin('google'),
+                            backgroundColor: StudyMateTheme.googleWhite,
+                            border: Border.all(
+                              color: StudyMateTheme.lightGray,
+                              width: 1,
+                            ),
+                            child: const Text(
+                              'G',
+                              style: TextStyle(
+                                color: Colors.black54,
+                                fontWeight: FontWeight.bold,
+                                fontSize: 20,
+                              ),
+                            ),
+                          ).animate()
+                            .fadeIn(delay: 900.ms, duration: 500.ms)
+                            .scale(begin: const Offset(0.8, 0.8), end: const Offset(1, 1)),
+                          
+                          const SizedBox(width: 16),
+                          
+                          // 애플
+                          _buildSocialButton(
+                            onTap: () => _handleSocialLogin('apple'),
+                            backgroundColor: StudyMateTheme.appleBlack,
+                            child: const Icon(
+                              Icons.apple,
+                              color: Colors.white,
+                              size: 24,
+                            ),
+                          ).animate()
+                            .fadeIn(delay: 1000.ms, duration: 500.ms)
+                            .scale(begin: const Offset(0.8, 0.8), end: const Offset(1, 1)),
                         ],
                       ),
-                    ),
+                    ],
                   ),
                 ],
               ),
             ),
           ),
         ),
+      ),
+    );
+  }
+
+  Widget _buildSocialButton({
+    required VoidCallback onTap,
+    required Color backgroundColor,
+    required Widget child,
+    Border? border,
+  }) {
+    return InkWell(
+      onTap: onTap,
+      borderRadius: BorderRadius.circular(30),
+      child: Container(
+        width: 60,
+        height: 60,
+        decoration: BoxDecoration(
+          color: backgroundColor,
+          shape: BoxShape.circle,
+          border: border,
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withOpacity(0.1),
+              blurRadius: 10,
+              offset: const Offset(0, 4),
+            ),
+          ],
+        ),
+        child: Center(child: child),
+      ),
+    );
+  }
+
+  Future<void> _handleSocialLogin(String provider) async {
+    // SNS 로그인 로직 구현
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text('$provider 로그인 준비 중입니다'),
+        backgroundColor: StudyMateTheme.primaryBlue,
       ),
     );
   }

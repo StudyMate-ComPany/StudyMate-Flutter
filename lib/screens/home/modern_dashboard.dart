@@ -4,7 +4,7 @@ import 'package:provider/provider.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import '../../providers/auth_provider.dart';
 import '../../providers/study_provider.dart';
-import '../../theme/modern_theme.dart';
+import '../../theme/studymate_theme.dart';
 import '../../models/study_goal.dart';
 import '../../models/study_session.dart';
 import '../../utils/constants.dart';
@@ -21,7 +21,7 @@ class _ModernDashboardState extends State<ModernDashboard> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: ModernTheme.backgroundColor,
+      backgroundColor: StudyMateTheme.lightBlue,
       body: SafeArea(
         child: Consumer2<AuthProvider, StudyProvider>(
           builder: (context, authProvider, studyProvider, child) {
@@ -31,7 +31,7 @@ class _ModernDashboardState extends State<ModernDashboard> {
             final recentSessions = studyProvider.sessions.take(3).toList();
 
             return RefreshIndicator(
-              color: ModernTheme.primaryColor,
+              color: StudyMateTheme.primaryBlue,
               backgroundColor: Colors.white,
               onRefresh: () async {
                 HapticFeedback.mediumImpact();
@@ -104,7 +104,7 @@ class _ModernDashboardState extends State<ModernDashboard> {
               Text(
                 greeting,
                 style: const TextStyle(
-                  color: ModernTheme.textSecondary,
+                  color: StudyMateTheme.grayText,
                   fontSize: 14,
                   fontWeight: FontWeight.w500,
                 ),
@@ -117,7 +117,7 @@ class _ModernDashboardState extends State<ModernDashboard> {
                   Text(
                     '$userName님',
                     style: const TextStyle(
-                      color: ModernTheme.textPrimary,
+                      color: StudyMateTheme.darkNavy,
                       fontSize: 24,
                       fontWeight: FontWeight.w700,
                     ),
@@ -128,13 +128,13 @@ class _ModernDashboardState extends State<ModernDashboard> {
                   Container(
                     padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                     decoration: BoxDecoration(
-                      color: ModernTheme.primaryColor.withOpacity(0.1),
+                      color: StudyMateTheme.primaryBlue.withOpacity(0.1),
                       borderRadius: BorderRadius.circular(8),
                     ),
                     child: Text(
                       '레벨 ${_calculateLevel(0)}',
                       style: const TextStyle(
-                        color: ModernTheme.primaryColor,
+                        color: StudyMateTheme.primaryBlue,
                         fontSize: 12,
                         fontWeight: FontWeight.w600,
                       ),
@@ -158,7 +158,7 @@ class _ModernDashboardState extends State<ModernDashboard> {
             children: [
               const Icon(
                 Icons.notifications_outlined,
-                color: ModernTheme.textPrimary,
+                color: StudyMateTheme.darkNavy,
                 size: 24,
               ),
               Positioned(
@@ -168,7 +168,7 @@ class _ModernDashboardState extends State<ModernDashboard> {
                   width: 8,
                   height: 8,
                   decoration: const BoxDecoration(
-                    color: ModernTheme.accentColor,
+                    color: StudyMateTheme.accentPink,
                     shape: BoxShape.circle,
                   ),
                 ),
@@ -191,11 +191,11 @@ class _ModernDashboardState extends State<ModernDashboard> {
       margin: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
-        gradient: ModernTheme.primaryGradient,
+        gradient: StudyMateTheme.buttonGradient,
         borderRadius: BorderRadius.circular(20),
         boxShadow: [
           BoxShadow(
-            color: ModernTheme.primaryColor.withOpacity(0.3),
+            color: StudyMateTheme.primaryBlue.withOpacity(0.3),
             blurRadius: 20,
             offset: const Offset(0, 10),
           ),
@@ -379,7 +379,7 @@ class _ModernDashboardState extends State<ModernDashboard> {
           const Text(
             '빠른 시작',
             style: TextStyle(
-              color: ModernTheme.textPrimary,
+              color: StudyMateTheme.darkNavy,
               fontSize: 18,
               fontWeight: FontWeight.w700,
             ),
@@ -392,7 +392,7 @@ class _ModernDashboardState extends State<ModernDashboard> {
                   context: context,
                   icon: Icons.play_circle_outline,
                   label: '학습 시작',
-                  color: ModernTheme.primaryColor,
+                  color: StudyMateTheme.primaryBlue,
                   onTap: () => _showStartStudyDialog(context),
                 ),
               ),
@@ -402,7 +402,7 @@ class _ModernDashboardState extends State<ModernDashboard> {
                   context: context,
                   icon: Icons.timer_outlined,
                   label: '포모도로',
-                  color: ModernTheme.secondaryColor,
+                  color: StudyMateTheme.accentPink,
                   onTap: () => _showPomodoroTimer(context),
                 ),
               ),
@@ -416,7 +416,7 @@ class _ModernDashboardState extends State<ModernDashboard> {
                   context: context,
                   icon: Icons.flag_outlined,
                   label: '목표 설정',
-                  color: ModernTheme.successColor,
+                  color: StudyMateTheme.primaryBlue,
                   onTap: () {
                     DefaultTabController.of(context)?.animateTo(1);
                   },
@@ -428,7 +428,7 @@ class _ModernDashboardState extends State<ModernDashboard> {
                   context: context,
                   icon: Icons.auto_awesome_outlined,
                   label: 'AI 도우미',
-                  color: ModernTheme.accentColor,
+                  color: StudyMateTheme.accentPink,
                   onTap: () {
                     DefaultTabController.of(context)?.animateTo(3);
                   },
@@ -462,7 +462,13 @@ class _ModernDashboardState extends State<ModernDashboard> {
           decoration: BoxDecoration(
             color: Colors.white,
             borderRadius: BorderRadius.circular(16),
-            boxShadow: ModernTheme.cardShadow,
+            boxShadow: [
+          BoxShadow(
+            color: StudyMateTheme.primaryBlue.withOpacity(0.08),
+            blurRadius: 20,
+            offset: const Offset(0, 4),
+          ),
+        ],
           ),
           child: Column(
             children: [
@@ -483,7 +489,7 @@ class _ModernDashboardState extends State<ModernDashboard> {
               Text(
                 label,
                 style: TextStyle(
-                  color: ModernTheme.textPrimary,
+                  color: StudyMateTheme.darkNavy,
                   fontSize: 13,
                   fontWeight: FontWeight.w600,
                 ),
@@ -507,7 +513,7 @@ class _ModernDashboardState extends State<ModernDashboard> {
               const Text(
                 '진행 중인 목표',
                 style: TextStyle(
-                  color: ModernTheme.textPrimary,
+                  color: StudyMateTheme.darkNavy,
                   fontSize: 18,
                   fontWeight: FontWeight.w700,
                 ),
@@ -520,7 +526,7 @@ class _ModernDashboardState extends State<ModernDashboard> {
                 child: const Text(
                   '모두 보기',
                   style: TextStyle(
-                    color: ModernTheme.primaryColor,
+                    color: StudyMateTheme.primaryBlue,
                     fontSize: 13,
                     fontWeight: FontWeight.w600,
                   ),
@@ -545,7 +551,13 @@ class _ModernDashboardState extends State<ModernDashboard> {
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(16),
-        boxShadow: ModernTheme.cardShadow,
+        boxShadow: [
+          BoxShadow(
+            color: StudyMateTheme.primaryBlue.withOpacity(0.08),
+            blurRadius: 20,
+            offset: const Offset(0, 4),
+          ),
+        ],
       ),
       child: Material(
         color: Colors.transparent,
@@ -583,7 +595,7 @@ class _ModernDashboardState extends State<ModernDashboard> {
                           Text(
                             goal.title,
                             style: const TextStyle(
-                              color: ModernTheme.textPrimary,
+                              color: StudyMateTheme.darkNavy,
                               fontSize: 15,
                               fontWeight: FontWeight.w600,
                             ),
@@ -592,7 +604,7 @@ class _ModernDashboardState extends State<ModernDashboard> {
                           Text(
                             goal.description,
                             style: const TextStyle(
-                              color: ModernTheme.textSecondary,
+                              color: StudyMateTheme.grayText,
                               fontSize: 12,
                             ),
                             maxLines: 1,
@@ -645,7 +657,7 @@ class _ModernDashboardState extends State<ModernDashboard> {
           const Text(
             '최근 학습',
             style: TextStyle(
-              color: ModernTheme.textPrimary,
+              color: StudyMateTheme.darkNavy,
               fontSize: 18,
               fontWeight: FontWeight.w700,
             ),
@@ -655,7 +667,13 @@ class _ModernDashboardState extends State<ModernDashboard> {
             decoration: BoxDecoration(
               color: Colors.white,
               borderRadius: BorderRadius.circular(16),
-              boxShadow: ModernTheme.cardShadow,
+              boxShadow: [
+          BoxShadow(
+            color: StudyMateTheme.primaryBlue.withOpacity(0.08),
+            blurRadius: 20,
+            offset: const Offset(0, 4),
+          ),
+        ],
             ),
             child: Column(
               children: sessions.map((session) {
@@ -699,12 +717,12 @@ class _ModernDashboardState extends State<ModernDashboard> {
                 width: 48,
                 height: 48,
                 decoration: BoxDecoration(
-                  color: ModernTheme.primaryColor.withOpacity(0.1),
+                  color: StudyMateTheme.primaryBlue.withOpacity(0.1),
                   borderRadius: BorderRadius.circular(12),
                 ),
                 child: const Icon(
                   Icons.book_outlined,
-                  color: ModernTheme.primaryColor,
+                  color: StudyMateTheme.primaryBlue,
                   size: 24,
                 ),
               ),
@@ -716,7 +734,7 @@ class _ModernDashboardState extends State<ModernDashboard> {
                     Text(
                       session.subject,
                       style: const TextStyle(
-                        color: ModernTheme.textPrimary,
+                        color: StudyMateTheme.darkNavy,
                         fontSize: 15,
                         fontWeight: FontWeight.w600,
                       ),
@@ -725,7 +743,7 @@ class _ModernDashboardState extends State<ModernDashboard> {
                     Text(
                       _formatSessionDate(session.startTime),
                       style: const TextStyle(
-                        color: ModernTheme.textSecondary,
+                        color: StudyMateTheme.grayText,
                         fontSize: 12,
                       ),
                     ),
@@ -738,7 +756,7 @@ class _ModernDashboardState extends State<ModernDashboard> {
                   Text(
                     hours > 0 ? '${hours}시간 ${minutes}분' : '${minutes}분',
                     style: const TextStyle(
-                      color: ModernTheme.textPrimary,
+                      color: StudyMateTheme.darkNavy,
                       fontSize: 14,
                       fontWeight: FontWeight.w600,
                     ),
@@ -748,16 +766,16 @@ class _ModernDashboardState extends State<ModernDashboard> {
                     padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
                     decoration: BoxDecoration(
                       color: session.status == SessionStatus.completed
-                          ? ModernTheme.successColor.withOpacity(0.1)
-                          : ModernTheme.warningColor.withOpacity(0.1),
+                          ? StudyMateTheme.primaryBlue.withOpacity(0.1)
+                          : StudyMateTheme.accentPink.withOpacity(0.1),
                       borderRadius: BorderRadius.circular(4),
                     ),
                     child: Text(
                       session.status == SessionStatus.completed ? '완료' : '진행중',
                       style: TextStyle(
                         color: session.status == SessionStatus.completed
-                            ? ModernTheme.successColor
-                            : ModernTheme.warningColor,
+                            ? StudyMateTheme.primaryBlue
+                            : StudyMateTheme.accentPink,
                         fontSize: 10,
                         fontWeight: FontWeight.w600,
                       ),
@@ -814,7 +832,7 @@ class _ModernDashboardState extends State<ModernDashboard> {
                   style: TextStyle(
                     fontSize: 20,
                     fontWeight: FontWeight.w700,
-                    color: ModernTheme.textPrimary,
+                    color: StudyMateTheme.darkNavy,
                   ),
                 ),
                 const SizedBox(height: 24),
@@ -824,7 +842,7 @@ class _ModernDashboardState extends State<ModernDashboard> {
                   style: TextStyle(
                     fontSize: 14,
                     fontWeight: FontWeight.w600,
-                    color: ModernTheme.textSecondary,
+                    color: StudyMateTheme.grayText,
                   ),
                 ),
                 const SizedBox(height: 8),
@@ -858,7 +876,7 @@ class _ModernDashboardState extends State<ModernDashboard> {
                   style: TextStyle(
                     fontSize: 14,
                     fontWeight: FontWeight.w600,
-                    color: ModernTheme.textSecondary,
+                    color: StudyMateTheme.grayText,
                   ),
                 ),
                 const SizedBox(height: 8),
@@ -902,7 +920,7 @@ class _ModernDashboardState extends State<ModernDashboard> {
                         ScaffoldMessenger.of(context).showSnackBar(
                           SnackBar(
                             content: const Text('학습이 시작되었습니다'),
-                            backgroundColor: ModernTheme.successColor,
+                            backgroundColor: StudyMateTheme.primaryBlue,
                             behavior: SnackBarBehavior.floating,
                             shape: RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(12),
@@ -911,7 +929,13 @@ class _ModernDashboardState extends State<ModernDashboard> {
                         );
                       }
                     },
-                    style: ModernTheme.primaryButtonStyle,
+                    style: ElevatedButton.styleFrom(
+                backgroundColor: StudyMateTheme.primaryBlue,
+                foregroundColor: Colors.white,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(16),
+                ),
+              ),
                     child: const Text('시작하기'),
                   ),
                 ),
@@ -934,10 +958,10 @@ class _ModernDashboardState extends State<ModernDashboard> {
         child: Container(
           padding: const EdgeInsets.symmetric(vertical: 12),
           decoration: BoxDecoration(
-            color: selected ? ModernTheme.primaryColor : Colors.grey[50],
+            color: selected ? StudyMateTheme.primaryBlue : Colors.grey[50],
             borderRadius: BorderRadius.circular(12),
             border: Border.all(
-              color: selected ? ModernTheme.primaryColor : Colors.transparent,
+              color: selected ? StudyMateTheme.primaryBlue : Colors.transparent,
               width: 2,
             ),
           ),
@@ -945,7 +969,7 @@ class _ModernDashboardState extends State<ModernDashboard> {
             child: Text(
               label,
               style: TextStyle(
-                color: selected ? Colors.white : ModernTheme.textSecondary,
+                color: selected ? Colors.white : StudyMateTheme.grayText,
                 fontSize: 14,
                 fontWeight: FontWeight.w600,
               ),
@@ -970,13 +994,13 @@ class _ModernDashboardState extends State<ModernDashboard> {
   Color _getGoalColor(String type) {
     switch (type.toLowerCase()) {
       case 'daily':
-        return ModernTheme.primaryColor;
+        return StudyMateTheme.primaryBlue;
       case 'weekly':
-        return ModernTheme.secondaryColor;
+        return StudyMateTheme.accentPink;
       case 'monthly':
-        return ModernTheme.successColor;
+        return StudyMateTheme.primaryBlue;
       default:
-        return ModernTheme.accentColor;
+        return StudyMateTheme.accentPink;
     }
   }
 

@@ -4,7 +4,7 @@ import 'package:provider/provider.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import '../../providers/ai_provider.dart';
 import '../../models/ai_response.dart';
-import '../../theme/modern_theme.dart';
+import '../../theme/studymate_theme.dart';
 import '../../widgets/korean_enabled_text_field.dart';
 
 class ModernAIAssistantScreen extends StatefulWidget {
@@ -28,7 +28,9 @@ class _ModernAIAssistantScreenState extends State<ModernAIAssistantScreen>
       vsync: this,
       duration: const Duration(seconds: 2),
     )..repeat(reverse: true);
-    _loadHistory();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _loadHistory();
+    });
   }
   
   @override
@@ -78,7 +80,7 @@ class _ModernAIAssistantScreenState extends State<ModernAIAssistantScreen>
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: ModernTheme.backgroundColor,
+      backgroundColor: StudyMateTheme.lightBlue,
       appBar: AppBar(
         backgroundColor: Colors.white,
         elevation: 0,
@@ -86,13 +88,13 @@ class _ModernAIAssistantScreenState extends State<ModernAIAssistantScreen>
           icon: Container(
             padding: const EdgeInsets.all(8),
             decoration: BoxDecoration(
-              color: ModernTheme.primaryColor.withOpacity(0.1),
+              color: StudyMateTheme.primaryBlue.withOpacity(0.1),
               borderRadius: BorderRadius.circular(12),
             ),
             child: const Icon(
               Icons.arrow_back_ios,
               size: 20,
-              color: ModernTheme.primaryColor,
+              color: StudyMateTheme.primaryBlue,
             ),
           ),
           onPressed: () => Navigator.pop(context),
@@ -109,8 +111,8 @@ class _ModernAIAssistantScreenState extends State<ModernAIAssistantScreen>
                   decoration: BoxDecoration(
                     gradient: LinearGradient(
                       colors: [
-                        ModernTheme.primaryColor,
-                        ModernTheme.accentColor,
+                        StudyMateTheme.primaryBlue,
+                        StudyMateTheme.accentPink,
                       ],
                       transform: GradientRotation(_animationController.value * 3.14),
                     ),
@@ -128,7 +130,7 @@ class _ModernAIAssistantScreenState extends State<ModernAIAssistantScreen>
             const Text(
               '스마트 학습 도우미',
               style: TextStyle(
-                color: ModernTheme.textPrimary,
+                color: StudyMateTheme.darkNavy,
                 fontWeight: FontWeight.w700,
               ),
             ),
@@ -140,13 +142,13 @@ class _ModernAIAssistantScreenState extends State<ModernAIAssistantScreen>
             icon: Container(
               padding: const EdgeInsets.all(8),
               decoration: BoxDecoration(
-                color: ModernTheme.accentColor.withOpacity(0.1),
+                color: StudyMateTheme.accentPink.withOpacity(0.1),
                 borderRadius: BorderRadius.circular(12),
               ),
               child: const Icon(
                 Icons.refresh,
                 size: 20,
-                color: ModernTheme.accentColor,
+                color: StudyMateTheme.accentPink,
               ),
             ),
             onPressed: () {
@@ -187,7 +189,7 @@ class _ModernAIAssistantScreenState extends State<ModernAIAssistantScreen>
       {
         'icon': Icons.schedule,
         'label': '학습 계획',
-        'color': ModernTheme.primaryColor,
+        'color': StudyMateTheme.primaryBlue,
         'action': () async {
           HapticFeedback.lightImpact();
           setState(() => _isTyping = true);
@@ -201,7 +203,7 @@ class _ModernAIAssistantScreenState extends State<ModernAIAssistantScreen>
       {
         'icon': Icons.quiz,
         'label': '퀴즈 생성',
-        'color': ModernTheme.accentColor,
+        'color': StudyMateTheme.accentPink,
         'action': () async {
           HapticFeedback.lightImpact();
           _showQuizGenerationDialog(aiProvider);
@@ -210,7 +212,7 @@ class _ModernAIAssistantScreenState extends State<ModernAIAssistantScreen>
       {
         'icon': Icons.lightbulb,
         'label': '개념 설명',
-        'color': ModernTheme.secondaryColor,
+        'color': StudyMateTheme.accentPink,
         'action': () async {
           HapticFeedback.lightImpact();
           _showConceptExplanationDialog(aiProvider);
@@ -219,7 +221,7 @@ class _ModernAIAssistantScreenState extends State<ModernAIAssistantScreen>
       {
         'icon': Icons.summarize,
         'label': '요약',
-        'color': ModernTheme.successColor,
+        'color': StudyMateTheme.primaryBlue,
         'action': () async {
           HapticFeedback.lightImpact();
           setState(() => _isTyping = true);
@@ -252,7 +254,13 @@ class _ModernAIAssistantScreenState extends State<ModernAIAssistantScreen>
                 decoration: BoxDecoration(
                   color: Colors.white,
                   borderRadius: BorderRadius.circular(16),
-                  boxShadow: ModernTheme.cardShadow,
+                  boxShadow: [
+          BoxShadow(
+            color: StudyMateTheme.primaryBlue.withOpacity(0.08),
+            blurRadius: 20,
+            offset: const Offset(0, 4),
+          ),
+        ],
                 ),
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
@@ -276,7 +284,7 @@ class _ModernAIAssistantScreenState extends State<ModernAIAssistantScreen>
                       style: const TextStyle(
                         fontSize: 11,
                         fontWeight: FontWeight.w600,
-                        color: ModernTheme.textPrimary,
+                        color: StudyMateTheme.darkNavy,
                       ),
                       textAlign: TextAlign.center,
                     ),
@@ -303,7 +311,7 @@ class _ModernAIAssistantScreenState extends State<ModernAIAssistantScreen>
               width: 120,
               height: 120,
               decoration: BoxDecoration(
-                gradient: ModernTheme.primaryGradient,
+                gradient: StudyMateTheme.buttonGradient,
                 borderRadius: BorderRadius.circular(30),
               ),
               child: const Icon(
@@ -322,7 +330,7 @@ class _ModernAIAssistantScreenState extends State<ModernAIAssistantScreen>
               style: TextStyle(
                 fontSize: 22,
                 fontWeight: FontWeight.w700,
-                color: ModernTheme.textPrimary,
+                color: StudyMateTheme.darkNavy,
               ),
             ).animate()
               .fadeIn(delay: 400.ms),
@@ -333,7 +341,7 @@ class _ModernAIAssistantScreenState extends State<ModernAIAssistantScreen>
               '무엇이든 물어보세요!\n학습을 도와드리겠습니다',
               style: TextStyle(
                 fontSize: 14,
-                color: ModernTheme.textSecondary,
+                color: StudyMateTheme.grayText,
               ),
               textAlign: TextAlign.center,
             ).animate()
@@ -370,17 +378,17 @@ class _ModernAIAssistantScreenState extends State<ModernAIAssistantScreen>
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
         decoration: BoxDecoration(
-          color: ModernTheme.primaryColor.withOpacity(0.1),
+          color: StudyMateTheme.primaryBlue.withOpacity(0.1),
           borderRadius: BorderRadius.circular(20),
           border: Border.all(
-            color: ModernTheme.primaryColor.withOpacity(0.3),
+            color: StudyMateTheme.primaryBlue.withOpacity(0.3),
           ),
         ),
         child: Text(
           text,
           style: const TextStyle(
             fontSize: 13,
-            color: ModernTheme.primaryColor,
+            color: StudyMateTheme.primaryBlue,
             fontWeight: FontWeight.w500,
           ),
         ),
@@ -428,7 +436,7 @@ class _ModernAIAssistantScreenState extends State<ModernAIAssistantScreen>
         ),
         decoration: BoxDecoration(
           gradient: isUser 
-            ? ModernTheme.primaryGradient
+            ? StudyMateTheme.buttonGradient
             : null,
           color: isUser ? null : Colors.white,
           borderRadius: BorderRadius.only(
@@ -437,7 +445,13 @@ class _ModernAIAssistantScreenState extends State<ModernAIAssistantScreen>
             bottomLeft: Radius.circular(isUser ? 20 : 4),
             bottomRight: Radius.circular(isUser ? 4 : 20),
           ),
-          boxShadow: ModernTheme.cardShadow,
+          boxShadow: [
+          BoxShadow(
+            color: StudyMateTheme.primaryBlue.withOpacity(0.08),
+            blurRadius: 20,
+            offset: const Offset(0, 4),
+          ),
+        ],
         ),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -450,7 +464,7 @@ class _ModernAIAssistantScreenState extends State<ModernAIAssistantScreen>
                     width: 24,
                     height: 24,
                     decoration: BoxDecoration(
-                      gradient: ModernTheme.primaryGradient,
+                      gradient: StudyMateTheme.buttonGradient,
                       borderRadius: BorderRadius.circular(8),
                     ),
                     child: const Icon(
@@ -465,7 +479,7 @@ class _ModernAIAssistantScreenState extends State<ModernAIAssistantScreen>
                     style: TextStyle(
                       fontSize: 12,
                       fontWeight: FontWeight.w600,
-                      color: ModernTheme.primaryColor,
+                      color: StudyMateTheme.primaryBlue,
                     ),
                   ),
                 ],
@@ -475,7 +489,7 @@ class _ModernAIAssistantScreenState extends State<ModernAIAssistantScreen>
               message,
               style: TextStyle(
                 fontSize: 14,
-                color: isUser ? Colors.white : ModernTheme.textPrimary,
+                color: isUser ? Colors.white : StudyMateTheme.darkNavy,
                 height: 1.5,
               ),
             ),
@@ -494,7 +508,13 @@ class _ModernAIAssistantScreenState extends State<ModernAIAssistantScreen>
         decoration: BoxDecoration(
           color: Colors.white,
           borderRadius: BorderRadius.circular(20),
-          boxShadow: ModernTheme.cardShadow,
+          boxShadow: [
+          BoxShadow(
+            color: StudyMateTheme.primaryBlue.withOpacity(0.08),
+            blurRadius: 20,
+            offset: const Offset(0, 4),
+          ),
+        ],
         ),
         child: Row(
           mainAxisSize: MainAxisSize.min,
@@ -503,7 +523,7 @@ class _ModernAIAssistantScreenState extends State<ModernAIAssistantScreen>
               width: 24,
               height: 24,
               decoration: BoxDecoration(
-                gradient: ModernTheme.primaryGradient,
+                gradient: StudyMateTheme.buttonGradient,
                 borderRadius: BorderRadius.circular(8),
               ),
               child: const Icon(
@@ -522,7 +542,7 @@ class _ModernAIAssistantScreenState extends State<ModernAIAssistantScreen>
                     width: 8,
                     height: 8,
                     decoration: BoxDecoration(
-                      color: ModernTheme.primaryColor,
+                      color: StudyMateTheme.primaryBlue,
                       shape: BoxShape.circle,
                     ),
                   ).animate(
@@ -568,7 +588,7 @@ class _ModernAIAssistantScreenState extends State<ModernAIAssistantScreen>
             Expanded(
               child: Container(
                 decoration: BoxDecoration(
-                  color: ModernTheme.backgroundColor,
+                  color: StudyMateTheme.lightBlue,
                   borderRadius: BorderRadius.circular(24),
                 ),
                 child: TextField(
@@ -579,7 +599,7 @@ class _ModernAIAssistantScreenState extends State<ModernAIAssistantScreen>
                   decoration: InputDecoration(
                     hintText: '메시지를 입력하세요...',
                     hintStyle: const TextStyle(
-                      color: ModernTheme.textLight,
+                      color: StudyMateTheme.grayText,
                       fontSize: 14,
                     ),
                     border: OutlineInputBorder(
@@ -597,7 +617,7 @@ class _ModernAIAssistantScreenState extends State<ModernAIAssistantScreen>
                       },
                       icon: const Icon(
                         Icons.attach_file,
-                        color: ModernTheme.textSecondary,
+                        color: StudyMateTheme.grayText,
                         size: 20,
                       ),
                     ),
@@ -610,11 +630,11 @@ class _ModernAIAssistantScreenState extends State<ModernAIAssistantScreen>
               width: 48,
               height: 48,
               decoration: BoxDecoration(
-                gradient: ModernTheme.primaryGradient,
+                gradient: StudyMateTheme.buttonGradient,
                 shape: BoxShape.circle,
                 boxShadow: [
                   BoxShadow(
-                    color: ModernTheme.primaryColor.withOpacity(0.3),
+                    color: StudyMateTheme.primaryBlue.withOpacity(0.3),
                     blurRadius: 8,
                     offset: const Offset(0, 2),
                   ),
@@ -679,7 +699,7 @@ class _ModernAIAssistantScreenState extends State<ModernAIAssistantScreen>
                         width: 40,
                         height: 40,
                         decoration: BoxDecoration(
-                          gradient: ModernTheme.primaryGradient,
+                          gradient: StudyMateTheme.buttonGradient,
                           borderRadius: BorderRadius.circular(12),
                         ),
                         child: const Icon(
@@ -694,7 +714,7 @@ class _ModernAIAssistantScreenState extends State<ModernAIAssistantScreen>
                         style: TextStyle(
                           fontSize: 20,
                           fontWeight: FontWeight.w700,
-                          color: ModernTheme.textPrimary,
+                          color: StudyMateTheme.darkNavy,
                         ),
                       ),
                     ],
@@ -707,9 +727,9 @@ class _ModernAIAssistantScreenState extends State<ModernAIAssistantScreen>
                     decoration: InputDecoration(
                       labelText: '과목',
                       hintText: '예: 수학, 영어, 과학',
-                      prefixIcon: const Icon(Icons.book, color: ModernTheme.primaryColor),
+                      prefixIcon: const Icon(Icons.book, color: StudyMateTheme.primaryBlue),
                       filled: true,
-                      fillColor: ModernTheme.backgroundColor,
+                      fillColor: StudyMateTheme.lightBlue,
                       border: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(16),
                         borderSide: BorderSide.none,
@@ -721,7 +741,7 @@ class _ModernAIAssistantScreenState extends State<ModernAIAssistantScreen>
                   
                   Row(
                     children: [
-                      const Icon(Icons.numbers, color: ModernTheme.primaryColor),
+                      const Icon(Icons.numbers, color: StudyMateTheme.primaryBlue),
                       const SizedBox(width: 12),
                       const Text('문제 수:'),
                       const SizedBox(width: 16),
@@ -731,7 +751,7 @@ class _ModernAIAssistantScreenState extends State<ModernAIAssistantScreen>
                           min: 3,
                           max: 10,
                           divisions: 7,
-                          activeColor: ModernTheme.primaryColor,
+                          activeColor: StudyMateTheme.primaryBlue,
                           label: questionCount.toString(),
                           onChanged: (value) {
                             setState(() {
@@ -744,7 +764,7 @@ class _ModernAIAssistantScreenState extends State<ModernAIAssistantScreen>
                         '$questionCount개',
                         style: const TextStyle(
                           fontWeight: FontWeight.w600,
-                          color: ModernTheme.primaryColor,
+                          color: StudyMateTheme.primaryBlue,
                         ),
                       ),
                     ],
@@ -762,7 +782,7 @@ class _ModernAIAssistantScreenState extends State<ModernAIAssistantScreen>
                             shape: RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(16),
                             ),
-                            side: const BorderSide(color: ModernTheme.primaryColor, width: 2),
+                            side: const BorderSide(color: StudyMateTheme.primaryBlue, width: 2),
                           ),
                           child: const Text('취소'),
                         ),
@@ -781,7 +801,7 @@ class _ModernAIAssistantScreenState extends State<ModernAIAssistantScreen>
                           },
                           style: ElevatedButton.styleFrom(
                             padding: const EdgeInsets.symmetric(vertical: 16),
-                            backgroundColor: ModernTheme.primaryColor,
+                            backgroundColor: StudyMateTheme.primaryBlue,
                             shape: RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(16),
                             ),
@@ -840,7 +860,7 @@ class _ModernAIAssistantScreenState extends State<ModernAIAssistantScreen>
                     width: 40,
                     height: 40,
                     decoration: BoxDecoration(
-                      gradient: ModernTheme.primaryGradient,
+                      gradient: StudyMateTheme.buttonGradient,
                       borderRadius: BorderRadius.circular(12),
                     ),
                     child: const Icon(
@@ -855,7 +875,7 @@ class _ModernAIAssistantScreenState extends State<ModernAIAssistantScreen>
                     style: TextStyle(
                       fontSize: 20,
                       fontWeight: FontWeight.w700,
-                      color: ModernTheme.textPrimary,
+                      color: StudyMateTheme.darkNavy,
                     ),
                   ),
                 ],
@@ -868,9 +888,9 @@ class _ModernAIAssistantScreenState extends State<ModernAIAssistantScreen>
                 decoration: InputDecoration(
                   labelText: '개념',
                   hintText: '예: 광합성, 미분, 영문법',
-                  prefixIcon: const Icon(Icons.lightbulb_outline, color: ModernTheme.primaryColor),
+                  prefixIcon: const Icon(Icons.lightbulb_outline, color: StudyMateTheme.primaryBlue),
                   filled: true,
-                  fillColor: ModernTheme.backgroundColor,
+                  fillColor: StudyMateTheme.lightBlue,
                   border: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(16),
                     borderSide: BorderSide.none,
@@ -885,9 +905,9 @@ class _ModernAIAssistantScreenState extends State<ModernAIAssistantScreen>
                 decoration: InputDecoration(
                   labelText: '과목 (선택)',
                   hintText: '예: 생물학, 수학, 영어',
-                  prefixIcon: const Icon(Icons.book, color: ModernTheme.primaryColor),
+                  prefixIcon: const Icon(Icons.book, color: StudyMateTheme.primaryBlue),
                   filled: true,
-                  fillColor: ModernTheme.backgroundColor,
+                  fillColor: StudyMateTheme.lightBlue,
                   border: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(16),
                     borderSide: BorderSide.none,
@@ -907,7 +927,7 @@ class _ModernAIAssistantScreenState extends State<ModernAIAssistantScreen>
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(16),
                         ),
-                        side: const BorderSide(color: ModernTheme.primaryColor, width: 2),
+                        side: const BorderSide(color: StudyMateTheme.primaryBlue, width: 2),
                       ),
                       child: const Text('취소'),
                     ),
@@ -926,7 +946,7 @@ class _ModernAIAssistantScreenState extends State<ModernAIAssistantScreen>
                       },
                       style: ElevatedButton.styleFrom(
                         padding: const EdgeInsets.symmetric(vertical: 16),
-                        backgroundColor: ModernTheme.primaryColor,
+                        backgroundColor: StudyMateTheme.primaryBlue,
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(16),
                         ),
@@ -972,13 +992,13 @@ class _ModernAIAssistantScreenState extends State<ModernAIAssistantScreen>
                 _buildAttachmentOption(
                   Icons.image,
                   '이미지',
-                  ModernTheme.primaryColor,
+                  StudyMateTheme.primaryBlue,
                   () {
                     Navigator.pop(context);
                     ScaffoldMessenger.of(context).showSnackBar(
                       SnackBar(
                         content: const Text('이미지 첨부 기능을 준비 중입니다'),
-                        backgroundColor: ModernTheme.primaryColor,
+                        backgroundColor: StudyMateTheme.primaryBlue,
                         behavior: SnackBarBehavior.floating,
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(20),
@@ -990,13 +1010,13 @@ class _ModernAIAssistantScreenState extends State<ModernAIAssistantScreen>
                 _buildAttachmentOption(
                   Icons.file_copy,
                   '파일',
-                  ModernTheme.accentColor,
+                  StudyMateTheme.accentPink,
                   () {
                     Navigator.pop(context);
                     ScaffoldMessenger.of(context).showSnackBar(
                       SnackBar(
                         content: const Text('파일 첨부 기능을 준비 중입니다'),
-                        backgroundColor: ModernTheme.accentColor,
+                        backgroundColor: StudyMateTheme.accentPink,
                         behavior: SnackBarBehavior.floating,
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(20),
@@ -1008,13 +1028,13 @@ class _ModernAIAssistantScreenState extends State<ModernAIAssistantScreen>
                 _buildAttachmentOption(
                   Icons.camera_alt,
                   '카메라',
-                  ModernTheme.secondaryColor,
+                  StudyMateTheme.accentPink,
                   () {
                     Navigator.pop(context);
                     ScaffoldMessenger.of(context).showSnackBar(
                       SnackBar(
                         content: const Text('카메라 기능을 준비 중입니다'),
-                        backgroundColor: ModernTheme.secondaryColor,
+                        backgroundColor: StudyMateTheme.accentPink,
                         behavior: SnackBarBehavior.floating,
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(20),
@@ -1062,7 +1082,7 @@ class _ModernAIAssistantScreenState extends State<ModernAIAssistantScreen>
             style: const TextStyle(
               fontSize: 12,
               fontWeight: FontWeight.w600,
-              color: ModernTheme.textPrimary,
+              color: StudyMateTheme.darkNavy,
             ),
           ),
         ],

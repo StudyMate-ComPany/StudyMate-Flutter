@@ -3,7 +3,7 @@ import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import '../../providers/auth_provider.dart';
-import '../../theme/modern_theme.dart';
+import '../../theme/studymate_theme.dart';
 import '../../widgets/korean_enabled_text_field.dart';
 import '../home/new_home_screen.dart';
 
@@ -73,7 +73,7 @@ class _ModernRegisterScreenState extends State<ModernRegisterScreen> {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text(authProvider.errorMessage ?? '회원가입에 실패했습니다'),
-            backgroundColor: ModernTheme.errorColor,
+            backgroundColor: StudyMateTheme.accentPink,
             behavior: SnackBarBehavior.floating,
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(12),
@@ -85,7 +85,7 @@ class _ModernRegisterScreenState extends State<ModernRegisterScreen> {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: const Text('약관에 동의해주세요'),
-          backgroundColor: ModernTheme.warningColor,
+          backgroundColor: StudyMateTheme.accentPink,
           behavior: SnackBarBehavior.floating,
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(12),
@@ -98,7 +98,7 @@ class _ModernRegisterScreenState extends State<ModernRegisterScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: ModernTheme.backgroundColor,
+      backgroundColor: StudyMateTheme.lightBlue,
       appBar: AppBar(
         backgroundColor: Colors.transparent,
         elevation: 0,
@@ -112,11 +112,17 @@ class _ModernRegisterScreenState extends State<ModernRegisterScreen> {
             decoration: BoxDecoration(
               color: Colors.white,
               borderRadius: BorderRadius.circular(12),
-              boxShadow: ModernTheme.cardShadow,
+              boxShadow: [
+          BoxShadow(
+            color: StudyMateTheme.primaryBlue.withOpacity(0.08),
+            blurRadius: 20,
+            offset: const Offset(0, 4),
+          ),
+        ],
             ),
             child: const Icon(
               Icons.arrow_back,
-              color: ModernTheme.textPrimary,
+              color: StudyMateTheme.darkNavy,
               size: 20,
             ),
           ),
@@ -171,7 +177,7 @@ class _ModernRegisterScreenState extends State<ModernRegisterScreen> {
           style: TextStyle(
             fontSize: 32,
             fontWeight: FontWeight.w800,
-            color: ModernTheme.textPrimary,
+            color: StudyMateTheme.darkNavy,
             letterSpacing: -0.5,
           ),
         ).animate()
@@ -184,7 +190,7 @@ class _ModernRegisterScreenState extends State<ModernRegisterScreen> {
           'StudyMate와 함께 학습을 시작해보세요',
           style: TextStyle(
             fontSize: 16,
-            color: ModernTheme.textSecondary,
+            color: StudyMateTheme.grayText,
             fontWeight: FontWeight.w500,
           ),
         ).animate()
@@ -202,7 +208,7 @@ class _ModernRegisterScreenState extends State<ModernRegisterScreen> {
             height: 4,
             margin: const EdgeInsets.only(right: 4),
             decoration: BoxDecoration(
-              color: isActive ? ModernTheme.primaryColor : Colors.grey[300],
+              color: isActive ? StudyMateTheme.primaryBlue : Colors.grey[300],
               borderRadius: BorderRadius.circular(2),
             ),
           ).animate()
@@ -227,7 +233,13 @@ class _ModernRegisterScreenState extends State<ModernRegisterScreen> {
             decoration: BoxDecoration(
               color: Colors.white,
               borderRadius: BorderRadius.circular(16),
-              boxShadow: ModernTheme.cardShadow,
+              boxShadow: [
+          BoxShadow(
+            color: StudyMateTheme.primaryBlue.withOpacity(0.08),
+            blurRadius: 20,
+            offset: const Offset(0, 4),
+          ),
+        ],
             ),
             child: TextFormField(
               controller: _nameController,
@@ -238,7 +250,7 @@ class _ModernRegisterScreenState extends State<ModernRegisterScreen> {
                 hintText: '홍길동',
                 prefixIcon: Icon(
                   Icons.person_outline,
-                  color: ModernTheme.primaryColor,
+                  color: StudyMateTheme.primaryBlue,
                 ),
                 border: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(16),
@@ -268,7 +280,13 @@ class _ModernRegisterScreenState extends State<ModernRegisterScreen> {
             decoration: BoxDecoration(
               color: Colors.white,
               borderRadius: BorderRadius.circular(16),
-              boxShadow: ModernTheme.cardShadow,
+              boxShadow: [
+          BoxShadow(
+            color: StudyMateTheme.primaryBlue.withOpacity(0.08),
+            blurRadius: 20,
+            offset: const Offset(0, 4),
+          ),
+        ],
             ),
             child: TextFormField(
               controller: _emailController,
@@ -280,7 +298,7 @@ class _ModernRegisterScreenState extends State<ModernRegisterScreen> {
                 hintText: 'example@email.com',
                 prefixIcon: Icon(
                   Icons.email_outlined,
-                  color: ModernTheme.primaryColor,
+                  color: StudyMateTheme.primaryBlue,
                 ),
                 border: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(16),
@@ -310,7 +328,13 @@ class _ModernRegisterScreenState extends State<ModernRegisterScreen> {
             decoration: BoxDecoration(
               color: Colors.white,
               borderRadius: BorderRadius.circular(16),
-              boxShadow: ModernTheme.cardShadow,
+              boxShadow: [
+          BoxShadow(
+            color: StudyMateTheme.primaryBlue.withOpacity(0.08),
+            blurRadius: 20,
+            offset: const Offset(0, 4),
+          ),
+        ],
             ),
             child: TextFormField(
               controller: _passwordController,
@@ -322,7 +346,7 @@ class _ModernRegisterScreenState extends State<ModernRegisterScreen> {
                 hintText: '6자 이상',
                 prefixIcon: Icon(
                   Icons.lock_outline,
-                  color: ModernTheme.primaryColor,
+                  color: StudyMateTheme.primaryBlue,
                 ),
                 suffixIcon: IconButton(
                   onPressed: () {
@@ -332,7 +356,7 @@ class _ModernRegisterScreenState extends State<ModernRegisterScreen> {
                   },
                   icon: Icon(
                     _isPasswordVisible ? Icons.visibility_off : Icons.visibility,
-                    color: ModernTheme.textSecondary,
+                    color: StudyMateTheme.grayText,
                   ),
                 ),
                 border: OutlineInputBorder(
@@ -363,7 +387,13 @@ class _ModernRegisterScreenState extends State<ModernRegisterScreen> {
             decoration: BoxDecoration(
               color: Colors.white,
               borderRadius: BorderRadius.circular(16),
-              boxShadow: ModernTheme.cardShadow,
+              boxShadow: [
+          BoxShadow(
+            color: StudyMateTheme.primaryBlue.withOpacity(0.08),
+            blurRadius: 20,
+            offset: const Offset(0, 4),
+          ),
+        ],
             ),
             child: TextFormField(
               controller: _confirmPasswordController,
@@ -375,7 +405,7 @@ class _ModernRegisterScreenState extends State<ModernRegisterScreen> {
                 hintText: '비밀번호를 다시 입력해주세요',
                 prefixIcon: Icon(
                   Icons.lock_outline,
-                  color: ModernTheme.primaryColor,
+                  color: StudyMateTheme.primaryBlue,
                 ),
                 suffixIcon: IconButton(
                   onPressed: () {
@@ -385,7 +415,7 @@ class _ModernRegisterScreenState extends State<ModernRegisterScreen> {
                   },
                   icon: Icon(
                     _isConfirmPasswordVisible ? Icons.visibility_off : Icons.visibility,
-                    color: ModernTheme.textSecondary,
+                    color: StudyMateTheme.grayText,
                   ),
                 ),
                 border: OutlineInputBorder(
@@ -419,7 +449,13 @@ class _ModernRegisterScreenState extends State<ModernRegisterScreen> {
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(16),
-        boxShadow: ModernTheme.cardShadow,
+        boxShadow: [
+          BoxShadow(
+            color: StudyMateTheme.primaryBlue.withOpacity(0.08),
+            blurRadius: 20,
+            offset: const Offset(0, 4),
+          ),
+        ],
       ),
       child: Column(
         children: [
@@ -437,7 +473,7 @@ class _ModernRegisterScreenState extends State<ModernRegisterScreen> {
               padding: const EdgeInsets.all(12),
               decoration: BoxDecoration(
                 color: (_agreeToTerms && _agreeToPrivacy)
-                    ? ModernTheme.primaryColor.withOpacity(0.1)
+                    ? StudyMateTheme.primaryBlue.withOpacity(0.1)
                     : Colors.grey[50],
                 borderRadius: BorderRadius.circular(12),
               ),
@@ -448,7 +484,7 @@ class _ModernRegisterScreenState extends State<ModernRegisterScreen> {
                         ? Icons.check_circle
                         : Icons.check_circle_outline,
                     color: (_agreeToTerms && _agreeToPrivacy)
-                        ? ModernTheme.primaryColor
+                        ? StudyMateTheme.primaryBlue
                         : Colors.grey[400],
                     size: 24,
                   ),
@@ -458,7 +494,7 @@ class _ModernRegisterScreenState extends State<ModernRegisterScreen> {
                     style: TextStyle(
                       fontSize: 16,
                       fontWeight: FontWeight.w700,
-                      color: ModernTheme.textPrimary,
+                      color: StudyMateTheme.darkNavy,
                     ),
                   ),
                 ],
@@ -523,7 +559,7 @@ class _ModernRegisterScreenState extends State<ModernRegisterScreen> {
               child: Checkbox(
                 value: value,
                 onChanged: onChanged,
-                activeColor: ModernTheme.primaryColor,
+                activeColor: StudyMateTheme.primaryBlue,
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(4),
                 ),
@@ -535,7 +571,7 @@ class _ModernRegisterScreenState extends State<ModernRegisterScreen> {
                 title,
                 style: const TextStyle(
                   fontSize: 14,
-                  color: ModernTheme.textPrimary,
+                  color: StudyMateTheme.darkNavy,
                 ),
               ),
             ),
@@ -544,7 +580,7 @@ class _ModernRegisterScreenState extends State<ModernRegisterScreen> {
               icon: const Icon(
                 Icons.arrow_forward_ios,
                 size: 16,
-                color: ModernTheme.textSecondary,
+                color: StudyMateTheme.grayText,
               ),
             ),
           ],
@@ -562,7 +598,7 @@ class _ModernRegisterScreenState extends State<ModernRegisterScreen> {
       child: ElevatedButton(
         onPressed: (_isLoading || !isValid) ? null : _handleRegister,
         style: ElevatedButton.styleFrom(
-          backgroundColor: isValid ? ModernTheme.primaryColor : Colors.grey[300],
+          backgroundColor: isValid ? StudyMateTheme.primaryBlue : Colors.grey[300],
           foregroundColor: Colors.white,
           elevation: 0,
           shape: RoundedRectangleBorder(

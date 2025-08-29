@@ -4,7 +4,7 @@ import 'package:provider/provider.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import '../../providers/study_provider.dart';
 import '../../models/study_goal.dart';
-import '../../theme/modern_theme.dart';
+import '../../theme/studymate_theme.dart';
 
 class ModernStudyGoalsScreen extends StatefulWidget {
   const ModernStudyGoalsScreen({super.key});
@@ -24,7 +24,9 @@ class _ModernStudyGoalsScreenState extends State<ModernStudyGoalsScreen>
       vsync: this,
       duration: const Duration(seconds: 2),
     )..repeat(reverse: true);
-    _loadGoals();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _loadGoals();
+    });
   }
   
   @override
@@ -41,7 +43,7 @@ class _ModernStudyGoalsScreenState extends State<ModernStudyGoalsScreen>
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: ModernTheme.backgroundColor,
+      backgroundColor: StudyMateTheme.lightBlue,
       appBar: AppBar(
         backgroundColor: Colors.white,
         elevation: 0,
@@ -49,13 +51,13 @@ class _ModernStudyGoalsScreenState extends State<ModernStudyGoalsScreen>
           icon: Container(
             padding: const EdgeInsets.all(8),
             decoration: BoxDecoration(
-              color: ModernTheme.primaryColor.withOpacity(0.1),
+              color: StudyMateTheme.primaryBlue.withOpacity(0.1),
               borderRadius: BorderRadius.circular(12),
             ),
             child: const Icon(
               Icons.arrow_back_ios,
               size: 20,
-              color: ModernTheme.primaryColor,
+              color: StudyMateTheme.primaryBlue,
             ),
           ),
           onPressed: () => Navigator.pop(context),
@@ -63,7 +65,7 @@ class _ModernStudyGoalsScreenState extends State<ModernStudyGoalsScreen>
         title: const Text(
           '학습 목표',
           style: TextStyle(
-            color: ModernTheme.textPrimary,
+            color: StudyMateTheme.darkNavy,
             fontWeight: FontWeight.w700,
           ),
         ),
@@ -73,7 +75,7 @@ class _ModernStudyGoalsScreenState extends State<ModernStudyGoalsScreen>
             icon: Container(
               padding: const EdgeInsets.all(8),
               decoration: BoxDecoration(
-                gradient: ModernTheme.primaryGradient,
+                gradient: StudyMateTheme.buttonGradient,
                 borderRadius: BorderRadius.circular(12),
               ),
               child: const Icon(
@@ -105,8 +107,8 @@ class _ModernStudyGoalsScreenState extends State<ModernStudyGoalsScreen>
                         decoration: BoxDecoration(
                           gradient: LinearGradient(
                             colors: [
-                              ModernTheme.primaryColor,
-                              ModernTheme.secondaryColor,
+                              StudyMateTheme.primaryBlue,
+                              StudyMateTheme.accentPink,
                             ],
                             transform: GradientRotation(_animationController.value * 3.14),
                           ),
@@ -124,7 +126,7 @@ class _ModernStudyGoalsScreenState extends State<ModernStudyGoalsScreen>
                   const Text(
                     '목표를 불러오는 중...',
                     style: TextStyle(
-                      color: ModernTheme.textSecondary,
+                      color: StudyMateTheme.grayText,
                       fontSize: 16,
                     ),
                   ),
@@ -139,7 +141,7 @@ class _ModernStudyGoalsScreenState extends State<ModernStudyGoalsScreen>
           
           return RefreshIndicator(
             onRefresh: _loadGoals,
-            color: ModernTheme.primaryColor,
+            color: StudyMateTheme.primaryBlue,
             child: ListView.builder(
               padding: const EdgeInsets.all(20),
               itemCount: provider.goals.length,
@@ -169,13 +171,13 @@ class _ModernStudyGoalsScreenState extends State<ModernStudyGoalsScreen>
               width: 120,
               height: 120,
               decoration: BoxDecoration(
-                color: ModernTheme.primaryColor.withOpacity(0.1),
+                color: StudyMateTheme.primaryBlue.withOpacity(0.1),
                 borderRadius: BorderRadius.circular(30),
               ),
               child: const Icon(
                 Icons.flag_outlined,
                 size: 60,
-                color: ModernTheme.primaryColor,
+                color: StudyMateTheme.primaryBlue,
               ),
             ).animate()
               .scale(delay: 200.ms, duration: 600.ms)
@@ -188,7 +190,7 @@ class _ModernStudyGoalsScreenState extends State<ModernStudyGoalsScreen>
               style: TextStyle(
                 fontSize: 20,
                 fontWeight: FontWeight.w700,
-                color: ModernTheme.textPrimary,
+                color: StudyMateTheme.darkNavy,
               ),
             ).animate()
               .fadeIn(delay: 400.ms),
@@ -199,7 +201,7 @@ class _ModernStudyGoalsScreenState extends State<ModernStudyGoalsScreen>
               '목표를 설정하고 체계적으로 학습해보세요',
               style: TextStyle(
                 fontSize: 14,
-                color: ModernTheme.textSecondary,
+                color: StudyMateTheme.grayText,
               ),
               textAlign: TextAlign.center,
             ).animate()
@@ -209,7 +211,13 @@ class _ModernStudyGoalsScreenState extends State<ModernStudyGoalsScreen>
             
             ElevatedButton(
               onPressed: () => _showAddGoalDialog(),
-              style: ModernTheme.primaryButtonStyle.copyWith(
+              style: ElevatedButton.styleFrom(
+                backgroundColor: StudyMateTheme.primaryBlue,
+                foregroundColor: Colors.white,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(16),
+                ),
+              ).copyWith(
                 padding: const MaterialStatePropertyAll(
                   EdgeInsets.symmetric(horizontal: 48, vertical: 16),
                 ),
@@ -240,7 +248,7 @@ class _ModernStudyGoalsScreenState extends State<ModernStudyGoalsScreen>
             HapticFeedback.mediumImpact();
             _showAddGoalDialog();
           },
-          backgroundColor: ModernTheme.primaryColor,
+          backgroundColor: StudyMateTheme.primaryBlue,
           icon: const Icon(Icons.add, color: Colors.white),
           label: const Text(
             '목표 추가',
@@ -281,7 +289,13 @@ class ModernGoalCard extends StatelessWidget {
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(20),
-        boxShadow: ModernTheme.cardShadow,
+        boxShadow: [
+          BoxShadow(
+            color: StudyMateTheme.primaryBlue.withOpacity(0.08),
+            blurRadius: 20,
+            offset: const Offset(0, 4),
+          ),
+        ],
       ),
       child: Material(
         color: Colors.transparent,
@@ -323,7 +337,7 @@ class ModernGoalCard extends StatelessWidget {
                             style: const TextStyle(
                               fontSize: 18,
                               fontWeight: FontWeight.w700,
-                              color: ModernTheme.textPrimary,
+                              color: StudyMateTheme.darkNavy,
                             ),
                           ),
                           const SizedBox(height: 4),
@@ -331,7 +345,7 @@ class ModernGoalCard extends StatelessWidget {
                             goal.description,
                             style: const TextStyle(
                               fontSize: 14,
-                              color: ModernTheme.textSecondary,
+                              color: StudyMateTheme.grayText,
                             ),
                             maxLines: 1,
                             overflow: TextOverflow.ellipsis,
@@ -349,7 +363,7 @@ class ModernGoalCard extends StatelessWidget {
                 Container(
                   padding: const EdgeInsets.all(16),
                   decoration: BoxDecoration(
-                    color: ModernTheme.backgroundColor,
+                    color: StudyMateTheme.lightBlue,
                     borderRadius: BorderRadius.circular(16),
                   ),
                   child: Column(
@@ -370,7 +384,7 @@ class ModernGoalCard extends StatelessWidget {
                                 style: const TextStyle(
                                   fontSize: 14,
                                   fontWeight: FontWeight.w600,
-                                  color: ModernTheme.textPrimary,
+                                  color: StudyMateTheme.darkNavy,
                                 ),
                               ),
                             ],
@@ -414,13 +428,13 @@ class ModernGoalCard extends StatelessWidget {
                     _buildInfoChip(
                       Icons.calendar_today,
                       _formatDate(goal.endDate),
-                      ModernTheme.accentColor,
+                      StudyMateTheme.accentPink,
                     ),
                     const SizedBox(width: 12),
                     _buildInfoChip(
                       Icons.category,
                       _getTypeLabel(goal.type),
-                      ModernTheme.secondaryColor,
+                      StudyMateTheme.accentPink,
                     ),
                   ],
                 ),
@@ -439,7 +453,7 @@ class ModernGoalCard extends StatelessWidget {
     
     switch (goal.statusEnum) {
       case GoalStatus.active:
-        color = ModernTheme.successColor;
+        color = StudyMateTheme.primaryBlue;
         label = '진행중';
         icon = Icons.play_arrow;
         break;
@@ -449,12 +463,12 @@ class ModernGoalCard extends StatelessWidget {
         icon = Icons.check_circle;
         break;
       case GoalStatus.paused:
-        color = ModernTheme.warningColor;
+        color = StudyMateTheme.accentPink;
         label = '일시정지';
         icon = Icons.pause;
         break;
       case GoalStatus.cancelled:
-        color = ModernTheme.errorColor;
+        color = StudyMateTheme.accentPink;
         label = '취소';
         icon = Icons.cancel;
         break;
@@ -515,10 +529,10 @@ class ModernGoalCard extends StatelessWidget {
   }
   
   Color _getProgressColor(double progress) {
-    if (progress >= 100) return ModernTheme.successColor;
-    if (progress >= 75) return ModernTheme.primaryColor;
-    if (progress >= 50) return ModernTheme.accentColor;
-    return ModernTheme.warningColor;
+    if (progress >= 100) return StudyMateTheme.primaryBlue;
+    if (progress >= 75) return StudyMateTheme.primaryBlue;
+    if (progress >= 50) return StudyMateTheme.accentPink;
+    return StudyMateTheme.accentPink;
   }
   
   String _formatDate(DateTime date) {
@@ -583,7 +597,7 @@ class ModernGoalDetailsSheet extends StatelessWidget {
                 width: 56,
                 height: 56,
                 decoration: BoxDecoration(
-                  gradient: ModernTheme.primaryGradient,
+                  gradient: StudyMateTheme.buttonGradient,
                   borderRadius: BorderRadius.circular(16),
                 ),
                 child: const Icon(
@@ -602,7 +616,7 @@ class ModernGoalDetailsSheet extends StatelessWidget {
                       style: const TextStyle(
                         fontSize: 22,
                         fontWeight: FontWeight.w700,
-                        color: ModernTheme.textPrimary,
+                        color: StudyMateTheme.darkNavy,
                       ),
                     ),
                     const SizedBox(height: 4),
@@ -610,7 +624,7 @@ class ModernGoalDetailsSheet extends StatelessWidget {
                       goal.description,
                       style: const TextStyle(
                         fontSize: 14,
-                        color: ModernTheme.textSecondary,
+                        color: StudyMateTheme.grayText,
                       ),
                     ),
                   ],
@@ -636,13 +650,13 @@ class ModernGoalDetailsSheet extends StatelessWidget {
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(16),
                     ),
-                    side: const BorderSide(color: ModernTheme.primaryColor, width: 2),
+                    side: const BorderSide(color: StudyMateTheme.primaryBlue, width: 2),
                   ),
-                  icon: const Icon(Icons.edit, color: ModernTheme.primaryColor),
+                  icon: const Icon(Icons.edit, color: StudyMateTheme.primaryBlue),
                   label: const Text(
                     '수정하기',
                     style: TextStyle(
-                      color: ModernTheme.primaryColor,
+                      color: StudyMateTheme.primaryBlue,
                       fontWeight: FontWeight.w700,
                     ),
                   ),
@@ -658,7 +672,7 @@ class ModernGoalDetailsSheet extends StatelessWidget {
                   },
                   style: ElevatedButton.styleFrom(
                     padding: const EdgeInsets.symmetric(vertical: 16),
-                    backgroundColor: ModernTheme.errorColor,
+                    backgroundColor: StudyMateTheme.accentPink,
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(16),
                     ),
@@ -688,7 +702,7 @@ class ModernGoalDetailsSheet extends StatelessWidget {
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         content: const Text('목표 수정 기능을 준비 중입니다'),
-        backgroundColor: ModernTheme.primaryColor,
+        backgroundColor: StudyMateTheme.primaryBlue,
         behavior: SnackBarBehavior.floating,
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(20),
@@ -714,7 +728,7 @@ class ModernGoalDetailsSheet extends StatelessWidget {
           ElevatedButton(
             onPressed: () => Navigator.pop(context, true),
             style: ElevatedButton.styleFrom(
-              backgroundColor: ModernTheme.errorColor,
+              backgroundColor: StudyMateTheme.accentPink,
             ),
             child: const Text('삭제'),
           ),
@@ -730,7 +744,7 @@ class ModernGoalDetailsSheet extends StatelessWidget {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text(success ? '목표가 삭제되었습니다' : '목표 삭제에 실패했습니다'),
-            backgroundColor: success ? ModernTheme.successColor : ModernTheme.errorColor,
+            backgroundColor: success ? StudyMateTheme.primaryBlue : StudyMateTheme.accentPink,
             behavior: SnackBarBehavior.floating,
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(20),
@@ -795,7 +809,7 @@ class _ModernAddGoalSheetState extends State<ModernAddGoalSheet> {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text(success ? '목표가 생성되었습니다!' : '목표 생성에 실패했습니다'),
-          backgroundColor: success ? ModernTheme.successColor : ModernTheme.errorColor,
+          backgroundColor: success ? StudyMateTheme.primaryBlue : StudyMateTheme.accentPink,
           behavior: SnackBarBehavior.floating,
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(20),
@@ -818,7 +832,7 @@ class _ModernAddGoalSheetState extends State<ModernAddGoalSheet> {
           Container(
             padding: const EdgeInsets.all(24),
             decoration: BoxDecoration(
-              gradient: ModernTheme.primaryGradient,
+              gradient: StudyMateTheme.buttonGradient,
               borderRadius: const BorderRadius.vertical(top: Radius.circular(30)),
             ),
             child: Column(
@@ -991,7 +1005,7 @@ class _ModernAddGoalSheetState extends State<ModernAddGoalSheet> {
                       child: ElevatedButton(
                         onPressed: _isLoading ? null : _createGoal,
                         style: ElevatedButton.styleFrom(
-                          backgroundColor: ModernTheme.primaryColor,
+                          backgroundColor: StudyMateTheme.primaryBlue,
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(16),
                           ),
@@ -1044,9 +1058,9 @@ class _ModernAddGoalSheetState extends State<ModernAddGoalSheet> {
         labelText: label,
         hintText: hint,
         suffixText: suffix,
-        prefixIcon: Icon(icon, color: ModernTheme.primaryColor),
+        prefixIcon: Icon(icon, color: StudyMateTheme.primaryBlue),
         filled: true,
-        fillColor: ModernTheme.backgroundColor,
+        fillColor: StudyMateTheme.lightBlue,
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(16),
           borderSide: BorderSide.none,
@@ -1057,11 +1071,11 @@ class _ModernAddGoalSheetState extends State<ModernAddGoalSheet> {
         ),
         focusedBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(16),
-          borderSide: const BorderSide(color: ModernTheme.primaryColor, width: 2),
+          borderSide: const BorderSide(color: StudyMateTheme.primaryBlue, width: 2),
         ),
         errorBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(16),
-          borderSide: const BorderSide(color: ModernTheme.errorColor, width: 1),
+          borderSide: const BorderSide(color: StudyMateTheme.accentPink, width: 1),
         ),
       ),
       validator: validator,
@@ -1072,7 +1086,7 @@ class _ModernAddGoalSheetState extends State<ModernAddGoalSheet> {
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: ModernTheme.backgroundColor,
+        color: StudyMateTheme.lightBlue,
         borderRadius: BorderRadius.circular(16),
       ),
       child: Column(
@@ -1082,7 +1096,7 @@ class _ModernAddGoalSheetState extends State<ModernAddGoalSheet> {
             children: [
               const Icon(
                 Icons.category,
-                color: ModernTheme.primaryColor,
+                color: StudyMateTheme.primaryBlue,
                 size: 20,
               ),
               const SizedBox(width: 8),
@@ -1091,7 +1105,7 @@ class _ModernAddGoalSheetState extends State<ModernAddGoalSheet> {
                 style: TextStyle(
                   fontSize: 14,
                   fontWeight: FontWeight.w600,
-                  color: ModernTheme.textPrimary,
+                  color: StudyMateTheme.darkNavy,
                 ),
               ),
             ],
@@ -1124,10 +1138,10 @@ class _ModernAddGoalSheetState extends State<ModernAddGoalSheet> {
                     });
                   }
                 },
-                selectedColor: ModernTheme.primaryColor,
+                selectedColor: StudyMateTheme.primaryBlue,
                 backgroundColor: Colors.white,
                 labelStyle: TextStyle(
-                  color: isSelected ? Colors.white : ModernTheme.textPrimary,
+                  color: isSelected ? Colors.white : StudyMateTheme.darkNavy,
                   fontWeight: isSelected ? FontWeight.w600 : FontWeight.w400,
                 ),
               );
@@ -1149,14 +1163,14 @@ class _ModernAddGoalSheetState extends State<ModernAddGoalSheet> {
       child: Container(
         padding: const EdgeInsets.all(16),
         decoration: BoxDecoration(
-          color: ModernTheme.backgroundColor,
+          color: StudyMateTheme.lightBlue,
           borderRadius: BorderRadius.circular(16),
         ),
         child: Row(
           children: [
             const Icon(
               Icons.calendar_today,
-              color: ModernTheme.primaryColor,
+              color: StudyMateTheme.primaryBlue,
               size: 20,
             ),
             const SizedBox(width: 12),
@@ -1168,7 +1182,7 @@ class _ModernAddGoalSheetState extends State<ModernAddGoalSheet> {
                     label,
                     style: const TextStyle(
                       fontSize: 12,
-                      color: ModernTheme.textSecondary,
+                      color: StudyMateTheme.grayText,
                     ),
                   ),
                   const SizedBox(height: 4),
@@ -1177,7 +1191,7 @@ class _ModernAddGoalSheetState extends State<ModernAddGoalSheet> {
                     style: const TextStyle(
                       fontSize: 14,
                       fontWeight: FontWeight.w600,
-                      color: ModernTheme.textPrimary,
+                      color: StudyMateTheme.darkNavy,
                     ),
                   ),
                 ],

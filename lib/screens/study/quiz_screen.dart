@@ -3,7 +3,7 @@ import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import '../../providers/ai_provider.dart';
-import '../../theme/modern_theme.dart';
+import '../../theme/studymate_theme.dart';
 
 class QuizScreen extends StatefulWidget {
   final String subject;
@@ -33,7 +33,9 @@ class _QuizScreenState extends State<QuizScreen> {
   @override
   void initState() {
     super.initState();
-    _loadQuiz();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _loadQuiz();
+    });
   }
   
   Future<void> _loadQuiz() async {
@@ -59,7 +61,7 @@ class _QuizScreenState extends State<QuizScreen> {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
             content: Text('문제를 생성하는데 실패했습니다'),
-            backgroundColor: ModernTheme.errorColor,
+            backgroundColor: StudyMateTheme.accentPink,
           ),
         );
         Navigator.pop(context);
@@ -119,7 +121,7 @@ class _QuizScreenState extends State<QuizScreen> {
             Container(
               padding: const EdgeInsets.all(12),
               decoration: BoxDecoration(
-                gradient: ModernTheme.primaryGradient,
+                gradient: StudyMateTheme.buttonGradient,
                 borderRadius: BorderRadius.circular(12),
               ),
               child: const Icon(
@@ -146,10 +148,10 @@ class _QuizScreenState extends State<QuizScreen> {
               height: 120,
               decoration: BoxDecoration(
                 gradient: percentage >= 80 
-                    ? ModernTheme.successGradient
+                    ? StudyMateTheme.buttonGradient
                     : percentage >= 60
-                        ? ModernTheme.warningGradient
-                        : ModernTheme.errorGradient,
+                        ? StudyMateTheme.buttonGradient
+                        : StudyMateTheme.buttonGradient,
                 shape: BoxShape.circle,
               ),
               child: Center(
@@ -202,7 +204,7 @@ class _QuizScreenState extends State<QuizScreen> {
               Navigator.pop(context);
             },
             style: ElevatedButton.styleFrom(
-              backgroundColor: ModernTheme.primaryColor,
+              backgroundColor: StudyMateTheme.primaryBlue,
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(12),
               ),
@@ -218,7 +220,7 @@ class _QuizScreenState extends State<QuizScreen> {
   Widget build(BuildContext context) {
     if (_isLoading) {
       return Scaffold(
-        backgroundColor: ModernTheme.backgroundColor,
+        backgroundColor: StudyMateTheme.lightBlue,
         body: Center(
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
@@ -226,7 +228,7 @@ class _QuizScreenState extends State<QuizScreen> {
               Container(
                 padding: const EdgeInsets.all(20),
                 decoration: BoxDecoration(
-                  gradient: ModernTheme.primaryGradient,
+                  gradient: StudyMateTheme.buttonGradient,
                   borderRadius: BorderRadius.circular(20),
                 ),
                 child: const Icon(
@@ -244,13 +246,13 @@ class _QuizScreenState extends State<QuizScreen> {
                 style: TextStyle(
                   fontSize: 18,
                   fontWeight: FontWeight.w600,
-                  color: ModernTheme.textPrimary,
+                  color: StudyMateTheme.darkNavy,
                 ),
               ).animate()
                 .fadeIn(delay: 500.ms),
               const SizedBox(height: 32),
               const CircularProgressIndicator(
-                valueColor: AlwaysStoppedAnimation<Color>(ModernTheme.primaryColor),
+                valueColor: AlwaysStoppedAnimation<Color>(StudyMateTheme.primaryBlue),
               ),
             ],
           ),
@@ -260,17 +262,17 @@ class _QuizScreenState extends State<QuizScreen> {
     
     if (_questions == null || _questions!.isEmpty) {
       return Scaffold(
-        backgroundColor: ModernTheme.backgroundColor,
+        backgroundColor: StudyMateTheme.lightBlue,
         appBar: AppBar(
           backgroundColor: Colors.white,
           elevation: 0,
           leading: IconButton(
-            icon: const Icon(Icons.arrow_back, color: ModernTheme.textPrimary),
+            icon: const Icon(Icons.arrow_back, color: StudyMateTheme.darkNavy),
             onPressed: () => Navigator.pop(context),
           ),
           title: const Text(
             '퀴즈',
-            style: TextStyle(color: ModernTheme.textPrimary),
+            style: TextStyle(color: StudyMateTheme.darkNavy),
           ),
         ),
         body: const Center(
@@ -283,18 +285,18 @@ class _QuizScreenState extends State<QuizScreen> {
     final questionType = currentQuestion['type'] ?? 'multiple_choice';
     
     return Scaffold(
-      backgroundColor: ModernTheme.backgroundColor,
+      backgroundColor: StudyMateTheme.lightBlue,
       appBar: AppBar(
         backgroundColor: Colors.white,
         elevation: 0,
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back, color: ModernTheme.textPrimary),
+          icon: const Icon(Icons.arrow_back, color: StudyMateTheme.darkNavy),
           onPressed: () => Navigator.pop(context),
         ),
         title: Text(
           '${widget.subject} 퀴즈',
           style: const TextStyle(
-            color: ModernTheme.textPrimary,
+            color: StudyMateTheme.darkNavy,
             fontSize: 18,
             fontWeight: FontWeight.w600,
           ),
@@ -304,7 +306,7 @@ class _QuizScreenState extends State<QuizScreen> {
             margin: const EdgeInsets.only(right: 16),
             padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
             decoration: BoxDecoration(
-              gradient: ModernTheme.primaryGradient,
+              gradient: StudyMateTheme.buttonGradient,
               borderRadius: BorderRadius.circular(20),
             ),
             child: Text(
@@ -325,7 +327,7 @@ class _QuizScreenState extends State<QuizScreen> {
             child: LinearProgressIndicator(
               value: (_currentQuestionIndex + 1) / _questions!.length,
               backgroundColor: Colors.grey[200],
-              valueColor: AlwaysStoppedAnimation<Color>(ModernTheme.primaryColor),
+              valueColor: AlwaysStoppedAnimation<Color>(StudyMateTheme.primaryBlue),
             ),
           ),
           
@@ -360,13 +362,13 @@ class _QuizScreenState extends State<QuizScreen> {
                                 vertical: 6,
                               ),
                               decoration: BoxDecoration(
-                                color: ModernTheme.primaryColor.withOpacity(0.1),
+                                color: StudyMateTheme.primaryBlue.withOpacity(0.1),
                                 borderRadius: BorderRadius.circular(12),
                               ),
                               child: Text(
                                 _getQuestionTypeLabel(questionType),
                                 style: const TextStyle(
-                                  color: ModernTheme.primaryColor,
+                                  color: StudyMateTheme.primaryBlue,
                                   fontSize: 12,
                                   fontWeight: FontWeight.bold,
                                 ),
@@ -401,7 +403,7 @@ class _QuizScreenState extends State<QuizScreen> {
                           style: const TextStyle(
                             fontSize: 18,
                             fontWeight: FontWeight.w600,
-                            color: ModernTheme.textPrimary,
+                            color: StudyMateTheme.darkNavy,
                             height: 1.5,
                           ),
                         ),
@@ -436,20 +438,20 @@ class _QuizScreenState extends State<QuizScreen> {
                               padding: const EdgeInsets.all(16),
                               decoration: BoxDecoration(
                                 color: isCorrect
-                                    ? ModernTheme.successColor.withOpacity(0.1)
+                                    ? StudyMateTheme.primaryBlue.withOpacity(0.1)
                                     : isWrong
-                                        ? ModernTheme.errorColor.withOpacity(0.1)
+                                        ? StudyMateTheme.accentPink.withOpacity(0.1)
                                         : isSelected
-                                            ? ModernTheme.primaryColor.withOpacity(0.1)
+                                            ? StudyMateTheme.primaryBlue.withOpacity(0.1)
                                             : Colors.white,
                                 borderRadius: BorderRadius.circular(16),
                                 border: Border.all(
                                   color: isCorrect
-                                      ? ModernTheme.successColor
+                                      ? StudyMateTheme.primaryBlue
                                       : isWrong
-                                          ? ModernTheme.errorColor
+                                          ? StudyMateTheme.accentPink
                                           : isSelected
-                                              ? ModernTheme.primaryColor
+                                              ? StudyMateTheme.primaryBlue
                                               : Colors.grey[300]!,
                                   width: isSelected || isCorrect || isWrong ? 2 : 1,
                                 ),
@@ -461,11 +463,11 @@ class _QuizScreenState extends State<QuizScreen> {
                                     height: 32,
                                     decoration: BoxDecoration(
                                       color: isCorrect
-                                          ? ModernTheme.successColor
+                                          ? StudyMateTheme.primaryBlue
                                           : isWrong
-                                              ? ModernTheme.errorColor
+                                              ? StudyMateTheme.accentPink
                                               : isSelected
-                                                  ? ModernTheme.primaryColor
+                                                  ? StudyMateTheme.primaryBlue
                                                   : Colors.grey[300],
                                       shape: BoxShape.circle,
                                     ),
@@ -475,7 +477,7 @@ class _QuizScreenState extends State<QuizScreen> {
                                         style: TextStyle(
                                           color: isSelected || isCorrect || isWrong
                                               ? Colors.white
-                                              : ModernTheme.textSecondary,
+                                              : StudyMateTheme.grayText,
                                           fontWeight: FontWeight.bold,
                                         ),
                                       ),
@@ -487,7 +489,7 @@ class _QuizScreenState extends State<QuizScreen> {
                                       option,
                                       style: TextStyle(
                                         fontSize: 16,
-                                        color: ModernTheme.textPrimary,
+                                        color: StudyMateTheme.darkNavy,
                                         fontWeight: isSelected || isCorrect || isWrong
                                             ? FontWeight.w600
                                             : FontWeight.normal,
@@ -497,12 +499,12 @@ class _QuizScreenState extends State<QuizScreen> {
                                   if (isCorrect)
                                     const Icon(
                                       Icons.check_circle,
-                                      color: ModernTheme.successColor,
+                                      color: StudyMateTheme.primaryBlue,
                                     ),
                                   if (isWrong)
                                     const Icon(
                                       Icons.cancel,
-                                      color: ModernTheme.errorColor,
+                                      color: StudyMateTheme.accentPink,
                                     ),
                                 ],
                               ),
@@ -544,7 +546,7 @@ class _QuizScreenState extends State<QuizScreen> {
                         focusedBorder: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(16),
                           borderSide: const BorderSide(
-                            color: ModernTheme.primaryColor,
+                            color: StudyMateTheme.primaryBlue,
                             width: 2,
                           ),
                         ),
@@ -620,7 +622,7 @@ class _QuizScreenState extends State<QuizScreen> {
                       onPressed: _previousQuestion,
                       style: ElevatedButton.styleFrom(
                         backgroundColor: Colors.grey[200],
-                        foregroundColor: ModernTheme.textPrimary,
+                        foregroundColor: StudyMateTheme.darkNavy,
                         padding: const EdgeInsets.symmetric(vertical: 16),
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(12),
@@ -640,7 +642,7 @@ class _QuizScreenState extends State<QuizScreen> {
                         ? _nextQuestion
                         : null,
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: ModernTheme.primaryColor,
+                      backgroundColor: StudyMateTheme.primaryBlue,
                       padding: const EdgeInsets.symmetric(vertical: 16),
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(12),
@@ -678,20 +680,20 @@ class _QuizScreenState extends State<QuizScreen> {
         padding: const EdgeInsets.all(20),
         decoration: BoxDecoration(
           color: isCorrect
-              ? ModernTheme.successColor.withOpacity(0.1)
+              ? StudyMateTheme.primaryBlue.withOpacity(0.1)
               : isWrong
-                  ? ModernTheme.errorColor.withOpacity(0.1)
+                  ? StudyMateTheme.accentPink.withOpacity(0.1)
                   : isSelected
-                      ? ModernTheme.primaryColor.withOpacity(0.1)
+                      ? StudyMateTheme.primaryBlue.withOpacity(0.1)
                       : Colors.white,
           borderRadius: BorderRadius.circular(16),
           border: Border.all(
             color: isCorrect
-                ? ModernTheme.successColor
+                ? StudyMateTheme.primaryBlue
                 : isWrong
-                    ? ModernTheme.errorColor
+                    ? StudyMateTheme.accentPink
                     : isSelected
-                        ? ModernTheme.primaryColor
+                        ? StudyMateTheme.primaryBlue
                         : Colors.grey[300]!,
             width: isSelected || isCorrect || isWrong ? 2 : 1,
           ),
@@ -703,12 +705,12 @@ class _QuizScreenState extends State<QuizScreen> {
               fontSize: 18,
               fontWeight: FontWeight.bold,
               color: isCorrect
-                  ? ModernTheme.successColor
+                  ? StudyMateTheme.primaryBlue
                   : isWrong
-                      ? ModernTheme.errorColor
+                      ? StudyMateTheme.accentPink
                       : isSelected
-                          ? ModernTheme.primaryColor
-                          : ModernTheme.textPrimary,
+                          ? StudyMateTheme.primaryBlue
+                          : StudyMateTheme.darkNavy,
             ),
           ),
         ),

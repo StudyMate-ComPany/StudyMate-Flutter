@@ -4,7 +4,7 @@ import 'package:provider/provider.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import '../../providers/auth_provider.dart';
 import '../../providers/learning_plan_provider.dart';
-import '../../theme/modern_theme.dart';
+import '../../theme/studymate_theme.dart';
 import '../learning/ai_learning_setup_screen.dart';
 import 'learning_dashboard.dart';
 import '../profile/profile_screen.dart';
@@ -41,7 +41,7 @@ class _NewHomeScreenState extends State<NewHomeScreen>
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: ModernTheme.backgroundColor,
+      backgroundColor: StudyMateTheme.lightBlue,
       appBar: AppBar(
         backgroundColor: Colors.white,
         elevation: 0,
@@ -56,8 +56,8 @@ class _NewHomeScreenState extends State<NewHomeScreen>
                   decoration: BoxDecoration(
                     gradient: LinearGradient(
                       colors: [
-                        ModernTheme.primaryColor,
-                        ModernTheme.secondaryColor,
+                        StudyMateTheme.primaryBlue,
+                        StudyMateTheme.accentPink,
                       ],
                       transform: GradientRotation(_animationController.value * 3.14),
                     ),
@@ -77,7 +77,7 @@ class _NewHomeScreenState extends State<NewHomeScreen>
               style: TextStyle(
                 fontSize: 20,
                 fontWeight: FontWeight.w700,
-                color: ModernTheme.textPrimary,
+                color: StudyMateTheme.darkNavy,
               ),
             ),
           ],
@@ -90,12 +90,12 @@ class _NewHomeScreenState extends State<NewHomeScreen>
             icon: Container(
               padding: const EdgeInsets.all(8),
               decoration: BoxDecoration(
-                color: ModernTheme.secondaryColor.withOpacity(0.1),
+                color: StudyMateTheme.accentPink.withOpacity(0.1),
                 borderRadius: BorderRadius.circular(12),
               ),
               child: const Icon(
                 Icons.notifications_outlined,
-                color: ModernTheme.primaryColor,
+                color: StudyMateTheme.primaryBlue,
                 size: 20,
               ),
             ),
@@ -104,7 +104,7 @@ class _NewHomeScreenState extends State<NewHomeScreen>
               ScaffoldMessenger.of(context).showSnackBar(
                 SnackBar(
                   content: const Text('알림이 설정되어 있습니다 (9시, 12시, 21시) 🔔'),
-                  backgroundColor: ModernTheme.primaryColor,
+                  backgroundColor: StudyMateTheme.primaryBlue,
                   behavior: SnackBarBehavior.floating,
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(20),
@@ -167,12 +167,12 @@ class _NewHomeScreenState extends State<NewHomeScreen>
             icon: Container(
               padding: const EdgeInsets.all(8),
               decoration: BoxDecoration(
-                color: ModernTheme.accentColor.withOpacity(0.1),
+                color: StudyMateTheme.accentPink.withOpacity(0.1),
                 borderRadius: BorderRadius.circular(12),
               ),
               child: const Icon(
                 Icons.more_vert,
-                color: ModernTheme.primaryColor,
+                color: StudyMateTheme.primaryBlue,
                 size: 20,
               ),
             ),
@@ -183,7 +183,7 @@ class _NewHomeScreenState extends State<NewHomeScreen>
               const PopupMenuItem(
                 value: 'new_plan',
                 child: ListTile(
-                  leading: Icon(Icons.add, color: ModernTheme.primaryColor),
+                  leading: Icon(Icons.add, color: StudyMateTheme.primaryBlue),
                   title: Text('새 학습 플랜'),
                   contentPadding: EdgeInsets.zero,
                 ),
@@ -192,7 +192,7 @@ class _NewHomeScreenState extends State<NewHomeScreen>
               const PopupMenuItem(
                 value: 'subscription',
                 child: ListTile(
-                  leading: Icon(Icons.workspace_premium, color: ModernTheme.accentColor),
+                  leading: Icon(Icons.workspace_premium, color: StudyMateTheme.accentPink),
                   title: Text('프리미엄 구독'),
                   contentPadding: EdgeInsets.zero,
                 ),
@@ -200,7 +200,7 @@ class _NewHomeScreenState extends State<NewHomeScreen>
               const PopupMenuItem(
                 value: 'profile',
                 child: ListTile(
-                  leading: Icon(Icons.person, color: ModernTheme.primaryColor),
+                  leading: Icon(Icons.person, color: StudyMateTheme.primaryBlue),
                   title: Text('프로필'),
                   contentPadding: EdgeInsets.zero,
                 ),
@@ -208,7 +208,7 @@ class _NewHomeScreenState extends State<NewHomeScreen>
               const PopupMenuItem(
                 value: 'settings',
                 child: ListTile(
-                  leading: Icon(Icons.settings, color: ModernTheme.primaryColor),
+                  leading: Icon(Icons.settings, color: StudyMateTheme.primaryBlue),
                   title: Text('설정'),
                   contentPadding: EdgeInsets.zero,
                 ),
@@ -226,8 +226,8 @@ class _NewHomeScreenState extends State<NewHomeScreen>
               const PopupMenuItem(
                 value: 'logout',
                 child: ListTile(
-                  leading: Icon(Icons.logout, color: ModernTheme.errorColor),
-                  title: Text('로그아웃', style: TextStyle(color: ModernTheme.errorColor)),
+                  leading: Icon(Icons.logout, color: StudyMateTheme.accentPink),
+                  title: Text('로그아웃', style: TextStyle(color: StudyMateTheme.accentPink)),
                   contentPadding: EdgeInsets.zero,
                 ),
               ),
@@ -251,7 +251,7 @@ class _NewHomeScreenState extends State<NewHomeScreen>
                   ),
                 );
               },
-              backgroundColor: ModernTheme.primaryColor,
+              backgroundColor: StudyMateTheme.primaryBlue,
               icon: const Icon(Icons.add, color: Colors.white),
               label: const Text(
                 '새 플랜',

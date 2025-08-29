@@ -4,7 +4,7 @@ import 'package:provider/provider.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import '../../providers/learning_plan_provider.dart';
 import '../../models/learning_plan.dart';
-import '../../theme/modern_theme.dart';
+import '../../theme/studymate_theme.dart';
 
 class QuizScreen extends StatefulWidget {
   final StudyContent content;
@@ -142,16 +142,16 @@ class _QuizScreenState extends State<QuizScreen> with TickerProviderStateMixin {
                   shape: BoxShape.circle,
                   gradient: LinearGradient(
                     colors: percentage >= 80
-                      ? [ModernTheme.successColor, Colors.green[300]!]
+                      ? [StudyMateTheme.primaryBlue, Colors.green[300]!]
                       : percentage >= 60
-                        ? [ModernTheme.primaryColor, ModernTheme.secondaryColor]
-                        : [ModernTheme.warningColor, ModernTheme.accentColor],
+                        ? [StudyMateTheme.primaryBlue, StudyMateTheme.accentPink]
+                        : [StudyMateTheme.accentPink, StudyMateTheme.accentPink],
                   ),
                   boxShadow: [
                     BoxShadow(
                       color: (percentage >= 80 
-                        ? ModernTheme.successColor 
-                        : ModernTheme.primaryColor).withOpacity(0.3),
+                        ? StudyMateTheme.primaryBlue 
+                        : StudyMateTheme.primaryBlue).withOpacity(0.3),
                       blurRadius: 20,
                       spreadRadius: 5,
                     ),
@@ -188,7 +188,7 @@ class _QuizScreenState extends State<QuizScreen> with TickerProviderStateMixin {
                 style: const TextStyle(
                   fontSize: 24,
                   fontWeight: FontWeight.w700,
-                  color: ModernTheme.textPrimary,
+                  color: StudyMateTheme.darkNavy,
                 ),
               ),
               
@@ -199,7 +199,7 @@ class _QuizScreenState extends State<QuizScreen> with TickerProviderStateMixin {
                 textAlign: TextAlign.center,
                 style: const TextStyle(
                   fontSize: 16,
-                  color: ModernTheme.textSecondary,
+                  color: StudyMateTheme.grayText,
                   height: 1.5,
                 ),
               ),
@@ -223,7 +223,7 @@ class _QuizScreenState extends State<QuizScreen> with TickerProviderStateMixin {
                       },
                       style: OutlinedButton.styleFrom(
                         padding: const EdgeInsets.symmetric(vertical: 16),
-                        side: const BorderSide(color: ModernTheme.primaryColor, width: 2),
+                        side: const BorderSide(color: StudyMateTheme.primaryBlue, width: 2),
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(16),
                         ),
@@ -251,7 +251,7 @@ class _QuizScreenState extends State<QuizScreen> with TickerProviderStateMixin {
                       },
                       style: ElevatedButton.styleFrom(
                         padding: const EdgeInsets.symmetric(vertical: 16),
-                        backgroundColor: ModernTheme.primaryColor,
+                        backgroundColor: StudyMateTheme.primaryBlue,
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(16),
                         ),
@@ -278,7 +278,7 @@ class _QuizScreenState extends State<QuizScreen> with TickerProviderStateMixin {
   Widget build(BuildContext context) {
     if (currentQuestion == null) {
       return Scaffold(
-        backgroundColor: ModernTheme.backgroundColor,
+        backgroundColor: StudyMateTheme.lightBlue,
         body: const Center(
           child: Text('퀴즈를 불러올 수 없습니다'),
         ),
@@ -289,7 +289,7 @@ class _QuizScreenState extends State<QuizScreen> with TickerProviderStateMixin {
     final progress = (_currentQuestionIndex + 1) / totalQuestions;
     
     return Scaffold(
-      backgroundColor: ModernTheme.backgroundColor,
+      backgroundColor: StudyMateTheme.lightBlue,
       appBar: AppBar(
         backgroundColor: Colors.white,
         elevation: 0,
@@ -297,13 +297,13 @@ class _QuizScreenState extends State<QuizScreen> with TickerProviderStateMixin {
           icon: Container(
             padding: const EdgeInsets.all(8),
             decoration: BoxDecoration(
-              color: ModernTheme.primaryColor.withOpacity(0.1),
+              color: StudyMateTheme.primaryBlue.withOpacity(0.1),
               borderRadius: BorderRadius.circular(12),
             ),
             child: const Icon(
               Icons.close,
               size: 20,
-              color: ModernTheme.primaryColor,
+              color: StudyMateTheme.primaryBlue,
             ),
           ),
           onPressed: () => Navigator.pop(context),
@@ -314,7 +314,7 @@ class _QuizScreenState extends State<QuizScreen> with TickerProviderStateMixin {
               '문제 ${_currentQuestionIndex + 1} / $totalQuestions',
               style: const TextStyle(
                 fontSize: 14,
-                color: ModernTheme.textSecondary,
+                color: StudyMateTheme.grayText,
               ),
             ),
             const SizedBox(height: 4),
@@ -323,7 +323,7 @@ class _QuizScreenState extends State<QuizScreen> with TickerProviderStateMixin {
               child: LinearProgressIndicator(
                 value: progress,
                 backgroundColor: Colors.grey[200],
-                valueColor: const AlwaysStoppedAnimation<Color>(ModernTheme.primaryColor),
+                valueColor: const AlwaysStoppedAnimation<Color>(StudyMateTheme.primaryBlue),
               ),
             ),
           ],
@@ -341,7 +341,13 @@ class _QuizScreenState extends State<QuizScreen> with TickerProviderStateMixin {
               decoration: BoxDecoration(
                 color: Colors.white,
                 borderRadius: BorderRadius.circular(20),
-                boxShadow: ModernTheme.cardShadow,
+                boxShadow: [
+          BoxShadow(
+            color: StudyMateTheme.primaryBlue.withOpacity(0.08),
+            blurRadius: 20,
+            offset: const Offset(0, 4),
+          ),
+        ],
               ),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -351,7 +357,7 @@ class _QuizScreenState extends State<QuizScreen> with TickerProviderStateMixin {
                       Container(
                         padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
                         decoration: BoxDecoration(
-                          gradient: ModernTheme.primaryGradient,
+                          gradient: StudyMateTheme.buttonGradient,
                           borderRadius: BorderRadius.circular(20),
                         ),
                         child: Text(
@@ -371,7 +377,7 @@ class _QuizScreenState extends State<QuizScreen> with TickerProviderStateMixin {
                     style: const TextStyle(
                       fontSize: 18,
                       fontWeight: FontWeight.w600,
-                      color: ModernTheme.textPrimary,
+                      color: StudyMateTheme.darkNavy,
                       height: 1.5,
                     ),
                   ),
@@ -398,18 +404,18 @@ class _QuizScreenState extends State<QuizScreen> with TickerProviderStateMixin {
                   
                   if (showResult) {
                     if (isCorrect) {
-                      backgroundColor = ModernTheme.successColor.withOpacity(0.1);
-                      borderColor = ModernTheme.successColor;
-                      textColor = ModernTheme.successColor;
+                      backgroundColor = StudyMateTheme.primaryBlue.withOpacity(0.1);
+                      borderColor = StudyMateTheme.primaryBlue;
+                      textColor = StudyMateTheme.primaryBlue;
                     } else if (isSelected) {
-                      backgroundColor = ModernTheme.errorColor.withOpacity(0.1);
-                      borderColor = ModernTheme.errorColor;
-                      textColor = ModernTheme.errorColor;
+                      backgroundColor = StudyMateTheme.accentPink.withOpacity(0.1);
+                      borderColor = StudyMateTheme.accentPink;
+                      textColor = StudyMateTheme.accentPink;
                     }
                   } else if (isSelected) {
-                    backgroundColor = ModernTheme.primaryColor.withOpacity(0.1);
-                    borderColor = ModernTheme.primaryColor;
-                    textColor = ModernTheme.primaryColor;
+                    backgroundColor = StudyMateTheme.primaryBlue.withOpacity(0.1);
+                    borderColor = StudyMateTheme.primaryBlue;
+                    textColor = StudyMateTheme.primaryBlue;
                   }
                   
                   return Padding(
@@ -428,7 +434,13 @@ class _QuizScreenState extends State<QuizScreen> with TickerProviderStateMixin {
                             width: borderColor != null ? 2 : 1,
                           ),
                           boxShadow: isSelected && !showResult 
-                            ? ModernTheme.cardShadow 
+                            ? [
+          BoxShadow(
+            color: StudyMateTheme.primaryBlue.withOpacity(0.08),
+            blurRadius: 20,
+            offset: const Offset(0, 4),
+          ),
+        ] 
                             : [],
                         ),
                         child: Row(
@@ -437,7 +449,7 @@ class _QuizScreenState extends State<QuizScreen> with TickerProviderStateMixin {
                               width: 32,
                               height: 32,
                               decoration: BoxDecoration(
-                                color: (textColor ?? ModernTheme.textSecondary)
+                                color: (textColor ?? StudyMateTheme.grayText)
                                     .withOpacity(0.1),
                                 shape: BoxShape.circle,
                               ),
@@ -447,7 +459,7 @@ class _QuizScreenState extends State<QuizScreen> with TickerProviderStateMixin {
                                   style: TextStyle(
                                     fontSize: 14,
                                     fontWeight: FontWeight.w600,
-                                    color: textColor ?? ModernTheme.textSecondary,
+                                    color: textColor ?? StudyMateTheme.grayText,
                                   ),
                                 ),
                               ),
@@ -458,7 +470,7 @@ class _QuizScreenState extends State<QuizScreen> with TickerProviderStateMixin {
                                 currentQuestion!.options[index],
                                 style: TextStyle(
                                   fontSize: 15,
-                                  color: textColor ?? ModernTheme.textPrimary,
+                                  color: textColor ?? StudyMateTheme.darkNavy,
                                   fontWeight: isSelected ? FontWeight.w600 : FontWeight.w400,
                                 ),
                               ),
@@ -467,7 +479,7 @@ class _QuizScreenState extends State<QuizScreen> with TickerProviderStateMixin {
                               Icon(
                                 isCorrect ? Icons.check_circle : 
                                 isSelected ? Icons.cancel : null,
-                                color: isCorrect ? ModernTheme.successColor : ModernTheme.errorColor,
+                                color: isCorrect ? StudyMateTheme.primaryBlue : StudyMateTheme.accentPink,
                                 size: 24,
                               ),
                           ],
@@ -493,10 +505,10 @@ class _QuizScreenState extends State<QuizScreen> with TickerProviderStateMixin {
                       child: Container(
                         padding: const EdgeInsets.all(16),
                         decoration: BoxDecoration(
-                          color: ModernTheme.secondaryColor.withOpacity(0.1),
+                          color: StudyMateTheme.accentPink.withOpacity(0.1),
                           borderRadius: BorderRadius.circular(16),
                           border: Border.all(
-                            color: ModernTheme.secondaryColor.withOpacity(0.3),
+                            color: StudyMateTheme.accentPink.withOpacity(0.3),
                           ),
                         ),
                         child: Column(
@@ -506,7 +518,7 @@ class _QuizScreenState extends State<QuizScreen> with TickerProviderStateMixin {
                               children: [
                                 const Icon(
                                   Icons.lightbulb_outline,
-                                  color: ModernTheme.secondaryColor,
+                                  color: StudyMateTheme.accentPink,
                                   size: 20,
                                 ),
                                 const SizedBox(width: 8),
@@ -515,7 +527,7 @@ class _QuizScreenState extends State<QuizScreen> with TickerProviderStateMixin {
                                   style: TextStyle(
                                     fontSize: 14,
                                     fontWeight: FontWeight.w600,
-                                    color: ModernTheme.secondaryColor,
+                                    color: StudyMateTheme.accentPink,
                                   ),
                                 ),
                               ],
@@ -525,7 +537,7 @@ class _QuizScreenState extends State<QuizScreen> with TickerProviderStateMixin {
                               currentQuestion!.explanation,
                               style: const TextStyle(
                                 fontSize: 14,
-                                color: ModernTheme.textPrimary,
+                                color: StudyMateTheme.darkNavy,
                                 height: 1.5,
                               ),
                             ),
@@ -548,7 +560,7 @@ class _QuizScreenState extends State<QuizScreen> with TickerProviderStateMixin {
                   ? _nextQuestion 
                   : (_selectedAnswer != null ? _checkAnswer : null),
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: ModernTheme.primaryColor,
+                  backgroundColor: StudyMateTheme.primaryBlue,
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(16),
                   ),

@@ -4,7 +4,7 @@ import 'package:provider/provider.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import '../../providers/learning_plan_provider.dart';
 import '../../models/learning_plan.dart';
-import '../../theme/modern_theme.dart';
+import '../../theme/studymate_theme.dart';
 
 class DailyContentScreen extends StatefulWidget {
   final StudyContent content;
@@ -45,7 +45,7 @@ class _DailyContentScreenState extends State<DailyContentScreen> {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: const Text('학습 완료! 수고하셨어요 👏'),
-          backgroundColor: ModernTheme.successColor,
+          backgroundColor: StudyMateTheme.primaryBlue,
           behavior: SnackBarBehavior.floating,
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(20),
@@ -60,7 +60,7 @@ class _DailyContentScreenState extends State<DailyContentScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: ModernTheme.backgroundColor,
+      backgroundColor: StudyMateTheme.lightBlue,
       appBar: AppBar(
         backgroundColor: Colors.white,
         elevation: 0,
@@ -68,13 +68,13 @@ class _DailyContentScreenState extends State<DailyContentScreen> {
           icon: Container(
             padding: const EdgeInsets.all(8),
             decoration: BoxDecoration(
-              color: ModernTheme.primaryColor.withOpacity(0.1),
+              color: StudyMateTheme.primaryBlue.withOpacity(0.1),
               borderRadius: BorderRadius.circular(12),
             ),
             child: const Icon(
               Icons.arrow_back_ios,
               size: 20,
-              color: ModernTheme.primaryColor,
+              color: StudyMateTheme.primaryBlue,
             ),
           ),
           onPressed: () => Navigator.pop(context),
@@ -82,7 +82,7 @@ class _DailyContentScreenState extends State<DailyContentScreen> {
         title: Text(
           widget.content.title,
           style: const TextStyle(
-            color: ModernTheme.textPrimary,
+            color: StudyMateTheme.darkNavy,
             fontWeight: FontWeight.w700,
             fontSize: 18,
           ),
@@ -94,8 +94,8 @@ class _DailyContentScreenState extends State<DailyContentScreen> {
             padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
             decoration: BoxDecoration(
               color: _isCompleted 
-                ? ModernTheme.successColor.withOpacity(0.1)
-                : ModernTheme.primaryColor.withOpacity(0.1),
+                ? StudyMateTheme.primaryBlue.withOpacity(0.1)
+                : StudyMateTheme.primaryBlue.withOpacity(0.1),
               borderRadius: BorderRadius.circular(20),
             ),
             child: Row(
@@ -104,8 +104,8 @@ class _DailyContentScreenState extends State<DailyContentScreen> {
                   _isCompleted ? Icons.check_circle : Icons.timer,
                   size: 16,
                   color: _isCompleted 
-                    ? ModernTheme.successColor
-                    : ModernTheme.primaryColor,
+                    ? StudyMateTheme.primaryBlue
+                    : StudyMateTheme.primaryBlue,
                 ),
                 const SizedBox(width: 6),
                 Text(
@@ -114,8 +114,8 @@ class _DailyContentScreenState extends State<DailyContentScreen> {
                     fontSize: 12,
                     fontWeight: FontWeight.w600,
                     color: _isCompleted 
-                      ? ModernTheme.successColor
-                      : ModernTheme.primaryColor,
+                      ? StudyMateTheme.primaryBlue
+                      : StudyMateTheme.primaryBlue,
                   ),
                 ),
               ],
@@ -140,14 +140,14 @@ class _DailyContentScreenState extends State<DailyContentScreen> {
                         return Container(
                           padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
                           decoration: BoxDecoration(
-                            color: ModernTheme.primaryColor.withOpacity(0.1),
+                            color: StudyMateTheme.primaryBlue.withOpacity(0.1),
                             borderRadius: BorderRadius.circular(20),
                           ),
                           child: Text(
                             topic,
                             style: const TextStyle(
                               fontSize: 12,
-                              color: ModernTheme.primaryColor,
+                              color: StudyMateTheme.primaryBlue,
                               fontWeight: FontWeight.w500,
                             ),
                           ),
@@ -164,7 +164,13 @@ class _DailyContentScreenState extends State<DailyContentScreen> {
                     decoration: BoxDecoration(
                       color: Colors.white,
                       borderRadius: BorderRadius.circular(20),
-                      boxShadow: ModernTheme.cardShadow,
+                      boxShadow: [
+          BoxShadow(
+            color: StudyMateTheme.primaryBlue.withOpacity(0.08),
+            blurRadius: 20,
+            offset: const Offset(0, 4),
+          ),
+        ],
                     ),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
@@ -176,7 +182,7 @@ class _DailyContentScreenState extends State<DailyContentScreen> {
                               width: 48,
                               height: 48,
                               decoration: BoxDecoration(
-                                gradient: ModernTheme.primaryGradient,
+                                gradient: StudyMateTheme.buttonGradient,
                                 borderRadius: BorderRadius.circular(12),
                               ),
                               child: const Icon(
@@ -194,7 +200,7 @@ class _DailyContentScreenState extends State<DailyContentScreen> {
                                     '오늘의 학습 내용',
                                     style: TextStyle(
                                       fontSize: 14,
-                                      color: ModernTheme.textSecondary,
+                                      color: StudyMateTheme.grayText,
                                     ),
                                   ),
                                   Text(
@@ -202,7 +208,7 @@ class _DailyContentScreenState extends State<DailyContentScreen> {
                                     style: const TextStyle(
                                       fontSize: 16,
                                       fontWeight: FontWeight.w600,
-                                      color: ModernTheme.textPrimary,
+                                      color: StudyMateTheme.darkNavy,
                                     ),
                                   ),
                                 ],
@@ -220,7 +226,7 @@ class _DailyContentScreenState extends State<DailyContentScreen> {
                           widget.content.content,
                           style: const TextStyle(
                             fontSize: 15,
-                            color: ModernTheme.textPrimary,
+                            color: StudyMateTheme.darkNavy,
                             height: 1.8,
                           ),
                         ),
@@ -236,17 +242,17 @@ class _DailyContentScreenState extends State<DailyContentScreen> {
                   Container(
                     padding: const EdgeInsets.all(16),
                     decoration: BoxDecoration(
-                      color: ModernTheme.secondaryColor.withOpacity(0.1),
+                      color: StudyMateTheme.accentPink.withOpacity(0.1),
                       borderRadius: BorderRadius.circular(16),
                       border: Border.all(
-                        color: ModernTheme.secondaryColor.withOpacity(0.3),
+                        color: StudyMateTheme.accentPink.withOpacity(0.3),
                       ),
                     ),
                     child: Row(
                       children: [
                         const Icon(
                           Icons.lightbulb_outline,
-                          color: ModernTheme.secondaryColor,
+                          color: StudyMateTheme.accentPink,
                           size: 20,
                         ),
                         const SizedBox(width: 12),
@@ -255,7 +261,7 @@ class _DailyContentScreenState extends State<DailyContentScreen> {
                             '💡 Tip: ${_getRandomTip()}',
                             style: const TextStyle(
                               fontSize: 14,
-                              color: ModernTheme.textPrimary,
+                              color: StudyMateTheme.darkNavy,
                             ),
                           ),
                         ),
@@ -289,7 +295,7 @@ class _DailyContentScreenState extends State<DailyContentScreen> {
                   child: ElevatedButton(
                     onPressed: _markAsComplete,
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: ModernTheme.primaryColor,
+                      backgroundColor: StudyMateTheme.primaryBlue,
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(16),
                       ),

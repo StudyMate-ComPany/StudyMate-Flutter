@@ -3,7 +3,7 @@ import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import '../../providers/auth_provider.dart';
-import '../../theme/modern_theme.dart';
+import '../../theme/studymate_theme.dart';
 import '../../widgets/korean_enabled_text_field.dart';
 import 'modern_register_screen.dart';
 
@@ -66,7 +66,7 @@ class _ModernLoginScreenState extends State<ModernLoginScreen> with TickerProvid
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text(authProvider.errorMessage ?? '로그인에 실패했습니다'),
-            backgroundColor: ModernTheme.errorColor,
+            backgroundColor: StudyMateTheme.accentPink,
             behavior: SnackBarBehavior.floating,
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(12),
@@ -82,7 +82,7 @@ class _ModernLoginScreenState extends State<ModernLoginScreen> with TickerProvid
     final size = MediaQuery.of(context).size;
     
     return Scaffold(
-      backgroundColor: ModernTheme.backgroundColor,
+      backgroundColor: StudyMateTheme.lightBlue,
       body: SafeArea(
         child: SingleChildScrollView(
           physics: const BouncingScrollPhysics(),
@@ -139,16 +139,16 @@ class _ModernLoginScreenState extends State<ModernLoginScreen> with TickerProvid
                   begin: Alignment.topLeft,
                   end: Alignment.bottomRight,
                   colors: [
-                    ModernTheme.primaryColor,
-                    ModernTheme.primaryLight,
-                    ModernTheme.secondaryColor,
+                    StudyMateTheme.primaryBlue,
+                    StudyMateTheme.lightBlue,
+                    StudyMateTheme.accentPink,
                   ],
                   transform: GradientRotation(_animationController.value * 3.14),
                 ),
                 borderRadius: BorderRadius.circular(30),
                 boxShadow: [
                   BoxShadow(
-                    color: ModernTheme.primaryColor.withOpacity(0.3),
+                    color: StudyMateTheme.primaryBlue.withOpacity(0.3),
                     blurRadius: 20,
                     offset: const Offset(0, 10),
                   ),
@@ -172,7 +172,7 @@ class _ModernLoginScreenState extends State<ModernLoginScreen> with TickerProvid
           style: TextStyle(
             fontSize: 32,
             fontWeight: FontWeight.w800,
-            color: ModernTheme.textPrimary,
+            color: StudyMateTheme.darkNavy,
             letterSpacing: -0.5,
           ),
         ).animate()
@@ -185,7 +185,7 @@ class _ModernLoginScreenState extends State<ModernLoginScreen> with TickerProvid
           '스마트한 학습의 시작',
           style: TextStyle(
             fontSize: 16,
-            color: ModernTheme.textSecondary,
+            color: StudyMateTheme.grayText,
             fontWeight: FontWeight.w500,
           ),
         ).animate()
@@ -204,7 +204,13 @@ class _ModernLoginScreenState extends State<ModernLoginScreen> with TickerProvid
             decoration: BoxDecoration(
               color: Colors.white,
               borderRadius: BorderRadius.circular(16),
-              boxShadow: ModernTheme.cardShadow,
+              boxShadow: [
+          BoxShadow(
+            color: StudyMateTheme.primaryBlue.withOpacity(0.08),
+            blurRadius: 20,
+            offset: const Offset(0, 4),
+          ),
+        ],
             ),
             child: KoreanEnabledTextField(
               controller: _emailController,
@@ -214,14 +220,14 @@ class _ModernLoginScreenState extends State<ModernLoginScreen> with TickerProvid
               hintText: 'example@email.com',
               prefixIcon: Icon(
                 Icons.email_outlined,
-                color: ModernTheme.primaryColor,
+                color: StudyMateTheme.primaryBlue,
               ),
               decoration: InputDecoration(
                 labelText: '이메일',
                 hintText: 'example@email.com',
                 prefixIcon: Icon(
                   Icons.email_outlined,
-                  color: ModernTheme.primaryColor,
+                  color: StudyMateTheme.primaryBlue,
                 ),
                 border: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(16),
@@ -251,7 +257,13 @@ class _ModernLoginScreenState extends State<ModernLoginScreen> with TickerProvid
             decoration: BoxDecoration(
               color: Colors.white,
               borderRadius: BorderRadius.circular(16),
-              boxShadow: ModernTheme.cardShadow,
+              boxShadow: [
+          BoxShadow(
+            color: StudyMateTheme.primaryBlue.withOpacity(0.08),
+            blurRadius: 20,
+            offset: const Offset(0, 4),
+          ),
+        ],
             ),
             child: KoreanEnabledTextField(
               controller: _passwordController,
@@ -262,7 +274,7 @@ class _ModernLoginScreenState extends State<ModernLoginScreen> with TickerProvid
               hintText: '••••••••',
               prefixIcon: Icon(
                 Icons.lock_outline,
-                color: ModernTheme.primaryColor,
+                color: StudyMateTheme.primaryBlue,
               ),
               suffixIcon: IconButton(
                 onPressed: () {
@@ -272,7 +284,7 @@ class _ModernLoginScreenState extends State<ModernLoginScreen> with TickerProvid
                 },
                 icon: Icon(
                   _isPasswordVisible ? Icons.visibility_off : Icons.visibility,
-                  color: ModernTheme.textSecondary,
+                  color: StudyMateTheme.grayText,
                 ),
               ),
               decoration: InputDecoration(
@@ -280,7 +292,7 @@ class _ModernLoginScreenState extends State<ModernLoginScreen> with TickerProvid
                 hintText: '••••••••',
                 prefixIcon: Icon(
                   Icons.lock_outline,
-                  color: ModernTheme.primaryColor,
+                  color: StudyMateTheme.primaryBlue,
                 ),
                 suffixIcon: IconButton(
                   onPressed: () {
@@ -290,7 +302,7 @@ class _ModernLoginScreenState extends State<ModernLoginScreen> with TickerProvid
                   },
                   icon: Icon(
                     _isPasswordVisible ? Icons.visibility_off : Icons.visibility,
-                    color: ModernTheme.textSecondary,
+                    color: StudyMateTheme.grayText,
                   ),
                 ),
                 border: OutlineInputBorder(
@@ -332,7 +344,7 @@ class _ModernLoginScreenState extends State<ModernLoginScreen> with TickerProvid
                           _rememberMe = value ?? false;
                         });
                       },
-                      activeColor: ModernTheme.primaryColor,
+                      activeColor: StudyMateTheme.primaryBlue,
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(4),
                       ),
@@ -342,7 +354,7 @@ class _ModernLoginScreenState extends State<ModernLoginScreen> with TickerProvid
                   Text(
                     '자동 로그인',
                     style: TextStyle(
-                      color: ModernTheme.textSecondary,
+                      color: StudyMateTheme.grayText,
                       fontSize: 14,
                     ),
                   ),
@@ -356,7 +368,7 @@ class _ModernLoginScreenState extends State<ModernLoginScreen> with TickerProvid
                 child: Text(
                   '비밀번호 찾기',
                   style: TextStyle(
-                    color: ModernTheme.primaryColor,
+                    color: StudyMateTheme.primaryBlue,
                     fontSize: 14,
                     fontWeight: FontWeight.w600,
                   ),
@@ -377,7 +389,7 @@ class _ModernLoginScreenState extends State<ModernLoginScreen> with TickerProvid
       child: ElevatedButton(
         onPressed: _isLoading ? null : _handleLogin,
         style: ElevatedButton.styleFrom(
-          backgroundColor: ModernTheme.primaryColor,
+          backgroundColor: StudyMateTheme.primaryBlue,
           foregroundColor: Colors.white,
           elevation: 0,
           shape: RoundedRectangleBorder(
@@ -414,7 +426,7 @@ class _ModernLoginScreenState extends State<ModernLoginScreen> with TickerProvid
           children: [
             const Expanded(
               child: Divider(
-                color: ModernTheme.textLight,
+                color: StudyMateTheme.grayText,
                 thickness: 0.5,
               ),
             ),
@@ -423,14 +435,14 @@ class _ModernLoginScreenState extends State<ModernLoginScreen> with TickerProvid
               child: Text(
                 '또는',
                 style: TextStyle(
-                  color: ModernTheme.textSecondary,
+                  color: StudyMateTheme.grayText,
                   fontSize: 14,
                 ),
               ),
             ),
             const Expanded(
               child: Divider(
-                color: ModernTheme.textLight,
+                color: StudyMateTheme.grayText,
                 thickness: 0.5,
               ),
             ),
@@ -489,7 +501,13 @@ class _ModernLoginScreenState extends State<ModernLoginScreen> with TickerProvid
         decoration: BoxDecoration(
           color: Colors.white,
           borderRadius: BorderRadius.circular(16),
-          boxShadow: ModernTheme.cardShadow,
+          boxShadow: [
+          BoxShadow(
+            color: StudyMateTheme.primaryBlue.withOpacity(0.08),
+            blurRadius: 20,
+            offset: const Offset(0, 4),
+          ),
+        ],
         ),
         child: Icon(
           icon,
@@ -507,7 +525,7 @@ class _ModernLoginScreenState extends State<ModernLoginScreen> with TickerProvid
         Text(
           '아직 계정이 없으신가요?',
           style: TextStyle(
-            color: ModernTheme.textSecondary,
+            color: StudyMateTheme.grayText,
             fontSize: 14,
           ),
         ),
@@ -524,7 +542,7 @@ class _ModernLoginScreenState extends State<ModernLoginScreen> with TickerProvid
           child: Text(
             '회원가입',
             style: TextStyle(
-              color: ModernTheme.primaryColor,
+              color: StudyMateTheme.primaryBlue,
               fontSize: 14,
               fontWeight: FontWeight.w700,
             ),

@@ -6,7 +6,7 @@ import 'dart:async';
 import '../../providers/study_provider.dart';
 import '../../models/study_session.dart';
 import '../../models/study_goal.dart';
-import '../../theme/modern_theme.dart';
+import '../../theme/studymate_theme.dart';
 
 class ModernStudySessionScreen extends StatefulWidget {
   const ModernStudySessionScreen({super.key});
@@ -56,7 +56,9 @@ class _ModernStudySessionScreenState extends State<ModernStudySessionScreen>
     ));
     
     _timerAnimationController.repeat(reverse: true);
-    _checkActiveSession();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _checkActiveSession();
+    });
   }
   
   @override
@@ -121,7 +123,7 @@ class _ModernStudySessionScreenState extends State<ModernStudySessionScreen>
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: const Text('학습 세션이 시작되었습니다! 화이팅! 💪'),
-            backgroundColor: ModernTheme.successColor,
+            backgroundColor: StudyMateTheme.primaryBlue,
             behavior: SnackBarBehavior.floating,
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(20),
@@ -134,7 +136,7 @@ class _ModernStudySessionScreenState extends State<ModernStudySessionScreen>
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text(provider.errorMessage ?? '세션 시작에 실패했습니다'),
-            backgroundColor: ModernTheme.errorColor,
+            backgroundColor: StudyMateTheme.accentPink,
             behavior: SnackBarBehavior.floating,
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(20),
@@ -205,7 +207,7 @@ class _ModernStudySessionScreenState extends State<ModernStudySessionScreen>
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
               content: const Text('수고하셨어요! 세션이 완료되었습니다! 🎉'),
-              backgroundColor: ModernTheme.successColor,
+              backgroundColor: StudyMateTheme.primaryBlue,
               behavior: SnackBarBehavior.floating,
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(20),
@@ -231,7 +233,7 @@ class _ModernStudySessionScreenState extends State<ModernStudySessionScreen>
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: ModernTheme.backgroundColor,
+      backgroundColor: StudyMateTheme.lightBlue,
       appBar: AppBar(
         backgroundColor: Colors.white,
         elevation: 0,
@@ -239,13 +241,13 @@ class _ModernStudySessionScreenState extends State<ModernStudySessionScreen>
           icon: Container(
             padding: const EdgeInsets.all(8),
             decoration: BoxDecoration(
-              color: ModernTheme.primaryColor.withOpacity(0.1),
+              color: StudyMateTheme.primaryBlue.withOpacity(0.1),
               borderRadius: BorderRadius.circular(12),
             ),
             child: const Icon(
               Icons.arrow_back_ios,
               size: 20,
-              color: ModernTheme.primaryColor,
+              color: StudyMateTheme.primaryBlue,
             ),
           ),
           onPressed: () {
@@ -269,7 +271,7 @@ class _ModernStudySessionScreenState extends State<ModernStudySessionScreen>
                         Navigator.pop(context);
                       },
                       style: ElevatedButton.styleFrom(
-                        backgroundColor: ModernTheme.errorColor,
+                        backgroundColor: StudyMateTheme.accentPink,
                       ),
                       child: const Text('나가기'),
                     ),
@@ -284,7 +286,7 @@ class _ModernStudySessionScreenState extends State<ModernStudySessionScreen>
         title: const Text(
           '학습 세션',
           style: TextStyle(
-            color: ModernTheme.textPrimary,
+            color: StudyMateTheme.darkNavy,
             fontWeight: FontWeight.w700,
           ),
         ),
@@ -312,7 +314,7 @@ class _ModernStudySessionScreenState extends State<ModernStudySessionScreen>
           end: Alignment.bottomCenter,
           colors: [
             Colors.white,
-            ModernTheme.primaryColor.withOpacity(0.05),
+            StudyMateTheme.primaryBlue.withOpacity(0.05),
           ],
         ),
       ),
@@ -333,14 +335,14 @@ class _ModernStudySessionScreenState extends State<ModernStudySessionScreen>
                     shape: BoxShape.circle,
                     gradient: LinearGradient(
                       colors: _isSessionPaused 
-                        ? [ModernTheme.warningColor, ModernTheme.accentColor]
-                        : [ModernTheme.primaryColor, ModernTheme.secondaryColor],
+                        ? [StudyMateTheme.accentPink, StudyMateTheme.accentPink]
+                        : [StudyMateTheme.primaryBlue, StudyMateTheme.accentPink],
                       begin: Alignment.topLeft,
                       end: Alignment.bottomRight,
                     ),
                     boxShadow: [
                       BoxShadow(
-                        color: (_isSessionPaused ? ModernTheme.warningColor : ModernTheme.primaryColor)
+                        color: (_isSessionPaused ? StudyMateTheme.accentPink : StudyMateTheme.primaryBlue)
                             .withOpacity(0.3),
                         blurRadius: 30,
                         spreadRadius: 10,
@@ -397,7 +399,13 @@ class _ModernStudySessionScreenState extends State<ModernStudySessionScreen>
                 decoration: BoxDecoration(
                   color: Colors.white,
                   borderRadius: BorderRadius.circular(20),
-                  boxShadow: ModernTheme.cardShadow,
+                  boxShadow: [
+          BoxShadow(
+            color: StudyMateTheme.primaryBlue.withOpacity(0.08),
+            blurRadius: 20,
+            offset: const Offset(0, 4),
+          ),
+        ],
                 ),
                 child: Column(
                   children: [
@@ -405,7 +413,7 @@ class _ModernStudySessionScreenState extends State<ModernStudySessionScreen>
                       Icons.book,
                       '과목',
                       session.subject,
-                      ModernTheme.primaryColor,
+                      StudyMateTheme.primaryBlue,
                     ),
                     if (session.topic != null) ...[
                       const SizedBox(height: 12),
@@ -413,7 +421,7 @@ class _ModernStudySessionScreenState extends State<ModernStudySessionScreen>
                         Icons.topic,
                         '주제',
                         session.topic!,
-                        ModernTheme.accentColor,
+                        StudyMateTheme.accentPink,
                       ),
                     ],
                     const SizedBox(height: 12),
@@ -421,7 +429,7 @@ class _ModernStudySessionScreenState extends State<ModernStudySessionScreen>
                       Icons.category,
                       '유형',
                       _getSessionTypeLabel(session.type),
-                      ModernTheme.secondaryColor,
+                      StudyMateTheme.accentPink,
                     ),
                   ],
                 ),
@@ -439,7 +447,7 @@ class _ModernStudySessionScreenState extends State<ModernStudySessionScreen>
                       child: ElevatedButton.icon(
                         onPressed: _resumeSession,
                         style: ElevatedButton.styleFrom(
-                          backgroundColor: ModernTheme.primaryColor,
+                          backgroundColor: StudyMateTheme.primaryBlue,
                           padding: const EdgeInsets.symmetric(vertical: 16),
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(16),
@@ -462,18 +470,18 @@ class _ModernStudySessionScreenState extends State<ModernStudySessionScreen>
                         onPressed: _pauseSession,
                         style: OutlinedButton.styleFrom(
                           padding: const EdgeInsets.symmetric(vertical: 16),
-                          side: const BorderSide(color: ModernTheme.warningColor, width: 2),
+                          side: const BorderSide(color: StudyMateTheme.accentPink, width: 2),
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(16),
                           ),
                         ),
-                        icon: const Icon(Icons.pause, color: ModernTheme.warningColor),
+                        icon: const Icon(Icons.pause, color: StudyMateTheme.accentPink),
                         label: const Text(
                           '일시정지',
                           style: TextStyle(
                             fontSize: 16,
                             fontWeight: FontWeight.w700,
-                            color: ModernTheme.warningColor,
+                            color: StudyMateTheme.accentPink,
                           ),
                         ),
                       ),
@@ -484,7 +492,7 @@ class _ModernStudySessionScreenState extends State<ModernStudySessionScreen>
                     child: ElevatedButton.icon(
                       onPressed: _endSession,
                       style: ElevatedButton.styleFrom(
-                        backgroundColor: ModernTheme.errorColor,
+                        backgroundColor: StudyMateTheme.accentPink,
                         padding: const EdgeInsets.symmetric(vertical: 16),
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(16),
@@ -526,9 +534,15 @@ class _ModernStudySessionScreenState extends State<ModernStudySessionScreen>
             Container(
               padding: const EdgeInsets.all(24),
               decoration: BoxDecoration(
-                gradient: ModernTheme.primaryGradient,
+                gradient: StudyMateTheme.buttonGradient,
                 borderRadius: BorderRadius.circular(24),
-                boxShadow: ModernTheme.elevatedShadow,
+                boxShadow: [
+          BoxShadow(
+            color: StudyMateTheme.primaryBlue.withOpacity(0.08),
+            blurRadius: 20,
+            offset: const Offset(0, 4),
+          ),
+        ],
               ),
               child: Column(
                 children: [
@@ -621,7 +635,7 @@ class _ModernStudySessionScreenState extends State<ModernStudySessionScreen>
               child: ElevatedButton(
                 onPressed: provider.state == StudyState.loading ? null : _startSession,
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: ModernTheme.primaryColor,
+                  backgroundColor: StudyMateTheme.primaryBlue,
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(16),
                   ),
@@ -664,7 +678,7 @@ class _ModernStudySessionScreenState extends State<ModernStudySessionScreen>
       decoration: InputDecoration(
         labelText: label,
         hintText: hint,
-        prefixIcon: Icon(icon, color: ModernTheme.primaryColor),
+        prefixIcon: Icon(icon, color: StudyMateTheme.primaryBlue),
         filled: true,
         fillColor: Colors.white,
         border: OutlineInputBorder(
@@ -677,11 +691,11 @@ class _ModernStudySessionScreenState extends State<ModernStudySessionScreen>
         ),
         focusedBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(16),
-          borderSide: const BorderSide(color: ModernTheme.primaryColor, width: 2),
+          borderSide: const BorderSide(color: StudyMateTheme.primaryBlue, width: 2),
         ),
         errorBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(16),
-          borderSide: const BorderSide(color: ModernTheme.errorColor, width: 1),
+          borderSide: const BorderSide(color: StudyMateTheme.accentPink, width: 1),
         ),
       ),
       validator: validator,
@@ -694,7 +708,13 @@ class _ModernStudySessionScreenState extends State<ModernStudySessionScreen>
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(16),
-        boxShadow: ModernTheme.cardShadow,
+        boxShadow: [
+          BoxShadow(
+            color: StudyMateTheme.primaryBlue.withOpacity(0.08),
+            blurRadius: 20,
+            offset: const Offset(0, 4),
+          ),
+        ],
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -703,7 +723,7 @@ class _ModernStudySessionScreenState extends State<ModernStudySessionScreen>
             children: [
               const Icon(
                 Icons.flag,
-                color: ModernTheme.primaryColor,
+                color: StudyMateTheme.primaryBlue,
                 size: 20,
               ),
               const SizedBox(width: 8),
@@ -712,7 +732,7 @@ class _ModernStudySessionScreenState extends State<ModernStudySessionScreen>
                 style: TextStyle(
                   fontSize: 14,
                   fontWeight: FontWeight.w600,
-                  color: ModernTheme.textPrimary,
+                  color: StudyMateTheme.darkNavy,
                 ),
               ),
             ],
@@ -723,7 +743,7 @@ class _ModernStudySessionScreenState extends State<ModernStudySessionScreen>
             decoration: InputDecoration(
               contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
               filled: true,
-              fillColor: ModernTheme.backgroundColor,
+              fillColor: StudyMateTheme.lightBlue,
               border: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(12),
                 borderSide: BorderSide.none,
@@ -753,7 +773,13 @@ class _ModernStudySessionScreenState extends State<ModernStudySessionScreen>
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(16),
-        boxShadow: ModernTheme.cardShadow,
+        boxShadow: [
+          BoxShadow(
+            color: StudyMateTheme.primaryBlue.withOpacity(0.08),
+            blurRadius: 20,
+            offset: const Offset(0, 4),
+          ),
+        ],
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -762,7 +788,7 @@ class _ModernStudySessionScreenState extends State<ModernStudySessionScreen>
             children: [
               const Icon(
                 Icons.category,
-                color: ModernTheme.primaryColor,
+                color: StudyMateTheme.primaryBlue,
                 size: 20,
               ),
               const SizedBox(width: 8),
@@ -771,7 +797,7 @@ class _ModernStudySessionScreenState extends State<ModernStudySessionScreen>
                 style: TextStyle(
                   fontSize: 14,
                   fontWeight: FontWeight.w600,
-                  color: ModernTheme.textPrimary,
+                  color: StudyMateTheme.darkNavy,
                 ),
               ),
             ],
@@ -792,10 +818,10 @@ class _ModernStudySessionScreenState extends State<ModernStudySessionScreen>
                     HapticFeedback.selectionClick();
                   }
                 },
-                selectedColor: ModernTheme.primaryColor,
-                backgroundColor: ModernTheme.backgroundColor,
+                selectedColor: StudyMateTheme.primaryBlue,
+                backgroundColor: StudyMateTheme.lightBlue,
                 labelStyle: TextStyle(
-                  color: isSelected ? Colors.white : ModernTheme.textPrimary,
+                  color: isSelected ? Colors.white : StudyMateTheme.darkNavy,
                   fontWeight: isSelected ? FontWeight.w600 : FontWeight.w400,
                 ),
               );
@@ -814,7 +840,13 @@ class _ModernStudySessionScreenState extends State<ModernStudySessionScreen>
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(16),
-        boxShadow: ModernTheme.cardShadow,
+        boxShadow: [
+          BoxShadow(
+            color: StudyMateTheme.primaryBlue.withOpacity(0.08),
+            blurRadius: 20,
+            offset: const Offset(0, 4),
+          ),
+        ],
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -823,7 +855,7 @@ class _ModernStudySessionScreenState extends State<ModernStudySessionScreen>
             children: [
               const Icon(
                 Icons.timer,
-                color: ModernTheme.primaryColor,
+                color: StudyMateTheme.primaryBlue,
                 size: 20,
               ),
               const SizedBox(width: 8),
@@ -832,7 +864,7 @@ class _ModernStudySessionScreenState extends State<ModernStudySessionScreen>
                 style: TextStyle(
                   fontSize: 14,
                   fontWeight: FontWeight.w600,
-                  color: ModernTheme.textPrimary,
+                  color: StudyMateTheme.darkNavy,
                 ),
               ),
             ],
@@ -853,10 +885,10 @@ class _ModernStudySessionScreenState extends State<ModernStudySessionScreen>
                     HapticFeedback.selectionClick();
                   }
                 },
-                selectedColor: ModernTheme.primaryColor,
-                backgroundColor: ModernTheme.backgroundColor,
+                selectedColor: StudyMateTheme.primaryBlue,
+                backgroundColor: StudyMateTheme.lightBlue,
                 labelStyle: TextStyle(
-                  color: isSelected ? Colors.white : ModernTheme.textPrimary,
+                  color: isSelected ? Colors.white : StudyMateTheme.darkNavy,
                   fontWeight: isSelected ? FontWeight.w600 : FontWeight.w400,
                 ),
               );
@@ -892,7 +924,7 @@ class _ModernStudySessionScreenState extends State<ModernStudySessionScreen>
                 label,
                 style: const TextStyle(
                   fontSize: 12,
-                  color: ModernTheme.textSecondary,
+                  color: StudyMateTheme.grayText,
                 ),
               ),
               Text(
@@ -900,7 +932,7 @@ class _ModernStudySessionScreenState extends State<ModernStudySessionScreen>
                 style: const TextStyle(
                   fontSize: 14,
                   fontWeight: FontWeight.w600,
-                  color: ModernTheme.textPrimary,
+                  color: StudyMateTheme.darkNavy,
                 ),
               ),
             ],
@@ -963,7 +995,7 @@ class _ModernSessionEndSheetState extends State<ModernSessionEndSheet> {
           Container(
             padding: const EdgeInsets.all(24),
             decoration: BoxDecoration(
-              gradient: ModernTheme.primaryGradient,
+              gradient: StudyMateTheme.buttonGradient,
               borderRadius: const BorderRadius.vertical(top: Radius.circular(30)),
             ),
             child: Column(
@@ -1013,7 +1045,7 @@ class _ModernSessionEndSheetState extends State<ModernSessionEndSheet> {
                   Container(
                     padding: const EdgeInsets.all(16),
                     decoration: BoxDecoration(
-                      color: ModernTheme.backgroundColor,
+                      color: StudyMateTheme.lightBlue,
                       borderRadius: BorderRadius.circular(16),
                     ),
                     child: Column(
@@ -1023,7 +1055,7 @@ class _ModernSessionEndSheetState extends State<ModernSessionEndSheet> {
                           children: [
                             const Icon(
                               Icons.psychology,
-                              color: ModernTheme.primaryColor,
+                              color: StudyMateTheme.primaryBlue,
                               size: 20,
                             ),
                             const SizedBox(width: 8),
@@ -1032,7 +1064,7 @@ class _ModernSessionEndSheetState extends State<ModernSessionEndSheet> {
                               style: TextStyle(
                                 fontSize: 16,
                                 fontWeight: FontWeight.w600,
-                                color: ModernTheme.textPrimary,
+                                color: StudyMateTheme.darkNavy,
                               ),
                             ),
                           ],
@@ -1056,12 +1088,12 @@ class _ModernSessionEndSheetState extends State<ModernSessionEndSheet> {
                                 height: 50,
                                 decoration: BoxDecoration(
                                   color: isSelected 
-                                    ? ModernTheme.primaryColor 
+                                    ? StudyMateTheme.primaryBlue 
                                     : Colors.white,
                                   borderRadius: BorderRadius.circular(12),
                                   border: Border.all(
                                     color: isSelected 
-                                      ? ModernTheme.primaryColor 
+                                      ? StudyMateTheme.primaryBlue 
                                       : Colors.grey[300]!,
                                     width: 2,
                                   ),
@@ -1074,7 +1106,7 @@ class _ModernSessionEndSheetState extends State<ModernSessionEndSheet> {
                                       fontWeight: FontWeight.w600,
                                       color: isSelected 
                                         ? Colors.white 
-                                        : ModernTheme.textSecondary,
+                                        : StudyMateTheme.grayText,
                                     ),
                                   ),
                                 ),
@@ -1088,7 +1120,7 @@ class _ModernSessionEndSheetState extends State<ModernSessionEndSheet> {
                             _getFocusLabel(_focusScore),
                             style: TextStyle(
                               fontSize: 14,
-                              color: ModernTheme.primaryColor,
+                              color: StudyMateTheme.primaryBlue,
                               fontWeight: FontWeight.w600,
                             ),
                           ),
@@ -1106,7 +1138,7 @@ class _ModernSessionEndSheetState extends State<ModernSessionEndSheet> {
                     decoration: InputDecoration(
                       labelText: '학습 노트 (선택)',
                       hintText: '오늘 배운 내용이나 메모할 사항을 적어주세요',
-                      prefixIcon: const Icon(Icons.note, color: ModernTheme.primaryColor),
+                      prefixIcon: const Icon(Icons.note, color: StudyMateTheme.primaryBlue),
                       filled: true,
                       fillColor: Colors.white,
                       border: OutlineInputBorder(
@@ -1119,7 +1151,7 @@ class _ModernSessionEndSheetState extends State<ModernSessionEndSheet> {
                       ),
                       focusedBorder: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(16),
-                        borderSide: const BorderSide(color: ModernTheme.primaryColor, width: 2),
+                        borderSide: const BorderSide(color: StudyMateTheme.primaryBlue, width: 2),
                       ),
                     ),
                   ),
@@ -1134,7 +1166,7 @@ class _ModernSessionEndSheetState extends State<ModernSessionEndSheet> {
                           onPressed: () => Navigator.pop(context),
                           style: OutlinedButton.styleFrom(
                             padding: const EdgeInsets.symmetric(vertical: 16),
-                            side: const BorderSide(color: ModernTheme.primaryColor, width: 2),
+                            side: const BorderSide(color: StudyMateTheme.primaryBlue, width: 2),
                             shape: RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(16),
                             ),
@@ -1144,7 +1176,7 @@ class _ModernSessionEndSheetState extends State<ModernSessionEndSheet> {
                             style: TextStyle(
                               fontSize: 16,
                               fontWeight: FontWeight.w700,
-                              color: ModernTheme.primaryColor,
+                              color: StudyMateTheme.primaryBlue,
                             ),
                           ),
                         ),
@@ -1160,7 +1192,7 @@ class _ModernSessionEndSheetState extends State<ModernSessionEndSheet> {
                           },
                           style: ElevatedButton.styleFrom(
                             padding: const EdgeInsets.symmetric(vertical: 16),
-                            backgroundColor: ModernTheme.primaryColor,
+                            backgroundColor: StudyMateTheme.primaryBlue,
                             shape: RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(16),
                             ),

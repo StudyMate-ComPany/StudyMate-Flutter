@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_animate/flutter_animate.dart';
-import '../../theme/modern_theme.dart';
+import '../../theme/studymate_theme.dart';
 
 class SubscriptionScreen extends StatefulWidget {
   const SubscriptionScreen({super.key});
@@ -68,18 +68,18 @@ class _SubscriptionScreenState extends State<SubscriptionScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: ModernTheme.backgroundColor,
+      backgroundColor: StudyMateTheme.lightBlue,
       appBar: AppBar(
         backgroundColor: Colors.white,
         elevation: 0,
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back, color: ModernTheme.textPrimary),
+          icon: const Icon(Icons.arrow_back, color: StudyMateTheme.darkNavy),
           onPressed: () => Navigator.pop(context),
         ),
         title: const Text(
           'StudyMate Premium',
           style: TextStyle(
-            color: ModernTheme.textPrimary,
+            color: StudyMateTheme.darkNavy,
             fontWeight: FontWeight.w700,
           ),
         ),
@@ -101,11 +101,11 @@ class _SubscriptionScreenState extends State<SubscriptionScreen> {
                           width: 80,
                           height: 80,
                           decoration: BoxDecoration(
-                            gradient: ModernTheme.primaryGradient,
+                            gradient: StudyMateTheme.buttonGradient,
                             borderRadius: BorderRadius.circular(20),
                             boxShadow: [
                               BoxShadow(
-                                color: ModernTheme.primaryColor.withOpacity(0.3),
+                                color: StudyMateTheme.primaryBlue.withOpacity(0.3),
                                 blurRadius: 20,
                                 offset: const Offset(0, 10),
                               ),
@@ -125,7 +125,7 @@ class _SubscriptionScreenState extends State<SubscriptionScreen> {
                           style: TextStyle(
                             fontSize: 24,
                             fontWeight: FontWeight.bold,
-                            color: ModernTheme.textPrimary,
+                            color: StudyMateTheme.darkNavy,
                           ),
                         ).animate()
                           .fadeIn(delay: 200.ms),
@@ -134,7 +134,7 @@ class _SubscriptionScreenState extends State<SubscriptionScreen> {
                           '스마트 기술과 함께 더 효과적으로 학습하세요',
                           style: TextStyle(
                             fontSize: 14,
-                            color: ModernTheme.textSecondary,
+                            color: StudyMateTheme.grayText,
                           ),
                         ).animate()
                           .fadeIn(delay: 400.ms),
@@ -149,7 +149,7 @@ class _SubscriptionScreenState extends State<SubscriptionScreen> {
                     style: TextStyle(
                       fontSize: 18,
                       fontWeight: FontWeight.bold,
-                      color: ModernTheme.textPrimary,
+                      color: StudyMateTheme.darkNavy,
                     ),
                   ),
                   const SizedBox(height: 15),
@@ -171,16 +171,16 @@ class _SubscriptionScreenState extends State<SubscriptionScreen> {
                         margin: const EdgeInsets.only(bottom: 15),
                         padding: const EdgeInsets.all(20),
                         decoration: BoxDecoration(
-                          color: isSelected ? ModernTheme.primaryLight.withOpacity(0.1) : Colors.white,
+                          color: isSelected ? StudyMateTheme.lightBlue.withOpacity(0.1) : Colors.white,
                           borderRadius: BorderRadius.circular(20),
                           border: Border.all(
-                            color: isSelected ? ModernTheme.primaryColor : Colors.grey.shade200,
+                            color: isSelected ? StudyMateTheme.primaryBlue : Colors.grey.shade200,
                             width: isSelected ? 2 : 1,
                           ),
                           boxShadow: isSelected
                               ? [
                                   BoxShadow(
-                                    color: ModernTheme.primaryColor.withOpacity(0.2),
+                                    color: StudyMateTheme.primaryBlue.withOpacity(0.2),
                                     blurRadius: 20,
                                     offset: const Offset(0, 10),
                                   ),
@@ -204,8 +204,8 @@ class _SubscriptionScreenState extends State<SubscriptionScreen> {
                                               fontSize: 18,
                                               fontWeight: FontWeight.bold,
                                               color: isSelected 
-                                                  ? ModernTheme.primaryColor 
-                                                  : ModernTheme.textPrimary,
+                                                  ? StudyMateTheme.primaryBlue 
+                                                  : StudyMateTheme.darkNavy,
                                             ),
                                           ),
                                           if (plan.isPopular) ...[
@@ -216,7 +216,7 @@ class _SubscriptionScreenState extends State<SubscriptionScreen> {
                                                 vertical: 4,
                                               ),
                                               decoration: BoxDecoration(
-                                                gradient: ModernTheme.primaryGradient,
+                                                gradient: StudyMateTheme.buttonGradient,
                                                 borderRadius: BorderRadius.circular(20),
                                               ),
                                               child: const Text(
@@ -236,7 +236,7 @@ class _SubscriptionScreenState extends State<SubscriptionScreen> {
                                         plan.duration,
                                         style: TextStyle(
                                           fontSize: 14,
-                                          color: ModernTheme.textSecondary,
+                                          color: StudyMateTheme.grayText,
                                         ),
                                       ),
                                     ],
@@ -252,7 +252,7 @@ class _SubscriptionScreenState extends State<SubscriptionScreen> {
                                           vertical: 4,
                                         ),
                                         decoration: BoxDecoration(
-                                          color: ModernTheme.errorColor,
+                                          color: StudyMateTheme.accentPink,
                                           borderRadius: BorderRadius.circular(8),
                                         ),
                                         child: Text(
@@ -285,8 +285,8 @@ class _SubscriptionScreenState extends State<SubscriptionScreen> {
                                             fontSize: 20,
                                             fontWeight: FontWeight.bold,
                                             color: isSelected 
-                                                ? ModernTheme.primaryColor 
-                                                : ModernTheme.textPrimary,
+                                                ? StudyMateTheme.primaryBlue 
+                                                : StudyMateTheme.darkNavy,
                                           ),
                                         ),
                                       ],
@@ -302,12 +302,12 @@ class _SubscriptionScreenState extends State<SubscriptionScreen> {
                                     shape: BoxShape.circle,
                                     border: Border.all(
                                       color: isSelected 
-                                          ? ModernTheme.primaryColor 
+                                          ? StudyMateTheme.primaryBlue 
                                           : Colors.grey.shade300,
                                       width: 2,
                                     ),
                                     color: isSelected 
-                                        ? ModernTheme.primaryColor 
+                                        ? StudyMateTheme.primaryBlue 
                                         : Colors.transparent,
                                   ),
                                   child: isSelected
@@ -330,7 +330,7 @@ class _SubscriptionScreenState extends State<SubscriptionScreen> {
                                   feature,
                                   style: TextStyle(
                                     fontSize: 13,
-                                    color: ModernTheme.textSecondary,
+                                    color: StudyMateTheme.grayText,
                                   ),
                                 ),
                               )),
@@ -349,14 +349,14 @@ class _SubscriptionScreenState extends State<SubscriptionScreen> {
                   Container(
                     padding: const EdgeInsets.all(16),
                     decoration: BoxDecoration(
-                      color: ModernTheme.accentColor.withOpacity(0.1),
+                      color: StudyMateTheme.accentPink.withOpacity(0.1),
                       borderRadius: BorderRadius.circular(15),
                     ),
                     child: Row(
                       children: [
                         Icon(
                           Icons.info_outline,
-                          color: ModernTheme.accentColor,
+                          color: StudyMateTheme.accentPink,
                           size: 20,
                         ),
                         const SizedBox(width: 12),
@@ -369,14 +369,14 @@ class _SubscriptionScreenState extends State<SubscriptionScreen> {
                                 style: TextStyle(
                                   fontSize: 14,
                                   fontWeight: FontWeight.bold,
-                                  color: ModernTheme.textPrimary,
+                                  color: StudyMateTheme.darkNavy,
                                 ),
                               ),
                               Text(
                                 '언제든지 취소 가능 • 자동 갱신',
                                 style: TextStyle(
                                   fontSize: 12,
-                                  color: ModernTheme.textSecondary,
+                                  color: StudyMateTheme.grayText,
                                 ),
                               ),
                             ],
@@ -417,7 +417,7 @@ class _SubscriptionScreenState extends State<SubscriptionScreen> {
                             '선택한 플랜',
                             style: TextStyle(
                               fontSize: 12,
-                              color: ModernTheme.textSecondary,
+                              color: StudyMateTheme.grayText,
                             ),
                           ),
                           const SizedBox(height: 4),
@@ -426,7 +426,7 @@ class _SubscriptionScreenState extends State<SubscriptionScreen> {
                             style: const TextStyle(
                               fontSize: 16,
                               fontWeight: FontWeight.bold,
-                              color: ModernTheme.textPrimary,
+                              color: StudyMateTheme.darkNavy,
                             ),
                           ),
                         ],
@@ -436,7 +436,7 @@ class _SubscriptionScreenState extends State<SubscriptionScreen> {
                         style: const TextStyle(
                           fontSize: 20,
                           fontWeight: FontWeight.bold,
-                          color: ModernTheme.primaryColor,
+                          color: StudyMateTheme.primaryBlue,
                         ),
                       ),
                     ],
@@ -445,7 +445,7 @@ class _SubscriptionScreenState extends State<SubscriptionScreen> {
                   ElevatedButton(
                     onPressed: _handleSubscribe,
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: ModernTheme.primaryColor,
+                      backgroundColor: StudyMateTheme.primaryBlue,
                       foregroundColor: Colors.white,
                       minimumSize: const Size(double.infinity, 56),
                       shape: RoundedRectangleBorder(
@@ -502,7 +502,7 @@ class _SubscriptionScreenState extends State<SubscriptionScreen> {
               _processSubscription();
             },
             style: ElevatedButton.styleFrom(
-              backgroundColor: ModernTheme.primaryColor,
+              backgroundColor: StudyMateTheme.primaryBlue,
               foregroundColor: Colors.white,
             ),
             child: const Text('확인'),
@@ -517,7 +517,7 @@ class _SubscriptionScreenState extends State<SubscriptionScreen> {
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         content: const Text('무료 체험이 시작되었습니다! 🎉'),
-        backgroundColor: ModernTheme.successColor,
+        backgroundColor: StudyMateTheme.primaryBlue,
         behavior: SnackBarBehavior.floating,
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(20),

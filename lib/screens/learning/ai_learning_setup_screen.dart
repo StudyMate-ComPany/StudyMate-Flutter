@@ -3,7 +3,7 @@ import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import '../../providers/learning_plan_provider.dart';
-import '../../theme/modern_theme.dart';
+import '../../theme/studymate_theme.dart';
 import '../../models/learning_plan.dart';
 import '../../services/chatgpt_service.dart';
 import '../home/new_home_screen.dart';
@@ -477,7 +477,7 @@ class _AILearningSetupScreenState extends State<AILearningSetupScreen>
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: ModernTheme.backgroundColor,
+      backgroundColor: StudyMateTheme.lightBlue,
       appBar: AppBar(
         backgroundColor: Colors.white,
         elevation: 0,
@@ -493,8 +493,8 @@ class _AILearningSetupScreenState extends State<AILearningSetupScreen>
                   decoration: BoxDecoration(
                     gradient: LinearGradient(
                       colors: [
-                        ModernTheme.primaryColor,
-                        ModernTheme.secondaryColor,
+                        StudyMateTheme.primaryBlue,
+                        StudyMateTheme.accentPink,
                       ],
                       transform: GradientRotation(_animationController.value * 3.14),
                     ),
@@ -512,7 +512,7 @@ class _AILearningSetupScreenState extends State<AILearningSetupScreen>
             const Text(
               '스마트 학습 플래너',
               style: TextStyle(
-                color: ModernTheme.textPrimary,
+                color: StudyMateTheme.darkNavy,
                 fontWeight: FontWeight.w700,
               ),
             ),
@@ -553,7 +553,7 @@ class _AILearningSetupScreenState extends State<AILearningSetupScreen>
                 color: Colors.white,
                 border: Border(
                   top: BorderSide(
-                    color: ModernTheme.primaryColor.withOpacity(0.2),
+                    color: StudyMateTheme.primaryBlue.withOpacity(0.2),
                     width: 1,
                   ),
                 ),
@@ -601,10 +601,10 @@ class _AILearningSetupScreenState extends State<AILearningSetupScreen>
                       print('조건: _planGenerated($_planGenerated) && _generatedPlan!=null(${_generatedPlan != null}) && !_isTyping(!$_isTyping)');
                     },
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: ModernTheme.primaryColor,
+                      backgroundColor: StudyMateTheme.primaryBlue,
                       foregroundColor: Colors.white,
                       elevation: 6,
-                      shadowColor: ModernTheme.primaryColor.withOpacity(0.4),
+                      shadowColor: StudyMateTheme.primaryBlue.withOpacity(0.4),
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(16),
                       ),
@@ -651,7 +651,7 @@ class _AILearningSetupScreenState extends State<AILearningSetupScreen>
         ),
         decoration: BoxDecoration(
           gradient: message.isUser 
-            ? ModernTheme.primaryGradient
+            ? StudyMateTheme.buttonGradient
             : null,
           color: message.isUser ? null : Colors.white,
           borderRadius: BorderRadius.only(
@@ -660,7 +660,13 @@ class _AILearningSetupScreenState extends State<AILearningSetupScreen>
             bottomLeft: Radius.circular(message.isUser ? 20 : 4),
             bottomRight: Radius.circular(message.isUser ? 4 : 20),
           ),
-          boxShadow: ModernTheme.cardShadow,
+          boxShadow: [
+          BoxShadow(
+            color: StudyMateTheme.primaryBlue.withOpacity(0.08),
+            blurRadius: 20,
+            offset: const Offset(0, 4),
+          ),
+        ],
         ),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -673,7 +679,7 @@ class _AILearningSetupScreenState extends State<AILearningSetupScreen>
                     width: 24,
                     height: 24,
                     decoration: BoxDecoration(
-                      gradient: ModernTheme.primaryGradient,
+                      gradient: StudyMateTheme.buttonGradient,
                       borderRadius: BorderRadius.circular(8),
                     ),
                     child: const Icon(
@@ -688,7 +694,7 @@ class _AILearningSetupScreenState extends State<AILearningSetupScreen>
                     style: TextStyle(
                       fontSize: 12,
                       fontWeight: FontWeight.w600,
-                      color: ModernTheme.primaryColor,
+                      color: StudyMateTheme.primaryBlue,
                     ),
                   ),
                 ],
@@ -698,7 +704,7 @@ class _AILearningSetupScreenState extends State<AILearningSetupScreen>
               message.text,
               style: TextStyle(
                 fontSize: 14,
-                color: message.isUser ? Colors.white : ModernTheme.textPrimary,
+                color: message.isUser ? Colors.white : StudyMateTheme.darkNavy,
                 height: 1.5,
               ),
             ),
@@ -717,7 +723,13 @@ class _AILearningSetupScreenState extends State<AILearningSetupScreen>
         decoration: BoxDecoration(
           color: Colors.white,
           borderRadius: BorderRadius.circular(20),
-          boxShadow: ModernTheme.cardShadow,
+          boxShadow: [
+          BoxShadow(
+            color: StudyMateTheme.primaryBlue.withOpacity(0.08),
+            blurRadius: 20,
+            offset: const Offset(0, 4),
+          ),
+        ],
         ),
         child: Row(
           mainAxisSize: MainAxisSize.min,
@@ -726,7 +738,7 @@ class _AILearningSetupScreenState extends State<AILearningSetupScreen>
               width: 24,
               height: 24,
               decoration: BoxDecoration(
-                gradient: ModernTheme.primaryGradient,
+                gradient: StudyMateTheme.buttonGradient,
                 borderRadius: BorderRadius.circular(8),
               ),
               child: const Icon(
@@ -745,7 +757,7 @@ class _AILearningSetupScreenState extends State<AILearningSetupScreen>
                     width: 8,
                     height: 8,
                     decoration: BoxDecoration(
-                      color: ModernTheme.primaryColor,
+                      color: StudyMateTheme.primaryBlue,
                       shape: BoxShape.circle,
                     ),
                   ).animate(
@@ -791,7 +803,7 @@ class _AILearningSetupScreenState extends State<AILearningSetupScreen>
             Expanded(
               child: Container(
                 decoration: BoxDecoration(
-                  color: ModernTheme.backgroundColor,
+                  color: StudyMateTheme.lightBlue,
                   borderRadius: BorderRadius.circular(24),
                 ),
                 child: TextField(
@@ -802,7 +814,7 @@ class _AILearningSetupScreenState extends State<AILearningSetupScreen>
                   decoration: InputDecoration(
                     hintText: '학습 목표를 자유롭게 입력하세요...',
                     hintStyle: const TextStyle(
-                      color: ModernTheme.textLight,
+                      color: StudyMateTheme.grayText,
                       fontSize: 14,
                     ),
                     border: OutlineInputBorder(
@@ -822,11 +834,11 @@ class _AILearningSetupScreenState extends State<AILearningSetupScreen>
               width: 48,
               height: 48,
               decoration: BoxDecoration(
-                gradient: ModernTheme.primaryGradient,
+                gradient: StudyMateTheme.buttonGradient,
                 shape: BoxShape.circle,
                 boxShadow: [
                   BoxShadow(
-                    color: ModernTheme.primaryColor.withOpacity(0.3),
+                    color: StudyMateTheme.primaryBlue.withOpacity(0.3),
                     blurRadius: 8,
                     offset: const Offset(0, 2),
                   ),

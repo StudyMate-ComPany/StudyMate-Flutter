@@ -4,7 +4,7 @@ import 'package:flutter_animate/flutter_animate.dart';
 import '../../providers/auth_provider.dart';
 import '../../providers/study_provider.dart';
 import '../../providers/ai_provider.dart';
-import '../../theme/modern_theme.dart';
+import '../../theme/studymate_theme.dart';
 import '../../widgets/common/loading_overlay.dart';
 import '../study/modern_study_goals_screen.dart';
 import '../study/modern_study_session_screen.dart';
@@ -72,7 +72,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
     return Consumer3<AuthProvider, StudyProvider, AIProvider>(
       builder: (context, authProvider, studyProvider, aiProvider, child) {
         return Scaffold(
-          backgroundColor: ModernTheme.backgroundColor,
+          backgroundColor: StudyMateTheme.lightBlue,
           appBar: AppBar(
             backgroundColor: Colors.white,
             elevation: 0,
@@ -82,7 +82,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                 Container(
                   padding: const EdgeInsets.all(8),
                   decoration: BoxDecoration(
-                    gradient: ModernTheme.primaryGradient,
+                    gradient: StudyMateTheme.buttonGradient,
                     borderRadius: BorderRadius.circular(12),
                   ),
                   child: const Icon(
@@ -97,7 +97,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                   style: TextStyle(
                     fontSize: 20,
                     fontWeight: FontWeight.bold,
-                    color: ModernTheme.primaryColor,
+                    color: StudyMateTheme.primaryBlue,
                   ),
                 ),
               ],
@@ -110,12 +110,12 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                 icon: Container(
                   padding: const EdgeInsets.all(8),
                   decoration: BoxDecoration(
-                    color: ModernTheme.secondaryColor.withOpacity(0.2),
+                    color: StudyMateTheme.accentPink.withOpacity(0.2),
                     borderRadius: BorderRadius.circular(12),
                   ),
                   child: const Icon(
                     Icons.notifications_outlined,
-                    color: ModernTheme.primaryColor,
+                    color: StudyMateTheme.primaryBlue,
                     size: 20,
                   ),
                 ),
@@ -123,7 +123,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                   ScaffoldMessenger.of(context).showSnackBar(
                     SnackBar(
                       content: const Text('알림 기능이 곧 추가됩니다! 🔔'),
-                      backgroundColor: ModernTheme.primaryColor,
+                      backgroundColor: StudyMateTheme.primaryBlue,
                       behavior: SnackBarBehavior.floating,
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(20),
@@ -155,12 +155,12 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                 icon: Container(
                   padding: const EdgeInsets.all(8),
                   decoration: BoxDecoration(
-                    color: ModernTheme.accentColor.withOpacity(0.2),
+                    color: StudyMateTheme.accentPink.withOpacity(0.2),
                     borderRadius: BorderRadius.circular(12),
                   ),
                   child: const Icon(
                     Icons.more_vert,
-                    color: ModernTheme.primaryColor,
+                    color: StudyMateTheme.primaryBlue,
                     size: 20,
                   ),
                 ),
@@ -171,7 +171,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                   const PopupMenuItem(
                     value: 'profile',
                     child: ListTile(
-                      leading: Icon(Icons.person, color: ModernTheme.primaryColor),
+                      leading: Icon(Icons.person, color: StudyMateTheme.primaryBlue),
                       title: Text('프로필'),
                       contentPadding: EdgeInsets.zero,
                     ),
@@ -179,7 +179,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                   const PopupMenuItem(
                     value: 'settings',
                     child: ListTile(
-                      leading: Icon(Icons.settings, color: ModernTheme.primaryColor),
+                      leading: Icon(Icons.settings, color: StudyMateTheme.primaryBlue),
                       title: Text('설정'),
                       contentPadding: EdgeInsets.zero,
                     ),
@@ -188,8 +188,8 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                   const PopupMenuItem(
                     value: 'logout',
                     child: ListTile(
-                      leading: Icon(Icons.logout, color: ModernTheme.errorColor),
-                      title: Text('로그아웃', style: TextStyle(color: ModernTheme.errorColor)),
+                      leading: Icon(Icons.logout, color: StudyMateTheme.accentPink),
+                      title: Text('로그아웃', style: TextStyle(color: StudyMateTheme.accentPink)),
                       contentPadding: EdgeInsets.zero,
                     ),
                   ),
@@ -239,7 +239,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                   _fabAnimationController.reverse();
                 });
               },
-              selectedItemColor: ModernTheme.primaryColor,
+              selectedItemColor: StudyMateTheme.primaryBlue,
               unselectedItemColor: Colors.grey,
               selectedLabelStyle: const TextStyle(
                 fontWeight: FontWeight.bold,
@@ -294,7 +294,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
         duration: const Duration(milliseconds: 300),
         padding: EdgeInsets.all(isSelected ? 8 : 4),
         decoration: BoxDecoration(
-          color: isSelected ? ModernTheme.primaryColor.withOpacity(0.1) : Colors.transparent,
+          color: isSelected ? StudyMateTheme.primaryBlue.withOpacity(0.1) : Colors.transparent,
           borderRadius: BorderRadius.circular(16),
         ),
         child: Icon(
@@ -322,7 +322,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                   ),
                 );
               },
-              backgroundColor: ModernTheme.primaryColor,
+              backgroundColor: StudyMateTheme.primaryBlue,
               icon: const Icon(Icons.add, color: Colors.white),
               label: const Text(
                 '목표 추가',
@@ -352,7 +352,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                   ),
                 );
               },
-              backgroundColor: ModernTheme.secondaryColor,
+              backgroundColor: StudyMateTheme.accentPink,
               icon: const Icon(Icons.play_arrow, color: Colors.white),
               label: const Text(
                 '학습 시작',
@@ -382,7 +382,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                   ),
                 );
               },
-              backgroundColor: ModernTheme.accentColor,
+              backgroundColor: StudyMateTheme.accentPink,
               icon: const Icon(Icons.chat, color: Colors.white),
               label: const Text(
                 'AI와 대화',

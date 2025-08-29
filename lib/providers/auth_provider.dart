@@ -56,6 +56,29 @@ class AuthProvider with ChangeNotifier {
       _setState(AuthState.loading);
       debugPrint('🔐 AuthProvider: Starting login for $email');
       
+      // TEST MODE: Allow test@test.com with password "test" for UI testing
+      if (email.toLowerCase() == 'test@test.com' && password == 'test') {
+        debugPrint('🧪 TEST MODE: Using test credentials');
+        final testUser = User(
+          id: '1',
+          email: 'test@test.com',
+          name: '테스트 사용자',
+          bio: '테스트용 사용자입니다',
+          avatarUrl: null,
+          createdAt: DateTime.now(),
+          lastLoginAt: DateTime.now(),
+        );
+        
+        await LocalStorageService.saveAuthToken('test_token_12345');
+        _apiService.setAuthToken('test_token_12345');
+        _user = testUser;
+        await LocalStorageService.saveUser(testUser);
+        
+        debugPrint('✅ TEST LOGIN successful, transitioning to authenticated state');
+        _setState(AuthState.authenticated);
+        return true;
+      }
+      
       final response = await _apiService.login(email, password);
       debugPrint('📦 Login response received: ${response.keys}');
       
@@ -191,5 +214,9 @@ class AuthProvider with ChangeNotifier {
     _errorMessage = error;
     _state = AuthState.error;
     notifyListeners();
+  }
+
+  Future<bool> checkLoginStatus() async {
+    return isAuthenticated;
   }
 }
