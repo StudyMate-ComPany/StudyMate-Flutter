@@ -61,39 +61,43 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
           SafeArea(
             bottom: false,
             child: Container(
-              height: 80, // 높이 증가
+              height: 95, // 높이 더 증가 (80 + 15)
               padding: const EdgeInsets.symmetric(horizontal: 24),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  // STUDYMATE 로고 - 왼쪽 정렬
-                  const Text(
-                    'STUDYMATE',
-                    style: TextStyle(
-                      fontFamily: 'ChangwonDangamAsac',
-                      fontSize: 24, // 크기 조정
-                      fontWeight: FontWeight.w700,
-                      color: Color(0xFF70C4DE),
-                      letterSpacing: 0,
-                      height: 1.2,
-                    ),
-                  ),
-                  // 다음 페이지 화살표 버튼
-                  if (_currentPage < _pages.length - 1)
-                    GestureDetector(
-                      onTap: _nextPage,
-                      child: Container(
-                        padding: const EdgeInsets.all(8),
-                        child: const Icon(
-                          Icons.arrow_forward,
-                          size: 28, // 크기 조정
-                          color: Color(0xFF70C4DE),
-                        ),
+              alignment: Alignment.bottomCenter,
+              child: Padding(
+                padding: const EdgeInsets.only(bottom: 10),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    // STUDYMATE 로고 - 왼쪽 정렬
+                    const Text(
+                      'STUDYMATE',
+                      style: TextStyle(
+                        fontFamily: 'ChangwonDangamAsac',
+                        fontSize: 24, // 크기 조정
+                        fontWeight: FontWeight.w700,
+                        color: Color(0xFF70C4DE),
+                        letterSpacing: 0,
+                        height: 1.2,
                       ),
-                    )
-                  else
-                    const SizedBox(width: 48),
-                ],
+                    ),
+                    // 다음 페이지 화살표 버튼
+                    if (_currentPage < _pages.length - 1)
+                      GestureDetector(
+                        onTap: _nextPage,
+                        child: Container(
+                          padding: const EdgeInsets.all(8),
+                          child: const Icon(
+                            Icons.arrow_forward,
+                            size: 28, // 크기 조정
+                            color: Color(0xFF70C4DE),
+                          ),
+                        ),
+                      )
+                    else
+                      const SizedBox(width: 48),
+                  ],
+                ),
               ),
             ),
           ),
@@ -116,8 +120,8 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
           
           // 하단 네비게이션
           Container(
-            height: 90,
-            padding: const EdgeInsets.symmetric(horizontal: 24),
+            height: 105, // 높이 증가 (90 + 15)
+            padding: const EdgeInsets.fromLTRB(24, 15, 24, 0), // 위쪽 패딩 추가
             child: Stack(
               alignment: Alignment.center,
               children: [
@@ -239,6 +243,11 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
               padding: const EdgeInsets.symmetric(horizontal: 10),
               child: Column(
                 children: [
+                  // 상단 구분선
+                  Container(
+                    height: 1,
+                    color: const Color(0xFFE5E5E5),
+                  ),
                   for (int i = 0; i < (page.features?.length ?? 0); i++) ...[
                     Container(
                       padding: const EdgeInsets.symmetric(vertical: 14),
@@ -285,12 +294,11 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                         duration: 500.ms,
                       )
                       .slideX(begin: -0.1, end: 0),
-                    // 구분선 (마지막 항목 제외)
-                    if (i < (page.features!.length - 1))
-                      Container(
-                        height: 1,
-                        color: const Color(0xFFE5E5E5),
-                      ),
+                    // 구분선 (모든 항목 뒤에)
+                    Container(
+                      height: 1,
+                      color: const Color(0xFFE5E5E5),
+                    ),
                   ],
                 ],
               ),
@@ -397,11 +405,8 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
       final prefs = await SharedPreferences.getInstance();
       await prefs.setBool('hasCompletedOnboarding', true);
       
-      try {
-        await NotificationService().requestPermission();
-      } catch (e) {
-        print('알림 권한 요청 실패: $e');
-      }
+      // 알림 권한 요청을 NotificationPermissionScreen에서 처리하도록 변경
+      // (알림 받기 버튼을 눌렀을 때만 요청)
       
       if (mounted) {
         Navigator.pushReplacement(
