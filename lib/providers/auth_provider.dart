@@ -110,7 +110,39 @@ class AuthProvider with ChangeNotifier {
     }
   }
 
-  Future<bool> register(String email, String password, String name, {String? username, String? passwordConfirm, bool termsAccepted = true, bool privacyAccepted = true}) async {
+  Future<bool> socialLogin(String provider) async {
+    try {
+      _setState(AuthState.loading);
+      debugPrint('🔐 AuthProvider: Starting social login with $provider');
+      
+      // TEST MODE: Mock social login for UI testing
+      debugPrint('🧪 TEST MODE: Using mock social login');
+      final testUser = User(
+        id: '1',
+        email: '$provider@user.com',
+        name: '$provider 사용자',
+        bio: '$provider로 로그인한 사용자입니다',
+        avatarUrl: null,
+        createdAt: DateTime.now(),
+        lastLoginAt: DateTime.now(),
+      );
+      
+      await LocalStorageService.saveAuthToken('${provider}_token_12345');
+      _apiService.setAuthToken('${provider}_token_12345');
+      _user = testUser;
+      await LocalStorageService.saveUser(testUser);
+      
+      debugPrint('✅ SOCIAL LOGIN successful, transitioning to authenticated state');
+      _setState(AuthState.authenticated);
+      return true;
+    } catch (e) {
+      debugPrint('❌ Social login error: $e');
+      _setError('소셜 로그인에 실패했습니다: $e');
+      return false;
+    }
+  }
+
+  Future<bool> register(String name, String email, String password, {String? username, String? passwordConfirm, bool termsAccepted = true, bool privacyAccepted = true}) async {
     try {
       _setState(AuthState.loading);
       

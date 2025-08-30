@@ -46,6 +46,11 @@ class NotificationService {
     );
   }
   
+  // 온보딩에서 호출할 권한 요청 메서드
+  Future<void> requestPermission() async {
+    await _requestPermissions();
+  }
+  
   void _onNotificationTapped(NotificationResponse response) {
     debugPrint('알림 탭됨: ${response.payload}');
   }
