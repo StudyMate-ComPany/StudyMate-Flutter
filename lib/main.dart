@@ -32,10 +32,11 @@ void main() async {
   // Initialize local storage
   await LocalStorageService.initialize();
   
-  // Initialize notification service
+  // Initialize notification service - 권한 요청 없이 초기화만
   try {
-    await NotificationService().initialize();
-    await NotificationService().scheduleDailyStudyReminders();
+    // 알림 서비스는 초기화하되, 권한 요청은 온보딩에서 처리
+    // await NotificationService().initialize();
+    // await NotificationService().scheduleDailyStudyReminders();
   } catch (e) {
     debugPrint('알림 초기화 실패: $e');
     // 알림 권한이 없어도 앱은 정상 실행되도록 처리
@@ -66,7 +67,8 @@ class StudyMateApp extends StatelessWidget {
             
             // 테마 설정 - StudyMate 테마 사용
             theme: StudyMateTheme.lightTheme,
-            themeMode: ThemeMode.light,
+            darkTheme: StudyMateTheme.darkTheme,
+            themeMode: ThemeMode.system, // 시스템 설정 따르기
         
         // 한국어 지역화 설정 - 강제로 한글 설정
         locale: const Locale('ko', 'KR'),

@@ -1,9 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
+import 'package:provider/provider.dart';
 import '../../theme/studymate_theme.dart';
+import '../../providers/auth_provider.dart';
 import 'learning_dashboard.dart';
 import '../study/quiz_screen.dart';
 import '../study/pomodoro_timer_screen.dart';
+import '../auth/login_screen.dart';
 
 class MainNavigationScreen extends StatefulWidget {
   const MainNavigationScreen({super.key});
@@ -45,18 +48,59 @@ class _MainNavigationScreenState extends State<MainNavigationScreen>
   }
 
   void _onItemTapped(int index) {
+    final authProvider = Provider.of<AuthProvider>(context, listen: false);
+    
+    // 학습 플래너(index 0) 접근 시 로그인 체크
+    if (index == 0 && !authProvider.isAuthenticated) {
+      _showLoginRequiredDialog();
+      return;
+    }
+    
     setState(() {
       _selectedIndex = index;
     });
   }
 
+  void _showLoginRequiredDialog() {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text('로그인 필요'),
+          content: const Text('학습 플래너를 사용하려면 로그인이 필요합니다.'),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+              child: const Text('취소'),
+            ),
+            ElevatedButton(
+              onPressed: () {
+                Navigator.of(context).pop();
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => const LoginScreen()),
+                );
+              },
+              child: const Text('로그인'),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
+    print('🏠 MainNavigationScreen build() 호출됨 - selectedIndex: $_selectedIndex');
+    
     return Scaffold(
       backgroundColor: StudyMateTheme.lightBlue,
       appBar: AppBar(
         backgroundColor: Colors.white,
         elevation: 0,
+        automaticallyImplyLeading: false,
         title: Row(
           mainAxisSize: MainAxisSize.min,
           children: [
@@ -111,7 +155,9 @@ class _MainNavigationScreenState extends State<MainNavigationScreen>
                 size: 20,
               ),
             ),
-            onPressed: () {},
+            onPressed: () {
+              print('🔔 알림 버튼 클릭');
+            },
           ),
           IconButton(
             icon: Container(
@@ -126,7 +172,9 @@ class _MainNavigationScreenState extends State<MainNavigationScreen>
                 size: 20,
               ),
             ),
-            onPressed: () {},
+            onPressed: () {
+              print('📋 더보기 버튼 클릭');
+            },
           ),
           const SizedBox(width: 8),
         ],

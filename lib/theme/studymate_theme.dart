@@ -274,4 +274,145 @@ class StudyMateTheme {
     color: primaryBlue.withOpacity(0.3),
     borderRadius: BorderRadius.circular(4),
   );
+  
+  // Dark Theme Colors
+  static const Color darkBackground = Color(0xFF1A1A2E);
+  static const Color darkSurface = Color(0xFF16213E);
+  static const Color darkCard = Color(0xFF0F3460);
+  static const Color darkPrimary = Color(0xFF53A2BE);
+  static const Color darkAccent = Color(0xFFE94560);
+  
+  // Dark Theme
+  static ThemeData get darkTheme {
+    return ThemeData(
+      useMaterial3: true,
+      brightness: Brightness.dark,
+      primaryColor: darkPrimary,
+      scaffoldBackgroundColor: darkBackground,
+      
+      // ColorScheme
+      colorScheme: const ColorScheme.dark(
+        primary: darkPrimary,
+        secondary: darkAccent,
+        surface: darkSurface,
+        surfaceContainer: darkCard,
+        onPrimary: white,
+        onSecondary: white,
+        onSurface: white,
+        error: Color(0xFFFF6B6B),
+      ),
+
+      // AppBar Theme
+      appBarTheme: AppBarTheme(
+        backgroundColor: Colors.transparent,
+        elevation: 0,
+        centerTitle: true,
+        iconTheme: const IconThemeData(color: white),
+        titleTextStyle: headingMedium.copyWith(color: white),
+      ),
+
+      // Text Theme
+      textTheme: TextTheme(
+        displayLarge: headingLarge.copyWith(color: darkPrimary),
+        displayMedium: headingMedium.copyWith(color: white),
+        displaySmall: headingSmall.copyWith(color: white),
+        headlineLarge: headingLarge.copyWith(color: darkPrimary),
+        headlineMedium: headingMedium.copyWith(color: white),
+        headlineSmall: headingSmall.copyWith(color: white),
+        bodyLarge: bodyLarge.copyWith(color: white),
+        bodyMedium: bodyMedium.copyWith(color: Colors.white70),
+        bodySmall: bodySmall.copyWith(color: Colors.white60),
+        labelLarge: buttonText,
+        labelMedium: labelText.copyWith(color: white),
+      ),
+
+      // Input Decoration Theme
+      inputDecorationTheme: InputDecorationTheme(
+        filled: true,
+        fillColor: darkSurface,
+        contentPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
+        border: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(16),
+          borderSide: BorderSide.none,
+        ),
+        enabledBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(16),
+          borderSide: BorderSide.none,
+        ),
+        focusedBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(16),
+          borderSide: const BorderSide(color: darkPrimary, width: 2),
+        ),
+        errorBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(16),
+          borderSide: const BorderSide(color: Color(0xFFFF6B6B), width: 1),
+        ),
+        hintStyle: bodyMedium.copyWith(color: Colors.white38),
+        labelStyle: labelText.copyWith(color: Colors.white70),
+      ),
+
+      // Elevated Button Theme
+      elevatedButtonTheme: ElevatedButtonThemeData(
+        style: ElevatedButton.styleFrom(
+          backgroundColor: darkPrimary,
+          foregroundColor: white,
+          elevation: 0,
+          padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(16),
+          ),
+          textStyle: buttonText,
+        ),
+      ),
+
+      // Card Theme
+      cardTheme: CardTheme(
+        color: darkCard,
+        elevation: 0,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(20),
+        ),
+        margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+      ),
+
+      // Chip Theme
+      chipTheme: ChipThemeData(
+        backgroundColor: darkSurface,
+        selectedColor: darkPrimary.withOpacity(0.3),
+        labelStyle: bodyMedium.copyWith(color: white),
+        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(12),
+        ),
+      ),
+
+      // Bottom Navigation Bar Theme
+      bottomNavigationBarTheme: const BottomNavigationBarThemeData(
+        backgroundColor: darkSurface,
+        selectedItemColor: darkPrimary,
+        unselectedItemColor: Colors.white38,
+        showSelectedLabels: true,
+        showUnselectedLabels: true,
+        type: BottomNavigationBarType.fixed,
+        elevation: 8,
+      ),
+
+      // Dialog Theme
+      dialogTheme: DialogTheme(
+        backgroundColor: darkCard,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(24),
+        ),
+        titleTextStyle: headingSmall.copyWith(color: white),
+        contentTextStyle: bodyMedium.copyWith(color: Colors.white70),
+      ),
+
+      // Divider Theme
+      dividerTheme: DividerThemeData(
+        color: Colors.white.withOpacity(0.1),
+        thickness: 1,
+        space: 24,
+      ),
+    );
+  }
 }

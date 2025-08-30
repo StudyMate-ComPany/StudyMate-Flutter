@@ -12,11 +12,33 @@ class SplashScreen extends StatefulWidget {
   State<SplashScreen> createState() => _SplashScreenState();
 }
 
-class _SplashScreenState extends State<SplashScreen> {
+class _SplashScreenState extends State<SplashScreen> 
+    with SingleTickerProviderStateMixin {
+  late AnimationController _progressController;
+  late Animation<double> _progressAnimation;
+  
   @override
   void initState() {
     super.initState();
+    _progressController = AnimationController(
+      duration: const Duration(seconds: 2),
+      vsync: this,
+    );
+    _progressAnimation = Tween<double>(
+      begin: 0.0,
+      end: 1.0,
+    ).animate(CurvedAnimation(
+      parent: _progressController,
+      curve: Curves.easeInOut,
+    ));
+    _progressController.forward();
     _initializeApp();
+  }
+  
+  @override
+  void dispose() {
+    _progressController.dispose();
+    super.dispose();
   }
 
   Future<void> _initializeApp() async {
@@ -29,8 +51,8 @@ class _SplashScreenState extends State<SplashScreen> {
       ),
     );
 
-    // 최소 2초간 스플래시 화면 표시
-    await Future.delayed(const Duration(seconds: 2));
+    // 최소 3초간 스플래시 화면 표시
+    await Future.delayed(const Duration(seconds: 3));
 
     if (!mounted) return;
 
@@ -69,118 +91,74 @@ class _SplashScreenState extends State<SplashScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFF87CEEB), // 와이어프레임의 정확한 하늘색
-      body: Stack(
-        children: [
-          // 상태바 영역
-          Positioned(
-            top: 0,
-            left: 0,
-            right: 0,
-            child: SafeArea(
-              bottom: false,
-              child: Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    const Text(
-                      '9:41',
-                      style: TextStyle(
-                        color: Colors.white,
-                        fontSize: 16,
-                        fontWeight: FontWeight.w600,
-                      ),
+      backgroundColor: const Color(0xFF70C4DE), // Figma: RGB(112, 196, 222)
+      body: Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            // 마스코트 이미지 - Figma: 159.41 x 159.41px
+            Container(
+              width: 159.41,
+              height: 159.41,
+              child: Image.asset(
+                'assets/images/sm_main.png',
+                fit: BoxFit.contain,
+                errorBuilder: (context, error, stackTrace) {
+                  return Container(
+                    width: 159.41,
+                    height: 159.41,
+                    decoration: BoxDecoration(
+                      color: Colors.white.withOpacity(0.2),
+                      shape: BoxShape.circle,
                     ),
-                    Row(
-                      children: [
-                        Icon(Icons.signal_cellular_4_bar, 
-                          color: Colors.white, size: 16),
-                        const SizedBox(width: 4),
-                        Icon(Icons.wifi, 
-                          color: Colors.white, size: 16),
-                        const SizedBox(width: 4),
-                        Icon(Icons.battery_full, 
-                          color: Colors.white, size: 16),
-                      ],
+                    child: const Icon(
+                      Icons.school,
+                      color: Colors.white,
+                      size: 80,
                     ),
-                  ],
-                ),
-              ),
-            ),
-          ),
-          
-          // 중앙 콘텐츠
-          Center(
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                // 마스코트 이미지
-                Container(
-                  width: 150,
-                  height: 150,
-                  child: Image.asset(
-                    'assets/images/sm_happy.png',
-                    fit: BoxFit.contain,
-                    errorBuilder: (context, error, stackTrace) {
-                      // 이미지 로드 실패 시 대체 뷰
-                      return Container(
-                        width: 150,
-                        height: 150,
-                        decoration: BoxDecoration(
-                          color: const Color(0xFF5DADE2),
-                          shape: BoxShape.circle,
-                        ),
-                        child: const Icon(
-                          Icons.school,
-                          color: Colors.white,
-                          size: 60,
-                        ),
-                      );
-                    },
-                  ),
-                ).animate()
-                  .fadeIn(duration: 600.ms)
-                  .scale(
-                    begin: const Offset(0.8, 0.8),
-                    end: const Offset(1, 1),
-                    duration: 500.ms,
-                  ),
-                
-                const SizedBox(height: 20),
-                
-                // STUDYMATE 텍스트
-                const Text(
-                  'STUDYMATE',
-                  style: TextStyle(
-                    fontSize: 36,
-                    fontWeight: FontWeight.w900,
-                    color: Colors.white,
-                    letterSpacing: 2,
-                  ),
-                ).animate()
-                  .fadeIn(delay: 300.ms, duration: 500.ms),
-              ],
-            ),
-          ),
-          
-          // 하단 텍스트
-          Positioned(
-            bottom: 100,
-            left: 0,
-            right: 0,
-            child: const Text(
-              '나만의 학습도우미',
-              textAlign: TextAlign.center,
-              style: TextStyle(
-                fontSize: 18,
-                fontWeight: FontWeight.w500,
-                color: Colors.white,
+                  );
+                },
               ),
             ).animate()
-              .fadeIn(delay: 500.ms, duration: 500.ms),
-          ),
-        ],
+              .fadeIn(duration: 600.ms)
+              .scale(
+                begin: const Offset(0.8, 0.8),
+                end: const Offset(1, 1),
+                duration: 500.ms,
+              ),
+            
+            const SizedBox(height: 4), // Figma: 3.71px 간격
+            
+            // STUDYMATE 텍스트 - Figma: ChangwonDangamAsac Bold, 26.69px
+            const Text(
+              'STUDYMATE',
+              style: TextStyle(
+                fontFamily: 'ChangwonDangamAsac',
+                fontSize: 26.69,
+                fontWeight: FontWeight.w700,
+                color: Colors.white,
+                letterSpacing: 0,
+                height: 1.2, // 32.03px / 26.69px
+              ),
+            ).animate()
+              .fadeIn(delay: 200.ms, duration: 500.ms),
+            
+            const SizedBox(height: 192), // Figma: STUDYMATE에서 부제목까지 간격
+            
+            // "나만의 학습도우미" - Figma: Pretendard SemiBold, 18px
+            const Text(
+              '나만의 학습도우미',
+              style: TextStyle(
+                fontSize: 18,
+                fontWeight: FontWeight.w600,
+                color: Colors.white,
+                letterSpacing: 0,
+                height: 1.44, // 26px / 18px
+              ),
+            ).animate()
+              .fadeIn(delay: 400.ms, duration: 500.ms),
+          ],
+        ),
       ),
     );
   }

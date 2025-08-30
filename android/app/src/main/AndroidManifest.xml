@@ -3,9 +3,9 @@
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE"/>
     
     <application
-        android:label="studymate_flutter"
+        android:label="StudyMate"
         android:name="${applicationName}"
-        android:icon="@mipmap/ic_launcher"
+        android:icon="@mipmap/launcher_icon"
         android:usesCleartextTraffic="true">
         <activity
             android:name=".MainActivity"
@@ -23,6 +23,11 @@
             <meta-data
               android:name="io.flutter.embedding.android.NormalTheme"
               android:resource="@style/NormalTheme"
+              />
+            <!-- Disable splash screen completely -->
+            <meta-data
+              android:name="io.flutter.embedding.android.SplashScreenDrawable"
+              android:resource="@android:color/transparent"
               />
             <intent-filter>
                 <action android:name="android.intent.action.MAIN"/>

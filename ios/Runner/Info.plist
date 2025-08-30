@@ -5,7 +5,7 @@
 	<key>CFBundleDevelopmentRegion</key>
 	<string>ko_KR</string>
 	<key>CFBundleDisplayName</key>
-	<string>스터디메이트</string>
+	<string>StudyMate</string>
 	<key>CFBundleLocalizations</key>
 	<array>
 		<string>ko</string>
@@ -18,7 +18,7 @@
 	<key>CFBundleInfoDictionaryVersion</key>
 	<string>6.0</string>
 	<key>CFBundleName</key>
-	<string>스터디메이트</string>
+	<string>StudyMate</string>
 	<key>CFBundlePackageType</key>
 	<string>APPL</string>
 	<key>CFBundleShortVersionString</key>

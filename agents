@@ -1,0 +1,7 @@
+#!/bin/bash
+
+# Flutter Development Agents CLI
+# This script provides a command-line interface for managing Flutter development agents
+
+cd "$(dirname "$0")"
+dart run .agents/agents_cli.dart "$@"
