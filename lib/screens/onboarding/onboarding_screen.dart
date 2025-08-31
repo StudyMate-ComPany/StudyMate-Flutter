@@ -402,13 +402,16 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
 
   Future<void> _completeOnboarding() async {
     try {
+      print('🚀 [온보딩] _completeOnboarding 호출됨');
       final prefs = await SharedPreferences.getInstance();
       await prefs.setBool('hasCompletedOnboarding', true);
+      print('  💾 온보딩 완료 상태 저장됨');
       
       // 알림 권한 요청을 NotificationPermissionScreen에서 처리하도록 변경
       // (알림 받기 버튼을 눌렀을 때만 요청)
       
       if (mounted) {
+        print('  📱 NotificationPermissionScreen으로 이동 시도');
         Navigator.pushReplacement(
           context,
           PageRouteBuilder(
@@ -420,9 +423,12 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
             transitionDuration: const Duration(milliseconds: 500),
           ),
         );
+        print('  ✅ Navigator.pushReplacement 완료');
+      } else {
+        print('  ⚠️ mounted가 false입니다');
       }
     } catch (e) {
-      print('온보딩 완료 처리 중 오류: $e');
+      print('❌ 온보딩 완료 처리 중 오류: $e');
     }
   }
 

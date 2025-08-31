@@ -11,6 +11,7 @@ import 'providers/notification_provider.dart';
 import 'providers/study_provider.dart';
 import 'providers/theme_provider.dart';
 import 'screens/splash/splash_screen.dart';
+import 'screens/onboarding/notification_permission_screen.dart';
 import 'services/local_storage_service.dart';
 import 'services/notification_service.dart';
 import 'theme/studymate_theme.dart';
@@ -86,8 +87,8 @@ class StudyMateApp extends StatelessWidget {
           GlobalCupertinoLocalizations.delegate,
         ],
         
-        // 항상 스플래시 화면부터 시작
-        home: const SplashScreen(),
+        // 알림 권한 화면 테스트
+        home: const NotificationPermissionScreen(),
           );
         },
       ),
