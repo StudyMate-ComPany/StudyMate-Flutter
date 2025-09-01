@@ -67,33 +67,42 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
               alignment: Alignment.bottomCenter,
               child: Padding(
                 padding: const EdgeInsets.only(bottom: 15),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                child: Stack(
                   children: [
                     // STUDYMATE 로고 - 왼쪽 정렬
-                    const Text(
-                      'STUDYMATE',
-                      style: TextStyle(
-                        fontFamily: 'ChangwonDangamAsac',
-                        fontSize: 24, // 크기 조정
-                        fontWeight: FontWeight.w700,
-                        color: Color(0xFF70C4DE),
-                        letterSpacing: 0,
-                        height: 1.2,
-                      ),
-                    ),
-                    // 다음 페이지 화살표 버튼 - 모든 페이지에 표시
-                    GestureDetector(
-                      onTap: _currentPage < _pages.length - 1 ? _nextPage : _completeOnboarding,
-                      child: Container(
-                        padding: const EdgeInsets.all(8),
-                        child: Icon(
-                          Icons.arrow_forward,
-                          size: 28, // 크기 조정
-                          color: const Color(0xFF70C4DE),
+                    Align(
+                      alignment: Alignment.centerLeft,
+                      child: const Text(
+                        'STUDYMATE',
+                        style: TextStyle(
+                          fontFamily: 'ChangwonDangamAsac',
+                          fontSize: 24,
+                          fontWeight: FontWeight.w700,
+                          color: Color(0xFF70C4DE),
+                          letterSpacing: 0,
+                          height: 1.2,
                         ),
                       ),
                     ),
+                    // 건너뛰기 버튼 (마지막 페이지 제외)
+                    if (_currentPage < _pages.length - 1)
+                      Align(
+                        alignment: Alignment.centerRight,
+                        child: GestureDetector(
+                          onTap: _skipOnboarding,
+                          child: const Text(
+                            '건너뛰기',
+                            style: TextStyle(
+                              fontFamily: 'Pretendard',
+                              fontSize: 15,
+                              fontWeight: FontWeight.w400,
+                              color: Color(0xFF545454),
+                              decoration: TextDecoration.underline,
+                              decorationColor: Color(0xFF545454),
+                            ),
+                          ),
+                        ),
+                      ),
                   ],
                 ),
               ),
@@ -123,35 +132,67 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
             child: Stack(
               alignment: Alignment.center,
               children: [
+                // 이전 버튼 (2번, 3번 페이지에서 왼쪽 하단에 표시) - 오른쪽 화살표와 동일한 스타일
+                if (_currentPage == 1 || _currentPage == 2)
+                  Align(
+                    alignment: Alignment.centerLeft,
+                    child: GestureDetector(
+                      onTap: _previousPage,
+                      child: Container(
+                        width: 48,
+                        height: 48,
+                        alignment: Alignment.center,
+                        child: Transform.scale(
+                          scaleX: 1, // 좌우 반전 없음 (왼쪽 방향 유지)
+                          child: SvgPicture.asset(
+                            'assets/icons/arrow_up.svg',
+                            width: 48,
+                            height: 48,
+                            colorFilter: const ColorFilter.mode(
+                              Color(0xFF70C4DE),
+                              BlendMode.srcIn,
+                            ),
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
                 // 페이지 인디케이터 - 중앙
                 Center(
                   child: Text(
                     _pages[_currentPage].pageNumber,
                     style: const TextStyle(
                       fontFamily: 'Pretendard',
-                      fontSize: 16,
+                      fontSize: 20,
                       fontWeight: FontWeight.w600,
                       color: Color(0xFF70C4DE),
                     ),
                   ),
                 ),
-                // 건너뛰기 버튼만 표시 (마지막 페이지에서는 표시 안함)
-                if (_currentPage < _pages.length - 1)
-                  Align(
-                    alignment: Alignment.centerRight,
-                    child: GestureDetector(
-                      onTap: _skipOnboarding,
-                      child: const Text(
-                        '건너뛰기',
-                        style: TextStyle(
-                          fontFamily: 'Pretendard',
-                          fontSize: 15,
-                          fontWeight: FontWeight.w400,
-                          color: Color(0xFF545454),
+                // 다음/완료 화살표 버튼 - 화살표만 (동그라미 배경 없음)
+                Align(
+                  alignment: Alignment.centerRight,
+                  child: GestureDetector(
+                    onTap: _currentPage < _pages.length - 1 ? _nextPage : _completeOnboarding,
+                    child: Container(
+                      width: 48,
+                      height: 48,
+                      alignment: Alignment.center,
+                      child: Transform.scale(
+                        scaleX: -1, // 좌우 반전
+                        child: SvgPicture.asset(
+                          'assets/icons/arrow_up.svg',
+                          width: 48,
+                          height: 48,
+                          colorFilter: const ColorFilter.mode(
+                            Color(0xFF70C4DE),
+                            BlendMode.srcIn,
+                          ),
                         ),
                       ),
                     ),
                   ),
+                ),
               ],
             ),
           ),
@@ -346,6 +387,15 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
         ],
       ),
     );
+  }
+
+  void _previousPage() {
+    if (_currentPage > 0) {
+      _pageController.previousPage(
+        duration: const Duration(milliseconds: 300),
+        curve: Curves.easeInOut,
+      );
+    }
   }
 
   Future<void> _nextPage() async {
