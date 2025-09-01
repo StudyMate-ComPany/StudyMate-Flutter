@@ -83,42 +83,40 @@ class _ModernLoginScreenState extends State<ModernLoginScreen> with TickerProvid
     
     return Scaffold(
       backgroundColor: StudyMateTheme.lightBlue,
+      resizeToAvoidBottomInset: false,
       body: SafeArea(
-        child: SingleChildScrollView(
-          physics: const BouncingScrollPhysics(),
-          child: Container(
-            height: size.height - MediaQuery.of(context).padding.top,
-            padding: const EdgeInsets.symmetric(horizontal: 24),
-            child: Column(
-              children: [
-                const SizedBox(height: 40),
-                
-                // Logo Section
-                _buildLogoSection(),
-                
-                const SizedBox(height: 40),
-                
-                // Login Form
-                _buildLoginForm(),
-                
-                const SizedBox(height: 24),
-                
-                // Login Button
-                _buildLoginButton(),
-                
-                const SizedBox(height: 16),
-                
-                // Social Login
-                _buildSocialLogin(),
-                
-                const Spacer(),
-                
-                // Register Link
-                _buildRegisterLink(),
-                
-                const SizedBox(height: 32),
-              ],
-            ),
+        child: Container(
+          height: double.infinity,
+          padding: const EdgeInsets.symmetric(horizontal: 24),
+          child: Column(
+            children: [
+              const SizedBox(height: 20),
+              
+              // Logo Section
+              _buildLogoSection(),
+              
+              const SizedBox(height: 20),
+              
+              // Login Form
+              _buildLoginForm(),
+              
+              const SizedBox(height: 16),
+              
+              // Login Button
+              _buildLoginButton(),
+              
+              const SizedBox(height: 12),
+              
+              // Social Login
+              _buildSocialLogin(),
+              
+              const Spacer(),
+              
+              // Register Link
+              _buildRegisterLink(),
+              
+              const SizedBox(height: 20),
+            ],
           ),
         ),
       ),
@@ -132,8 +130,8 @@ class _ModernLoginScreenState extends State<ModernLoginScreen> with TickerProvid
           animation: _animationController,
           builder: (context, child) {
             return Container(
-              width: 100,
-              height: 100,
+              width: 80,
+              height: 80,
               decoration: BoxDecoration(
                 gradient: LinearGradient(
                   begin: Alignment.topLeft,
@@ -145,19 +143,19 @@ class _ModernLoginScreenState extends State<ModernLoginScreen> with TickerProvid
                   ],
                   transform: GradientRotation(_animationController.value * 3.14),
                 ),
-                borderRadius: BorderRadius.circular(30),
+                borderRadius: BorderRadius.circular(24),
                 boxShadow: [
                   BoxShadow(
                     color: StudyMateTheme.primaryBlue.withOpacity(0.3),
-                    blurRadius: 20,
-                    offset: const Offset(0, 10),
+                    blurRadius: 16,
+                    offset: const Offset(0, 8),
                   ),
                 ],
               ),
               child: const Icon(
                 Icons.school_rounded,
                 color: Colors.white,
-                size: 50,
+                size: 40,
               ),
             );
           },
@@ -165,12 +163,12 @@ class _ModernLoginScreenState extends State<ModernLoginScreen> with TickerProvid
           .fadeIn(duration: 800.ms)
           .scale(delay: 200.ms),
         
-        const SizedBox(height: 24),
+        const SizedBox(height: 16),
         
         Text(
           'StudyMate',
           style: TextStyle(
-            fontSize: 32,
+            fontSize: 28,
             fontWeight: FontWeight.w800,
             color: StudyMateTheme.darkNavy,
             letterSpacing: -0.5,
@@ -179,12 +177,12 @@ class _ModernLoginScreenState extends State<ModernLoginScreen> with TickerProvid
           .fadeIn(delay: 400.ms, duration: 600.ms)
           .slideY(begin: 0.2, end: 0),
         
-        const SizedBox(height: 8),
+        const SizedBox(height: 6),
         
         Text(
           '스마트한 학습의 시작',
           style: TextStyle(
-            fontSize: 16,
+            fontSize: 14,
             color: StudyMateTheme.grayText,
             fontWeight: FontWeight.w500,
           ),
@@ -326,7 +324,7 @@ class _ModernLoginScreenState extends State<ModernLoginScreen> with TickerProvid
             .fadeIn(delay: 900.ms, duration: 600.ms)
             .slideX(begin: -0.2, end: 0),
           
-          const SizedBox(height: 16),
+          const SizedBox(height: 12),
           
           // Remember Me & Forgot Password
           Row(
@@ -335,8 +333,8 @@ class _ModernLoginScreenState extends State<ModernLoginScreen> with TickerProvid
               Row(
                 children: [
                   SizedBox(
-                    width: 24,
-                    height: 24,
+                    width: 20,
+                    height: 20,
                     child: Checkbox(
                       value: _rememberMe,
                       onChanged: (value) {
@@ -350,12 +348,12 @@ class _ModernLoginScreenState extends State<ModernLoginScreen> with TickerProvid
                       ),
                     ),
                   ),
-                  const SizedBox(width: 8),
+                  const SizedBox(width: 6),
                   Text(
                     '자동 로그인',
                     style: TextStyle(
                       color: StudyMateTheme.grayText,
-                      fontSize: 14,
+                      fontSize: 13,
                     ),
                   ),
                 ],
@@ -369,7 +367,7 @@ class _ModernLoginScreenState extends State<ModernLoginScreen> with TickerProvid
                   '비밀번호 찾기',
                   style: TextStyle(
                     color: StudyMateTheme.primaryBlue,
-                    fontSize: 14,
+                    fontSize: 13,
                     fontWeight: FontWeight.w600,
                   ),
                 ),
@@ -385,7 +383,7 @@ class _ModernLoginScreenState extends State<ModernLoginScreen> with TickerProvid
   Widget _buildLoginButton() {
     return SizedBox(
       width: double.infinity,
-      height: 56,
+      height: 48,
       child: ElevatedButton(
         onPressed: _isLoading ? null : _handleLogin,
         style: ElevatedButton.styleFrom(
@@ -393,13 +391,13 @@ class _ModernLoginScreenState extends State<ModernLoginScreen> with TickerProvid
           foregroundColor: Colors.white,
           elevation: 0,
           shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(16),
+            borderRadius: BorderRadius.circular(14),
           ),
         ),
         child: _isLoading
             ? SizedBox(
-                width: 24,
-                height: 24,
+                width: 20,
+                height: 20,
                 child: CircularProgressIndicator(
                   strokeWidth: 2,
                   valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
@@ -408,7 +406,7 @@ class _ModernLoginScreenState extends State<ModernLoginScreen> with TickerProvid
             : const Text(
                 '로그인',
                 style: TextStyle(
-                  fontSize: 16,
+                  fontSize: 15,
                   fontWeight: FontWeight.w700,
                   letterSpacing: 0.5,
                 ),
@@ -431,12 +429,12 @@ class _ModernLoginScreenState extends State<ModernLoginScreen> with TickerProvid
               ),
             ),
             Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 16),
+              padding: const EdgeInsets.symmetric(horizontal: 12),
               child: Text(
                 '또는',
                 style: TextStyle(
                   color: StudyMateTheme.grayText,
-                  fontSize: 14,
+                  fontSize: 13,
                 ),
               ),
             ),
@@ -449,7 +447,7 @@ class _ModernLoginScreenState extends State<ModernLoginScreen> with TickerProvid
           ],
         ),
         
-        const SizedBox(height: 16),
+        const SizedBox(height: 12),
         
         Row(
           mainAxisAlignment: MainAxisAlignment.center,
@@ -462,7 +460,7 @@ class _ModernLoginScreenState extends State<ModernLoginScreen> with TickerProvid
                 // TODO: Google 로그인
               },
             ),
-            const SizedBox(width: 16),
+            const SizedBox(width: 12),
             _buildSocialButton(
               icon: Icons.apple,
               color: Colors.black,
@@ -471,7 +469,7 @@ class _ModernLoginScreenState extends State<ModernLoginScreen> with TickerProvid
                 // TODO: Apple 로그인
               },
             ),
-            const SizedBox(width: 16),
+            const SizedBox(width: 12),
             _buildSocialButton(
               icon: Icons.chat_bubble,
               color: const Color(0xFFFEE500),
@@ -494,25 +492,25 @@ class _ModernLoginScreenState extends State<ModernLoginScreen> with TickerProvid
   }) {
     return InkWell(
       onTap: onTap,
-      borderRadius: BorderRadius.circular(16),
+      borderRadius: BorderRadius.circular(14),
       child: Container(
-        width: 56,
-        height: 56,
+        width: 48,
+        height: 48,
         decoration: BoxDecoration(
           color: Colors.white,
-          borderRadius: BorderRadius.circular(16),
+          borderRadius: BorderRadius.circular(14),
           boxShadow: [
           BoxShadow(
             color: StudyMateTheme.primaryBlue.withOpacity(0.08),
-            blurRadius: 20,
-            offset: const Offset(0, 4),
+            blurRadius: 16,
+            offset: const Offset(0, 3),
           ),
         ],
         ),
         child: Icon(
           icon,
           color: color,
-          size: 28,
+          size: 24,
         ),
       ),
     );
@@ -526,7 +524,7 @@ class _ModernLoginScreenState extends State<ModernLoginScreen> with TickerProvid
           '아직 계정이 없으신가요?',
           style: TextStyle(
             color: StudyMateTheme.grayText,
-            fontSize: 14,
+            fontSize: 13,
           ),
         ),
         TextButton(
@@ -543,7 +541,7 @@ class _ModernLoginScreenState extends State<ModernLoginScreen> with TickerProvid
             '회원가입',
             style: TextStyle(
               color: StudyMateTheme.primaryBlue,
-              fontSize: 14,
+              fontSize: 13,
               fontWeight: FontWeight.w700,
             ),
           ),
