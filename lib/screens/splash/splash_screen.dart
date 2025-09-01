@@ -3,7 +3,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../onboarding/onboarding_screen.dart';
-import '../home/main_navigation_screen.dart';
+import '../auth/modern_login_screen.dart';
 
 class SplashScreen extends StatefulWidget {
   const SplashScreen({super.key});
@@ -42,49 +42,80 @@ class _SplashScreenState extends State<SplashScreen>
   }
 
   Future<void> _initializeApp() async {
-    // 상태바 스타일 설정
-    SystemChrome.setSystemUIOverlayStyle(
-      const SystemUiOverlayStyle(
-        statusBarColor: Colors.transparent,
-        statusBarIconBrightness: Brightness.light,
-        statusBarBrightness: Brightness.dark,
-      ),
-    );
-
-    // 최소 3초간 스플래시 화면 표시
-    await Future.delayed(const Duration(seconds: 3));
-
-    if (!mounted) return;
-
-    // 온보딩 완료 여부 확인
-    final prefs = await SharedPreferences.getInstance();
-    final hasCompletedOnboarding = prefs.getBool('hasCompletedOnboarding') ?? false;
-
-    if (!mounted) return;
-
-    // 플로우: 스플래시 -> 온보딩(첫 실행) -> 메인 화면
-    if (!hasCompletedOnboarding) {
-      Navigator.pushReplacement(
-        context,
-        PageRouteBuilder(
-          pageBuilder: (context, animation, secondaryAnimation) => const OnboardingScreen(),
-          transitionsBuilder: (context, animation, secondaryAnimation, child) {
-            return FadeTransition(opacity: animation, child: child);
-          },
-          transitionDuration: const Duration(milliseconds: 500),
+    try {
+      print('🚀 [SplashScreen] 앱 초기화 시작');
+      
+      // 상태바 스타일 설정
+      SystemChrome.setSystemUIOverlayStyle(
+        const SystemUiOverlayStyle(
+          statusBarColor: Colors.transparent,
+          statusBarIconBrightness: Brightness.dark,
+          statusBarBrightness: Brightness.light,
         ),
       );
-    } else {
-      Navigator.pushReplacement(
-        context,
-        PageRouteBuilder(
-          pageBuilder: (context, animation, secondaryAnimation) => const MainNavigationScreen(),
-          transitionsBuilder: (context, animation, secondaryAnimation, child) {
-            return FadeTransition(opacity: animation, child: child);
-          },
-          transitionDuration: const Duration(milliseconds: 500),
-        ),
-      );
+
+      // 최소 3초간 스플래시 화면 표시
+      await Future.delayed(const Duration(seconds: 3));
+
+      if (!mounted) {
+        print('⚠️ [SplashScreen] Widget이 mounted 상태가 아님');
+        return;
+      }
+
+      // 온보딩 완료 여부 확인
+      final prefs = await SharedPreferences.getInstance();
+      final hasCompletedOnboarding = prefs.getBool('hasCompletedOnboarding') ?? false;
+      print('📱 [SplashScreen] 온보딩 완료 여부: $hasCompletedOnboarding');
+
+      if (!mounted) {
+        print('⚠️ [SplashScreen] Widget이 mounted 상태가 아님 (2차 체크)');
+        return;
+      }
+
+      // 플로우: 스플래시 -> 온보딩(첫 실행) -> 로그인 화면
+      if (!hasCompletedOnboarding) {
+        print('🎯 [SplashScreen] 온보딩 화면으로 이동');
+        Navigator.pushReplacement(
+          context,
+          PageRouteBuilder(
+            pageBuilder: (context, animation, secondaryAnimation) => const OnboardingScreen(),
+            transitionsBuilder: (context, animation, secondaryAnimation, child) {
+              return FadeTransition(opacity: animation, child: child);
+            },
+            transitionDuration: const Duration(milliseconds: 500),
+          ),
+        );
+      } else {
+        // 온보딩을 완료한 사용자는 로그인 화면으로 이동
+        print('🎯 [SplashScreen] 로그인 화면으로 이동');
+        Navigator.pushReplacement(
+          context,
+          PageRouteBuilder(
+            pageBuilder: (context, animation, secondaryAnimation) => const ModernLoginScreen(),
+            transitionsBuilder: (context, animation, secondaryAnimation, child) {
+              return FadeTransition(opacity: animation, child: child);
+            },
+            transitionDuration: const Duration(milliseconds: 500),
+          ),
+        );
+      }
+    } catch (e, stackTrace) {
+      print('❌ [SplashScreen] 에러 발생: $e');
+      print('📍 Stack trace: $stackTrace');
+      
+      // 에러 발생 시에도 온보딩 화면으로 이동
+      if (mounted) {
+        Navigator.pushReplacement(
+          context,
+          PageRouteBuilder(
+            pageBuilder: (context, animation, secondaryAnimation) => const OnboardingScreen(),
+            transitionsBuilder: (context, animation, secondaryAnimation, child) {
+              return FadeTransition(opacity: animation, child: child);
+            },
+            transitionDuration: const Duration(milliseconds: 500),
+          ),
+        );
+      }
     }
   }
 

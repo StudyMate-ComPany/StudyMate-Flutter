@@ -7,7 +7,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:permission_handler/permission_handler.dart';
 import '../../services/notification_service.dart';
 import '../home/main_navigation_screen.dart';
-import '../auth/login_screen.dart';
+import './ready_complete_screen.dart';
 
 class NotificationPermissionScreen extends StatefulWidget {
   const NotificationPermissionScreen({super.key});
@@ -69,50 +69,28 @@ class _NotificationPermissionScreenState extends State<NotificationPermissionScr
                     right: 25,
                   ),
                   width: 390,
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      // 텍스트 그룹
-                      Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          const Text(
-                            '알림을 허용해주세요',
-                            style: TextStyle(
-                              fontSize: 28,
-                              fontWeight: FontWeight.w800,
-                              color: Color(0xFF70C4DE),
-                              fontFamily: 'Pretendard',
-                              height: 1.2857,
-                            ),
-                          ),
-                          const SizedBox(height: 5),
-                          const Text(
-                            '시간 맞춰 살짝 알려드려요',
-                            style: TextStyle(
-                              fontSize: 18,
-                              fontWeight: FontWeight.w600,
-                              color: Color(0xFF555555),
-                              fontFamily: 'Pretendard',
-                              height: 1.444,
-                            ),
-                          ),
-                        ],
+                      const Text(
+                        '알림을 허용해주세요',
+                        style: TextStyle(
+                          fontSize: 28,
+                          fontWeight: FontWeight.w800,
+                          color: Color(0xFF70C4DE),
+                          fontFamily: 'Pretendard',
+                          height: 1.2857,
+                        ),
                       ),
-                      // 화살표 아이콘
-                      Container(
-                        width: 40,
-                        height: 40,
-                        alignment: Alignment.center,
-                        child: SvgPicture.asset(
-                          'assets/images/arrow_right.svg',
-                          width: 40,
-                          height: 40,
-                          colorFilter: const ColorFilter.mode(
-                            Color(0xFF70C4DE),
-                            BlendMode.srcIn,
-                          ),
+                      const SizedBox(height: 5),
+                      const Text(
+                        '시간 맞춰 살짝 알려드려요',
+                        style: TextStyle(
+                          fontSize: 18,
+                          fontWeight: FontWeight.w600,
+                          color: Color(0xFF555555),
+                          fontFamily: 'Pretendard',
+                          height: 1.444,
                         ),
                       ),
                     ],
@@ -503,7 +481,7 @@ class _NotificationPermissionScreenState extends State<NotificationPermissionScr
         context,
         PageRouteBuilder(
           pageBuilder: (context, animation, secondaryAnimation) => 
-            const LoginScreen(),
+            const ReadyCompleteScreen(),
           transitionsBuilder: (context, animation, secondaryAnimation, child) {
             return FadeTransition(opacity: animation, child: child);
           },
