@@ -1,6 +1,7 @@
 import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:permission_handler/permission_handler.dart';
@@ -32,385 +33,442 @@ class _NotificationPermissionScreenState extends State<NotificationPermissionScr
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Container(
-        decoration: BoxDecoration(
-          gradient: LinearGradient(
-            begin: Alignment.topCenter,
-            end: Alignment.bottomCenter,
-            colors: [
-              Colors.white,
-              const Color(0xFF70C4DE).withOpacity(0.15),
-            ],
-            stops: const [0.0, 0.68],
+      backgroundColor: Colors.white,
+      body: Stack(
+        children: [
+          // 배경 그라디언트 - Figma와 동일
+          Positioned(
+            top: 209,
+            left: 0,
+            right: 0,
+            bottom: 0,
+            child: Container(
+              decoration: const BoxDecoration(
+                gradient: LinearGradient(
+                  begin: Alignment.topCenter,
+                  end: Alignment.bottomCenter,
+                  colors: [
+                    Colors.white,
+                    Color(0xFF70C4DE),
+                  ],
+                  stops: [0.0, 0.68],
+                ),
+              ),
+            ),
           ),
-        ),
-        child: SafeArea(
-          child: Column(
-            children: [
-              // 상단 헤더 - 피그마 디자인과 동일하게
-              Container(
-                padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 20),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        const Text(
-                          '알림을 허용해주세요',
-                          style: TextStyle(
-                            fontSize: 28,
-                            fontWeight: FontWeight.w800,
-                            color: Color(0xFF70C4DE),
-                            fontFamily: 'Pretendard',
-                            height: 1.2,
+          
+          // 메인 컨텐츠
+          SafeArea(
+            child: Column(
+              children: [
+                // 상단 컨텐츠
+                Container(
+                  margin: const EdgeInsets.only(
+                    top: 39, // 95 - 56(status bar)
+                    left: 25,
+                    right: 25,
+                  ),
+                  width: 390,
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      // 텍스트 그룹
+                      Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          const Text(
+                            '알림을 허용해주세요',
+                            style: TextStyle(
+                              fontSize: 28,
+                              fontWeight: FontWeight.w800,
+                              color: Color(0xFF70C4DE),
+                              fontFamily: 'Pretendard',
+                              height: 1.2857,
+                            ),
                           ),
-                        ),
-                        Container(
+                          const SizedBox(height: 5),
+                          const Text(
+                            '시간 맞춰 살짝 알려드려요',
+                            style: TextStyle(
+                              fontSize: 18,
+                              fontWeight: FontWeight.w600,
+                              color: Color(0xFF555555),
+                              fontFamily: 'Pretendard',
+                              height: 1.444,
+                            ),
+                          ),
+                        ],
+                      ),
+                      // 화살표 아이콘
+                      Container(
+                        width: 40,
+                        height: 40,
+                        alignment: Alignment.center,
+                        child: SvgPicture.asset(
+                          'assets/images/arrow_right.svg',
                           width: 40,
                           height: 40,
+                          colorFilter: const ColorFilter.mode(
+                            Color(0xFF70C4DE),
+                            BlendMode.srcIn,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                
+                const Spacer(flex: 1),
+                
+                // 캐릭터 이미지
+                Container(
+                  constraints: const BoxConstraints(
+                    maxWidth: 280,
+                    maxHeight: 250,
+                  ),
+                  alignment: Alignment.center,
+                  child: Image.asset(
+                    'assets/images/notification_character.png',
+                    width: 230,
+                    height: 208,
+                      fit: BoxFit.contain,
+                    errorBuilder: (context, error, stackTrace) {
+                      return Container(
+                        decoration: BoxDecoration(
+                          color: Colors.grey[200],
+                          borderRadius: BorderRadius.circular(20),
+                        ),
+                        child: const Icon(
+                          Icons.alarm,
+                          size: 150,
+                          color: Color(0xFF70C4DE),
+                        ),
+                      );
+                    },
+                  ),
+                ).animate()
+                  .fadeIn(duration: 600.ms)
+                  .scale(begin: const Offset(0.8, 0.8), end: const Offset(1, 1)),
+                
+                const Spacer(flex: 1),
+                
+                // 알림 카드 스택
+                Container(
+                  height: 100.13,
+                  width: double.infinity,
+                  child: Stack(
+                    clipBehavior: Clip.none,
+                    alignment: Alignment.center,
+                    children: [
+                      // 카카오톡 알림 (뒤쪽) - 투명 배경에 흰색 테두리
+                      Positioned(
+                        top: 0,
+                        child: ClipRRect(
+                          borderRadius: BorderRadius.circular(25.24),
+                          child: BackdropFilter(
+                            filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
+                            child: Container(
+                          width: 358,
+                          height: 64.26,
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 14.69,
+                            vertical: 11.02,
+                          ),
                           decoration: BoxDecoration(
-                            color: Colors.white,
-                            shape: BoxShape.circle,
+                            color: Colors.white.withOpacity(0.1),
+                            borderRadius: BorderRadius.circular(25.24),
+                            border: Border.all(
+                              color: Colors.white.withOpacity(0.6),
+                              width: 2,
+                            ),
                             boxShadow: [
                               BoxShadow(
-                                color: const Color(0xFF70C4DE).withOpacity(0.2),
-                                blurRadius: 8,
-                                offset: const Offset(0, 2),
+                                color: Colors.black.withOpacity(0.1),
+                                blurRadius: 15,
+                                offset: const Offset(0, 5),
                               ),
                             ],
                           ),
-                          child: const Icon(
-                            Icons.arrow_forward,
-                            color: Color(0xFF70C4DE),
-                            size: 22,
-                          ),
-                        ),
-                      ],
-                    ),
-                    const SizedBox(height: 5),
-                    const Text(
-                      '시간 맞춰 살짝 알려드려요',
-                      style: TextStyle(
-                        fontSize: 18,
-                        fontWeight: FontWeight.w600,
-                        color: Color(0xFF545454),
-                        fontFamily: 'Pretendard',
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-              
-              // 중앙 컨텐츠
-              Expanded(
-                child: Stack(
-                  alignment: Alignment.center,
-                  children: [
-                    // 알람 들고 있는 손과 마스코트
-                    Positioned(
-                      top: 30,
-                      child: SizedBox(
-                        width: 300,
-                        height: 300,
-                        child: Image.asset(
-                          'assets/images/sm_alarm.png',
-                          fit: BoxFit.contain,
-                        ),
-                      ),
-                    ),
-                    
-                    // 알림 카드들 - Figma 디자인과 동일하게
-                    Positioned(
-                      bottom: 180,
-                      left: 24,
-                      right: 24,
-                      child: Stack(
-                        clipBehavior: Clip.none,
-                        alignment: Alignment.center,
-                        children: [
-                          // STUDYMATE 알림 (아래쪽, 뒤에 위치)
-                          Positioned(
-                            top: 50,
-                            child: Opacity(
-                              opacity: 0.7,
-                              child: Container(
-                                width: MediaQuery.of(context).size.width - 60,
-                                padding: const EdgeInsets.all(12),
+                          child: Row(
+                            children: [
+                              // 카카오 아이콘 - 노란색 배경
+                              Container(
+                                width: 36,
+                                height: 36,
+                                padding: const EdgeInsets.all(5),
                                 decoration: BoxDecoration(
-                                  color: Colors.transparent,
-                                  borderRadius: BorderRadius.circular(20),
-                                  border: Border.all(
-                                    color: Colors.white.withOpacity(0.5),
-                                    width: 2,
+                                  color: const Color(0xFFFFE746).withOpacity(0.52),
+                                  borderRadius: BorderRadius.circular(9.64),
+                                ),
+                                child: Center(
+                                  child: SvgPicture.asset(
+                                    'assets/images/kakao_logo.svg',
+                                    width: 24.5,
+                                    height: 22.52,
+                                    colorFilter: const ColorFilter.mode(
+                                      Color(0xFF3C1E1E),
+                                      BlendMode.srcIn,
+                                    ),
                                   ),
                                 ),
-                                    child: Row(
+                              ),
+                              const SizedBox(width: 9.18),
+                              // 텍스트
+                              Expanded(
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  mainAxisSize: MainAxisSize.min,
                                   children: [
-                                    // STUDYMATE 아이콘
-                                    Container(
-                                      width: 48,
-                                      height: 48,
-                                      decoration: BoxDecoration(
-                                        color: Colors.white,
-                                        borderRadius: BorderRadius.circular(12),
-                                        border: Border.all(
-                                          color: const Color(0xFFE8F4F8),
-                                          width: 1.5,
+                                    Flexible(
+                                      child: Text(
+                                        '카카오톡',
+                                        style: TextStyle(
+                                          fontSize: 12,
+                                          fontWeight: FontWeight.w600,
+                                          color: Colors.white,
+                                          fontFamily: 'Pretendard',
                                         ),
-                                      ),
-                                      child: ClipRRect(
-                                        borderRadius: BorderRadius.circular(11),
-                                        child: Container(
-                                          color: const Color(0xFFE8F4F8),
-                                          padding: const EdgeInsets.all(6),
-                                          child: Image.asset(
-                                            'assets/images/sm_main.png',
-                                            fit: BoxFit.contain,
-                                            errorBuilder: (context, error, stackTrace) {
-                                              return const Icon(
-                                                Icons.school,
-                                                color: Color(0xFF70C4DE),
-                                                size: 24,
-                                              );
-                                            },
-                                          ),
-                                        ),
+                                        overflow: TextOverflow.ellipsis,
                                       ),
                                     ),
-                                    const SizedBox(width: 12),
-                                    Expanded(
-                                      child: Column(
-                                        crossAxisAlignment: CrossAxisAlignment.start,
-                                        mainAxisSize: MainAxisSize.min,
-                                        children: [
-                                          Row(
-                                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                            children: [
-                                              const Text(
-                                                'STUDYMATE',
-                                                style: TextStyle(
-                                                  fontSize: 15,
-                                                  fontWeight: FontWeight.w600,
-                                                  color: Color(0xFF1A1A1A),
-                                                  fontFamily: 'Pretendard',
-                                                ),
-                                              ),
-                                              const Text(
-                                                '방금',
-                                                style: TextStyle(
-                                                  fontSize: 12,
-                                                  fontWeight: FontWeight.w400,
-                                                  color: Color(0xFF8E8E93),
-                                                  fontFamily: 'Pretendard',
-                                                ),
-                                              ),
-                                            ],
-                                          ),
-                                          const SizedBox(height: 4),
-                                          const Text(
-                                            '요약 알림 도착!',
-                                            style: TextStyle(
-                                              fontSize: 13,
-                                              fontWeight: FontWeight.w400,
-                                              color: Color(0xFF636366),
-                                              fontFamily: 'Pretendard',
-                                            ),
-                                          ),
-                                        ],
+                                    Flexible(
+                                      child: Text(
+                                        '1개의 메세지',
+                                        style: TextStyle(
+                                          fontSize: 9,
+                                          fontWeight: FontWeight.w400,
+                                          color: Colors.white,
+                                          fontFamily: 'Pretendard',
+                                        ),
+                                        overflow: TextOverflow.ellipsis,
                                       ),
                                     ),
                                   ],
                                 ),
                               ),
-                            ),
-                          ),
-                          
-                          // 카카오톡 알림 (위쪽, 앞에 위치) - 피그마 디자인과 동일하게
-                          Container(
-                            width: MediaQuery.of(context).size.width - 48,
-                            padding: const EdgeInsets.all(12),
-                            decoration: BoxDecoration(
-                              color: Colors.transparent,
-                              borderRadius: BorderRadius.circular(20),
-                              border: Border.all(
-                                color: Colors.white.withOpacity(0.6),
-                                width: 2,
+                              // 시간
+                              const Text(
+                                '9분 전',
+                                style: TextStyle(
+                                  fontSize: 10,
+                                  fontWeight: FontWeight.w400,
+                                  color: Colors.white,
+                                  fontFamily: 'Pretendard',
+                                ),
                               ),
-                            ),
-                                child: Row(
-                              children: [
-                                // 카카오톡 아이콘
-                                Container(
-                                  width: 48,
-                                  height: 48,
-                                  decoration: BoxDecoration(
-                                    color: const Color(0xFFFEE500),
-                                    borderRadius: BorderRadius.circular(12),
-                                  ),
-                                  child: Center(
-                                    child: Image.asset(
-                                      'assets/icons/kakao_icon.png',
-                                      width: 26,
-                                      height: 26,
-                                      fit: BoxFit.contain,
-                                      errorBuilder: (context, error, stackTrace) {
-                                        // 카카오 아이콘이 없을 경우 대체 텍스트
-                                        return const Text(
-                                          'K',
-                                          style: TextStyle(
-                                            fontSize: 24,
-                                            fontWeight: FontWeight.bold,
-                                            color: Color(0xFF3C1E1E),
-                                          ),
-                                        );
-                                      },
-                                    ),
-                                  ),
-                                ),
-                                const SizedBox(width: 12),
-                                Expanded(
-                                  child: Column(
-                                    crossAxisAlignment: CrossAxisAlignment.start,
-                                    mainAxisSize: MainAxisSize.min,
-                                    children: [
-                                      Row(
-                                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                        children: [
-                                          const Text(
-                                            '카카오톡',
-                                            style: TextStyle(
-                                              fontSize: 15,
-                                              fontWeight: FontWeight.w600,
-                                              color: Color(0xFF1A1A1A),
-                                              fontFamily: 'Pretendard',
-                                            ),
-                                          ),
-                                          const Text(
-                                            '9분 전',
-                                            style: TextStyle(
-                                              fontSize: 12,
-                                              fontWeight: FontWeight.w400,
-                                              color: Color(0xFF8E8E93),
-                                              fontFamily: 'Pretendard',
-                                            ),
-                                          ),
-                                        ],
-                                      ),
-                                      const SizedBox(height: 4),
-                                      const Text(
-                                        '1개의 메세지',
-                                        style: TextStyle(
-                                          fontSize: 13,
-                                          fontWeight: FontWeight.w400,
-                                          color: Color(0xFF636366),
-                                          fontFamily: 'Pretendard',
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ).animate()
-                            .fadeIn(duration: 600.ms, delay: 200.ms)
-                            .slideY(begin: -0.2, end: 0, duration: 600.ms, curve: Curves.easeOutBack),
-                        ],
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-              
-              // 하단 버튼
-              Container(
-                padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 24),
-                child: Row(
-                  children: [
-                    // 나중에 버튼
-                    Expanded(
-                      child: Container(
-                        height: 56,
-                        decoration: BoxDecoration(
-                          color: Colors.white,
-                          borderRadius: BorderRadius.circular(28),
-                          boxShadow: [
-                            BoxShadow(
-                              color: Colors.black.withOpacity(0.08),
-                              blurRadius: 12,
-                              offset: const Offset(0, 2),
-                            ),
-                          ],
-                        ),
-                        child: TextButton(
-                          onPressed: _skipNotification,
-                          style: TextButton.styleFrom(
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(28),
-                            ),
-                          ),
-                          child: const Text(
-                            '나중에',
-                            style: TextStyle(
-                              fontSize: 17,
-                              fontWeight: FontWeight.w600,
-                              color: Color(0xFF666666),
-                              fontFamily: 'Pretendard',
-                            ),
-                          ),
-                        ),
-                      ),
-                    ),
-                    
-                    const SizedBox(width: 12),
-                    
-                    // 알림 받기 버튼
-                    Expanded(
-                      child: Container(
-                        height: 56,
-                        decoration: BoxDecoration(
-                          gradient: const LinearGradient(
-                            colors: [
-                              Color(0xFF6FBDE0),
-                              Color(0xFF5CAED4),
                             ],
                           ),
-                          borderRadius: BorderRadius.circular(28),
-                          boxShadow: [
-                            BoxShadow(
-                              color: const Color(0xFF6FBDE0).withOpacity(0.4),
-                              blurRadius: 16,
-                              offset: const Offset(0, 6),
-                            ),
-                          ],
-                        ),
-                        child: ElevatedButton(
-                          onPressed: _allowNotification,
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: Colors.transparent,
-                            shadowColor: Colors.transparent,
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(28),
                             ),
                           ),
-                          child: const Text(
-                            '알림 받기',
-                            style: TextStyle(
-                              fontSize: 17,
-                              fontWeight: FontWeight.w700,
-                              color: Colors.white,
-                              fontFamily: 'Pretendard',
+                        ).animate()
+                          .fadeIn(duration: 600.ms, delay: 400.ms)
+                          .slideY(begin: 0.1, end: 0),
+                      ),
+                      
+                      // STUDYMATE 알림 (앞쪽) - 투명 배경에 흰색 테두리
+                      Positioned(
+                        top: 30.13,
+                        child: ClipRRect(
+                          borderRadius: BorderRadius.circular(27.5),
+                          child: BackdropFilter(
+                            filter: ImageFilter.blur(sigmaX: 12, sigmaY: 12),
+                            child: Container(
+                          width: 390,
+                          height: 70,
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 16,
+                            vertical: 12,
+                          ),
+                          decoration: BoxDecoration(
+                            color: Colors.white.withOpacity(0.15),
+                            borderRadius: BorderRadius.circular(27.5),
+                            border: Border.all(
+                              color: Colors.white.withOpacity(0.7),
+                              width: 2,
+                            ),
+                            boxShadow: [
+                              BoxShadow(
+                                color: Colors.black.withOpacity(0.12),
+                                blurRadius: 15,
+                                offset: const Offset(0, 5),
+                              ),
+                            ],
+                          ),
+                          child: Row(
+                            children: [
+                              // STUDYMATE 아이콘
+                              Container(
+                                width: 40,
+                                height: 40,
+                                padding: const EdgeInsets.all(5),
+                                decoration: BoxDecoration(
+                                  color: Colors.white,
+                                  borderRadius: BorderRadius.circular(10.5),
+                                ),
+                                child: ClipRRect(
+                                  borderRadius: BorderRadius.circular(4.5),
+                                  child: Image.asset(
+                                    'assets/images/studymate_logo.png',
+                                    fit: BoxFit.cover,
+                                    errorBuilder: (context, error, stackTrace) {
+                                      // 로고가 없을 경우 기본 이미지 사용
+                                      return Image.asset(
+                                        'assets/images/characters/mascot_profile.png',
+                                        fit: BoxFit.cover,
+                                        errorBuilder: (context, error2, stackTrace2) {
+                                          return Container(
+                                            decoration: BoxDecoration(
+                                              color: const Color(0xFF70C4DE).withOpacity(0.2),
+                                              borderRadius: BorderRadius.circular(4.5),
+                                            ),
+                                            child: const Center(
+                                              child: Icon(
+                                                Icons.school,
+                                                size: 24,
+                                                color: Color(0xFF70C4DE),
+                                              ),
+                                            ),
+                                          );
+                                        },
+                                      );
+                                    },
+                                  ),
+                                ),
+                              ),
+                              const SizedBox(width: 10),
+                              // 텍스트
+                              Expanded(
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  mainAxisSize: MainAxisSize.min,
+                                  children: [
+                                    Flexible(
+                                      child: Text(
+                                        'STUDYMATE',
+                                        style: TextStyle(
+                                          fontSize: 13,
+                                          fontWeight: FontWeight.w600,
+                                          color: Colors.white,
+                                          fontFamily: 'Pretendard',
+                                        ),
+                                        overflow: TextOverflow.ellipsis,
+                                      ),
+                                    ),
+                                    Flexible(
+                                      child: Text(
+                                        '요약 알림 도착!',
+                                        style: TextStyle(
+                                          fontSize: 10,
+                                          fontWeight: FontWeight.w400,
+                                          color: Colors.white,
+                                          fontFamily: 'Pretendard',
+                                        ),
+                                        overflow: TextOverflow.ellipsis,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                              // 시간
+                              const Text(
+                                '방금',
+                                style: TextStyle(
+                                  fontSize: 10,
+                                  fontWeight: FontWeight.w400,
+                                  color: Colors.white,
+                                  fontFamily: 'Pretendard',
+                                ),
+                              ),
+                            ],
+                          ),
+                            ),
+                          ),
+                        ).animate()
+                          .fadeIn(duration: 600.ms, delay: 200.ms)
+                          .slideY(begin: -0.2, end: 0, duration: 600.ms, curve: Curves.easeOutBack),
+                      ),
+                    ],
+                  ),
+                ),
+                
+                const Spacer(),
+                
+                // 하단 버튼
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 25),
+                  child: Row(
+                    children: [
+                      // 나중에 버튼
+                      Expanded(
+                        child: Container(
+                          height: 60,
+                          decoration: BoxDecoration(
+                            color: Colors.white,
+                            borderRadius: BorderRadius.circular(15),
+                          ),
+                          child: TextButton(
+                            onPressed: _skipNotification,
+                            style: TextButton.styleFrom(
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(15),
+                              ),
+                            ),
+                            child: const Text(
+                              '나중에',
+                              style: TextStyle(
+                                fontSize: 18,
+                                fontWeight: FontWeight.w600,
+                                color: Color(0xFF555555),
+                                fontFamily: 'Pretendard',
+                                height: 1.444,
+                              ),
                             ),
                           ),
                         ),
                       ),
-                    ),
-                  ],
+                      
+                      const SizedBox(width: 20),
+                      
+                      // 알림 받기 버튼
+                      Expanded(
+                        child: Container(
+                          height: 60,
+                          decoration: BoxDecoration(
+                            color: const Color(0xFF4D9DB5),
+                            borderRadius: BorderRadius.circular(15),
+                          ),
+                          child: ElevatedButton(
+                            onPressed: _allowNotification,
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: Colors.transparent,
+                              shadowColor: Colors.transparent,
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(15),
+                              ),
+                            ),
+                            child: const Text(
+                              '알림 받기',
+                              style: TextStyle(
+                                fontSize: 18,
+                                fontWeight: FontWeight.w600,
+                                color: Colors.white,
+                                fontFamily: 'Pretendard',
+                                height: 1.444,
+                              ),
+                            ),
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
                 ),
-              ),
-            ],
+              ],
+            ),
           ),
-        ),
+        ],
       ),
     );
   }

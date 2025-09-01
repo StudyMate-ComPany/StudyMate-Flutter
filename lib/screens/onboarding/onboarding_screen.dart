@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_animate/flutter_animate.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../../services/notification_service.dart';
 import '../home/main_navigation_screen.dart';
@@ -61,11 +62,11 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
           SafeArea(
             bottom: false,
             child: Container(
-              height: 95, // 높이 더 증가 (80 + 15)
-              padding: const EdgeInsets.symmetric(horizontal: 24),
+              height: 80, // 피그마에 맞게 조정
+              padding: const EdgeInsets.symmetric(horizontal: 30),
               alignment: Alignment.bottomCenter,
               child: Padding(
-                padding: const EdgeInsets.only(bottom: 10),
+                padding: const EdgeInsets.only(bottom: 15),
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
@@ -81,21 +82,18 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                         height: 1.2,
                       ),
                     ),
-                    // 다음 페이지 화살표 버튼
-                    if (_currentPage < _pages.length - 1)
-                      GestureDetector(
-                        onTap: _nextPage,
-                        child: Container(
-                          padding: const EdgeInsets.all(8),
-                          child: const Icon(
-                            Icons.arrow_forward,
-                            size: 28, // 크기 조정
-                            color: Color(0xFF70C4DE),
-                          ),
+                    // 다음 페이지 화살표 버튼 - 모든 페이지에 표시
+                    GestureDetector(
+                      onTap: _currentPage < _pages.length - 1 ? _nextPage : _completeOnboarding,
+                      child: Container(
+                        padding: const EdgeInsets.all(8),
+                        child: Icon(
+                          Icons.arrow_forward,
+                          size: 28, // 크기 조정
+                          color: const Color(0xFF70C4DE),
                         ),
-                      )
-                    else
-                      const SizedBox(width: 48),
+                      ),
+                    ),
                   ],
                 ),
               ),
@@ -120,8 +118,8 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
           
           // 하단 네비게이션
           Container(
-            height: 105, // 높이 증가 (90 + 15)
-            padding: const EdgeInsets.fromLTRB(24, 15, 24, 0), // 위쪽 패딩 추가
+            height: 120, // 피그마에 맞게 높이 조정
+            padding: const EdgeInsets.fromLTRB(30, 20, 30, 20), // 패딩 조정
             child: Stack(
               alignment: Alignment.center,
               children: [
@@ -137,45 +135,23 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                     ),
                   ),
                 ),
-                // 건너뛰기 또는 시작하기 버튼 - 오른쪽
-                Align(
-                  alignment: Alignment.centerRight,
-                  child: _currentPage < _pages.length - 1
-                    ? GestureDetector(
-                        onTap: _skipOnboarding,
-                        child: const Text(
-                          '건너뛰기',
-                          style: TextStyle(
-                            fontFamily: 'Pretendard',
-                            fontSize: 15,
-                            fontWeight: FontWeight.w400,
-                            color: Color(0xFF545454),
-                          ),
-                        ),
-                      )
-                    : GestureDetector(
-                        onTap: _completeOnboarding,
-                        child: Container(
-                          padding: const EdgeInsets.symmetric(
-                            horizontal: 28,
-                            vertical: 10,
-                          ),
-                          decoration: BoxDecoration(
-                            color: const Color(0xFF70C4DE),
-                            borderRadius: BorderRadius.circular(20),
-                          ),
-                          child: const Text(
-                            '시작하기',
-                            style: TextStyle(
-                              fontFamily: 'Pretendard',
-                              fontSize: 15,
-                              fontWeight: FontWeight.w600,
-                              color: Colors.white,
-                            ),
-                          ),
+                // 건너뛰기 버튼만 표시 (마지막 페이지에서는 표시 안함)
+                if (_currentPage < _pages.length - 1)
+                  Align(
+                    alignment: Alignment.centerRight,
+                    child: GestureDetector(
+                      onTap: _skipOnboarding,
+                      child: const Text(
+                        '건너뛰기',
+                        style: TextStyle(
+                          fontFamily: 'Pretendard',
+                          fontSize: 15,
+                          fontWeight: FontWeight.w400,
+                          color: Color(0xFF545454),
                         ),
                       ),
-                ),
+                    ),
+                  ),
               ],
             ),
           ),
@@ -185,128 +161,115 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
   }
 
   Widget _buildPage(OnboardingPage page, int index) {
-    return SingleChildScrollView(
-      physics: const ClampingScrollPhysics(),
-      child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 30),
-        child: Column(
-          children: [
-            const SizedBox(height: 20), // 상단 간격 줄임
-            
-            // 마스코트 이미지
-            SizedBox(
-              width: 240, // 크기 줄임
-              height: 240,
-              child: _buildMascotImage(index),
-            ).animate()
-              .fadeIn(duration: 500.ms)
-              .scale(begin: const Offset(0.9, 0.9), end: const Offset(1, 1)),
-            
-            const SizedBox(height: 50), // 간격 조정
-            
-            // 메인 타이틀
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 30),
+      child: Column(
+        children: [
+          const SizedBox(height: 50), // STUDYMATE와 이미지 간격 조정
+          
+          // 마스코트 이미지 - 크기 조정
+          SizedBox(
+            width: 260, // 크기 줄임
+            height: 260,
+            child: _buildMascotImage(index),
+          ).animate()
+            .fadeIn(duration: 500.ms)
+            .scale(begin: const Offset(0.9, 0.9), end: const Offset(1, 1)),
+          
+          const SizedBox(height: 60), // 이미지와 타이틀 간격 2배로
+          
+          // 메인 타이틀
+          Text(
+            page.title,
+            style: const TextStyle(
+              fontFamily: 'ChangwonDangamRound',
+              fontSize: 27, // 크기 조정
+              fontWeight: FontWeight.w400,
+              color: Color(0xFF4D9DB5),
+              height: 1.2,
+            ),
+            textAlign: TextAlign.center,
+          ).animate()
+            .fadeIn(duration: 500.ms)
+            .slideY(begin: -0.1, end: 0),
+          
+          // 서브타이틀 (2,3번 페이지)
+          if (page.subtitle != null) ...[
+            const SizedBox(height: 8),
             Text(
-              page.title,
+              page.subtitle!,
               style: const TextStyle(
-                fontFamily: 'ChangwonDangamRound',
-                fontSize: 28, // 크기 조정
-                fontWeight: FontWeight.w400,
-                color: Color(0xFF4D9DB5),
-                height: 1.2,
+                fontFamily: 'Pretendard',
+                fontSize: 17, // 크기 조정
+                fontWeight: FontWeight.w600,
+                color: Color(0xFF545454),
+                height: 1.3,
               ),
               textAlign: TextAlign.center,
             ).animate()
-              .fadeIn(duration: 500.ms)
-              .slideY(begin: -0.1, end: 0),
-            
-            // 서브타이틀 (2,3번 페이지)
-            if (page.subtitle != null) ...[
-              const SizedBox(height: 8),
-              Text(
-                page.subtitle!,
-                style: const TextStyle(
-                  fontFamily: 'Pretendard',
-                  fontSize: 18,
-                  fontWeight: FontWeight.w600,
-                  color: Color(0xFF545454),
-                  height: 1.44,
+              .fadeIn(delay: 200.ms, duration: 500.ms),
+          ],
+          
+          const SizedBox(height: 50), // 타이틀과 기능 목록 간격 2배로
+          
+          // 기능 목록 - 체크박스와 구분선 포함
+          Expanded(
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                // 상단 구분선 추가
+                Container(
+                  height: 1.5,
+                  color: const Color(0xFFD0D0D0),
                 ),
-                textAlign: TextAlign.center,
-              ).animate()
-                .fadeIn(delay: 200.ms, duration: 500.ms),
-            ],
-            
-            const SizedBox(height: 50), // 간격 조정
-            
-            // 기능 목록 - 체크박스와 구분선 포함
-            Container(
-              padding: const EdgeInsets.symmetric(horizontal: 10),
-              child: Column(
-                children: [
-                  // 상단 구분선
-                  Container(
-                    height: 1,
-                    color: const Color(0xFFE5E5E5),
-                  ),
-                  for (int i = 0; i < (page.features?.length ?? 0); i++) ...[
-                    Container(
-                      padding: const EdgeInsets.symmetric(vertical: 14),
-                      child: Row(
-                        children: [
-                          // 체크 아이콘
-                          Container(
-                            width: 22,
-                            height: 22,
-                            margin: const EdgeInsets.only(right: 14),
-                            decoration: BoxDecoration(
-                              shape: BoxShape.circle,
-                              border: Border.all(
-                                color: const Color(0xFF70C4DE),
-                                width: 2,
-                              ),
-                            ),
-                            child: const Center(
-                              child: Icon(
-                                Icons.check,
-                                size: 14,
-                                color: Color(0xFF70C4DE),
-                              ),
-                            ),
-                          ),
-                          // 기능 텍스트
+                for (int i = 0; i < (page.features?.length ?? 0); i++) ...[
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+                    child: Row(
+                      children: [
+                          // 기능 텍스트 - 왼쪽 정렬
                           Expanded(
                             child: Text(
                               page.features![i],
                               style: const TextStyle(
                                 fontFamily: 'Pretendard',
-                                fontSize: 16, // 크기 조정
-                                fontWeight: FontWeight.w500,
+                                fontSize: 18, // 크기 증가
+                                fontWeight: FontWeight.w600, // 두께 증가
                                 color: Color(0xFF545454),
-                                height: 1.4,
+                                height: 1.3,
                               ),
                             ),
                           ),
-                        ],
-                      ),
-                    ).animate()
-                      .fadeIn(
-                        delay: Duration(milliseconds: 600 + (i * 100)),
-                        duration: 500.ms,
-                      )
-                      .slideX(begin: -0.1, end: 0),
-                    // 구분선 (모든 항목 뒤에)
-                    Container(
-                      height: 1,
-                      color: const Color(0xFFE5E5E5),
+                          // 체크 아이콘 - 피그마에서 가져온 SVG 아이콘
+                          SvgPicture.asset(
+                            'assets/icons/check_circle.svg',
+                            width: 24,
+                            height: 24,
+                            colorFilter: const ColorFilter.mode(
+                              Color(0xFF4D9DB5),
+                              BlendMode.srcIn,
+                            ),
+                          ),
+                      ],
                     ),
-                  ],
+                  ).animate()
+                    .fadeIn(
+                      delay: Duration(milliseconds: 600 + (i * 100)),
+                      duration: 500.ms,
+                    )
+                    .slideX(begin: -0.1, end: 0),
+                  // 하단 구분선
+                  Container(
+                    height: 1.5,
+                    color: const Color(0xFFD0D0D0),
+                  ),
                 ],
-              ),
+              ],
             ),
-            
-            const SizedBox(height: 40),
-          ],
-        ),
+          ),
+          
+          const SizedBox(height: 10), // 하단 여백
+        ],
       ),
     );
   }
