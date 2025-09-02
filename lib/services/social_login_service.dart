@@ -1,11 +1,12 @@
 import 'package:flutter/material.dart';
-import 'package:kakao_flutter_sdk/kakao_flutter_sdk.dart';
+import 'package:kakao_flutter_sdk_user/kakao_flutter_sdk_user.dart';
 // import 'package:flutter_naver_login/flutter_naver_login.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:sign_in_with_apple/sign_in_with_apple.dart';
 import 'package:crypto/crypto.dart';
 import 'dart:convert';
 import 'dart:math';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 
 class SocialLoginService {
   static final SocialLoginService _instance = SocialLoginService._internal();
@@ -22,54 +23,124 @@ class SocialLoginService {
 
   // 카카오 로그인
   Future<Map<String, dynamic>?> signInWithKakao(BuildContext context) async {
+    debugPrint('🔐 [SocialLogin] Starting Kakao login...');
+    debugPrint('📱 [SocialLogin] App Key: ${dotenv.env['KAKAO_NATIVE_APP_KEY']}');
+    
+    // 디버그용 키 해시 출력
+    try {
+      final keyHash = await KakaoSdk.origin;
+      debugPrint('🔑 [Debug] Kakao Key Hash: $keyHash');
+      debugPrint('📦 [Debug] Package Name: com.studymate.studymate_flutter');
+      
+      // SDK 버전 확인
+      debugPrint('🔧 [Debug] Kakao SDK initialized: ${KakaoSdk.origin}');
+    } catch (e) {
+      debugPrint('❌ [Debug] Failed to get debug info: $e');
+    }
+    
     try {
       // 카카오톡 설치 여부 확인
-      if (await isKakaoTalkInstalled()) {
+      bool isInstalled = await isKakaoTalkInstalled();
+      debugPrint('📱 [SocialLogin] KakaoTalk installed: $isInstalled');
+      
+      if (isInstalled) {
         try {
+          debugPrint('📲 [SocialLogin] Attempting KakaoTalk login...');
           // 카카오톡으로 로그인
-          await UserApi.instance.loginWithKakaoTalk();
+          final OAuthToken token = await UserApi.instance.loginWithKakaoTalk();
+          debugPrint('✅ [SocialLogin] KakaoTalk login successful');
+          debugPrint('🔑 [Response] Access Token: ${token.accessToken}');
+          debugPrint('🔑 [Response] Refresh Token: ${token.refreshToken}');
+          debugPrint('🔑 [Response] ID Token: ${token.idToken}');
+          debugPrint('🔑 [Response] Scopes: ${token.scopes}');
+          debugPrint('📦 [Response] Full Token Object: $token');
         } catch (error) {
-          print('카카오톡으로 로그인 실패: $error');
+          debugPrint('⚠️ 카카오톡으로 로그인 실패: $error');
           
           // 카카오톡에 연결된 카카오계정이 없는 경우, 카카오계정으로 로그인
           try {
-            await UserApi.instance.loginWithKakaoAccount();
+            debugPrint('🌐 [SocialLogin] Fallback to Kakao account login...');
+            final OAuthToken token = await UserApi.instance.loginWithKakaoAccount();
+            debugPrint('✅ [SocialLogin] Kakao account login successful');
+            debugPrint('🔑 [Response] Access Token: ${token.accessToken}');
+            debugPrint('🔑 [Response] Refresh Token: ${token.refreshToken}');
+            debugPrint('🔑 [Response] ID Token: ${token.idToken}');
+            debugPrint('🔑 [Response] Scopes: ${token.scopes}');
+            debugPrint('📦 [Response] Full Token Object: $token');
           } catch (error) {
-            print('카카오계정으로 로그인 실패: $error');
+            debugPrint('❌ 카카오계정으로 로그인 실패: $error');
             return null;
           }
         }
       } else {
         // 카카오톡이 설치되어 있지 않으면 카카오계정으로 로그인
         try {
-          await UserApi.instance.loginWithKakaoAccount();
+          debugPrint('🌐 [SocialLogin] Attempting Kakao account login (no KakaoTalk)...');
+          debugPrint('📍 [Debug] Calling loginWithKakaoAccount...');
+          
+          // 명시적으로 스코프 지정
+          final OAuthToken token = await UserApi.instance.loginWithKakaoAccount(
+            prompts: [Prompt.login], // 항상 로그인 프롬프트 표시
+          );
+          debugPrint('✅ [SocialLogin] Kakao account login successful');
+          debugPrint('✅ [Debug] Token received from Kakao');
+          debugPrint('🔑 [Response] Access Token: ${token.accessToken}');
+          debugPrint('🔑 [Response] Refresh Token: ${token.refreshToken}');
+          debugPrint('🔑 [Response] ID Token: ${token.idToken}');
+          debugPrint('🔑 [Response] Scopes: ${token.scopes}');
+          debugPrint('📦 [Response] Full Token Object: $token');
         } catch (error) {
-          print('카카오계정으로 로그인 실패: $error');
+          debugPrint('❌ 카카오계정으로 로그인 실패: $error');
+          debugPrint('📍 [Debug] Error type: ${error.runtimeType}');
+          debugPrint('📍 [Debug] Error details: $error');
+          if (error.toString().contains('CANCELED')) {
+            debugPrint('🚫 [Debug] User canceled login');
+          } else if (error.toString().contains('REDIRECT')) {
+            debugPrint('🔄 [Debug] Redirect issue detected');
+          }
           return null;
         }
       }
 
       // 사용자 정보 가져오기
       try {
-        User user = await UserApi.instance.me();
-        print('카카오 로그인 성공');
-        print('사용자 정보: ${user.id}');
-        print('닉네임: ${user.kakaoAccount?.profile?.nickname}');
-        print('이메일: ${user.kakaoAccount?.email}');
+        // 액세스 토큰 가져오기
+        final tokenInfo = await UserApi.instance.accessTokenInfo();
+        debugPrint('🎫 Access Token ID: ${tokenInfo.id}');
+        debugPrint('⏰ Token Expires In: ${tokenInfo.expiresIn}초');
         
-        return {
+        // 실제 액세스 토큰 가져오기
+        final token = await TokenManagerProvider.instance.manager.getToken();
+        final accessToken = token?.accessToken;
+        debugPrint('🔑 Access Token: $accessToken');
+        
+        User user = await UserApi.instance.me();
+        debugPrint('✅ 카카오 로그인 성공');
+        debugPrint('👤 사용자 정보: ${user.id}');
+        debugPrint('📝 닉네임: ${user.kakaoAccount?.profile?.nickname}');
+        debugPrint('📧 이메일: ${user.kakaoAccount?.email}');
+        
+        final userData = {
           'id': user.id.toString(),
           'email': user.kakaoAccount?.email ?? '',
           'name': user.kakaoAccount?.profile?.nickname ?? '',
           'profileImage': user.kakaoAccount?.profile?.profileImageUrl ?? '',
           'provider': 'kakao',
+          'access_token': accessToken,  // 액세스 토큰 추가
         };
+        
+        debugPrint('📦 Returning user data to AuthProvider: $userData');
+        return userData;
       } catch (error) {
-        print('사용자 정보 가져오기 실패: $error');
+        debugPrint('❌ 사용자 정보 가져오기 실패: $error');
+        debugPrint('📝 [Error] Type: ${error.runtimeType}');
+        debugPrint('📝 [Error] Details: $error');
         return null;
       }
     } catch (error) {
-      print('카카오 로그인 에러: $error');
+      debugPrint('❌ [KAKAO LOGIN ERROR] 카카오 로그인 에러: $error');
+      debugPrint('📝 [Error] Type: ${error.runtimeType}');
+      debugPrint('📝 [Error] Stack trace: ${StackTrace.current}');
       if (context.mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(

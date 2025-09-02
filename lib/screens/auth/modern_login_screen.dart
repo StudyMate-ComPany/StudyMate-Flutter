@@ -3,6 +3,7 @@ import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import '../../providers/auth_provider.dart';
+import '../../services/social_login_service.dart';
 import '../../theme/studymate_theme.dart';
 import '../../widgets/korean_enabled_text_field.dart';
 import 'modern_register_screen.dart';
@@ -64,26 +65,70 @@ class _ModernLoginScreenState extends State<ModernLoginScreen> with TickerProvid
       _isLoading = true;
     });
     
-    final authProvider = Provider.of<AuthProvider>(context, listen: false);
-    final success = await authProvider.socialLogin(provider);
-    
-    setState(() {
-      _isLoading = false;
-    });
-    
-    if (!mounted) return;
-    
-    if (!success) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(authProvider.errorMessage ?? '$provider 로그인에 실패했습니다'),
-          backgroundColor: StudyMateTheme.accentPink,
-          behavior: SnackBarBehavior.floating,
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(12),
+    try {
+      // 소셜 로그인 서비스 사용
+      final socialLoginService = SocialLoginService();
+      Map<String, dynamic>? socialUserData;
+
+      switch (provider) {
+        case 'kakao':
+          socialUserData = await socialLoginService.signInWithKakao(context);
+          break;
+        case 'naver':
+          // Naver login temporarily disabled
+          if (mounted) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              const SnackBar(content: Text('네이버 로그인은 준비 중입니다')),
+            );
+          }
+          setState(() => _isLoading = false);
+          return;
+        case 'google':
+          socialUserData = await socialLoginService.signInWithGoogle(context);
+          break;
+        case 'apple':
+          socialUserData = await socialLoginService.signInWithApple(context);
+          break;
+      }
+
+      if (socialUserData != null) {
+        final authProvider = Provider.of<AuthProvider>(context, listen: false);
+        final success = await authProvider.socialLogin(socialUserData);
+        
+        if (!mounted) return;
+        
+        if (!success) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text(authProvider.errorMessage ?? '$provider 로그인에 실패했습니다'),
+              backgroundColor: StudyMateTheme.accentPink,
+              behavior: SnackBarBehavior.floating,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(12),
+              ),
+            ),
+          );
+        }
+      }
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('오류가 발생했습니다: $e'),
+            backgroundColor: StudyMateTheme.accentPink,
+            behavior: SnackBarBehavior.floating,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(12),
+            ),
           ),
-        ),
-      );
+        );
+      }
+    } finally {
+      if (mounted) {
+        setState(() {
+          _isLoading = false;
+        });
+      }
     }
   }
   

@@ -231,6 +231,53 @@ class ApiService {
     }
   }
 
+  Future<Map<String, dynamic>> socialLogin(Map<String, dynamic> socialData) async {
+    debugPrint('🔐 Attempting social login with: ${socialData['provider']}');
+    
+    // Django 서버가 기대하는 형식으로 데이터 변환
+    Map<String, dynamic> requestData;
+    
+    if (socialData['provider'] == 'kakao') {
+      // 카카오 로그인용 데이터
+      requestData = {
+        'provider': 'kakao',
+        'access_token': socialData['access_token'] ?? '',
+        'kakao_id': socialData['id'],
+        'email': socialData['email'] ?? '',
+        'nickname': socialData['name'] ?? '',
+        'profile_image': socialData['profileImage'] ?? '',
+      };
+    } else {
+      // 다른 소셜 로그인 제공자
+      requestData = {
+        'provider': socialData['provider'],
+        'access_token': socialData['access_token'] ?? '',
+        'id_token': socialData['idToken'] ?? '',
+        'email': socialData['email'] ?? '',
+        'name': socialData['name'] ?? '',
+        'profile_image': socialData['profileImage'] ?? '',
+      };
+    }
+    
+    debugPrint('📤 Sending social login data: $requestData');
+    
+    try {
+      final response = await _makeRequest('POST', '/api/auth/social/login/', data: requestData);
+      
+      // Store token if provided
+      if (response['token'] != null) {
+        setAuthToken(response['token']);
+        debugPrint('✅ Social login successful, token stored');
+      }
+      
+      return response;
+    } catch (e) {
+      debugPrint('❌ Social login failed: $e');
+      debugPrint('💡 서버 응답 형식 문제일 수 있습니다. Django REST Framework 설정을 확인해주세요.');
+      rethrow;
+    }
+  }
+
   Future<Map<String, dynamic>> logout() async {
     return _makeRequest('POST', '/api/auth/logout/');
   }
@@ -533,22 +580,4 @@ class ApiService {
     return getStatistics();
   }
   
-  // 소셜 로그인
-  Future<Map<String, dynamic>> socialLogin(Map<String, dynamic> socialData) async {
-    try {
-      debugPrint('🔐 [API] Social login request: ${socialData['provider']}');
-      
-      final response = await _dio.post(
-        '/api/auth/social/login/',
-        data: socialData,
-      );
-      
-      debugPrint('✅ [API] Social login successful');
-      return response.data;
-    } on DioException catch (e) {
-      debugPrint('❌ [API] Social login failed: ${e.message}');
-      _handleDioError(e);
-      rethrow;
-    }
-  }
 }

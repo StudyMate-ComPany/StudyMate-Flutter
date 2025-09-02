@@ -5,6 +5,7 @@ import 'package:flutter_svg/flutter_svg.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:provider/provider.dart';
 import '../../providers/auth_provider.dart';
+import '../../services/social_login_service.dart';
 import '../home/main_navigation_screen.dart';
 import 'signup_screen.dart';
 
@@ -89,25 +90,68 @@ class _LoginScreenState extends State<LoginScreen> {
   }
 
   Future<void> _handleSocialLogin(String provider) async {
+    debugPrint('🔐 [LoginScreen] Starting social login: $provider');
     setState(() => _isLoading = true);
 
     try {
-      final authProvider = Provider.of<AuthProvider>(context, listen: false);
-      final success = await authProvider.socialLogin(provider);
+      // 소셜 로그인 서비스 사용
+      final socialLoginService = SocialLoginService();
+      Map<String, dynamic>? socialUserData;
 
-      if (mounted) {
-        if (success) {
-          Navigator.pushReplacement(
-            context,
-            MaterialPageRoute(
-              builder: (context) => const MainNavigationScreen(),
-            ),
-          );
-        } else {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text('$provider 로그인에 실패했습니다')),
-          );
+      switch (provider) {
+        case 'kakao':
+          debugPrint('📱 [LoginScreen] Calling Kakao login service...');
+          debugPrint('🔄 [LoginScreen] Before calling signInWithKakao');
+          socialUserData = await socialLoginService.signInWithKakao(context);
+          debugPrint('🔄 [LoginScreen] After calling signInWithKakao');
+          debugPrint('📦 [LoginScreen] Kakao data received: $socialUserData');
+          if (socialUserData == null) {
+            debugPrint('❌ [LoginScreen] Kakao login returned null');
+          } else {
+            debugPrint('✅ [LoginScreen] Kakao login successful, got user data');
+          }
+          break;
+        case 'naver':
+          // Naver login temporarily disabled
+          if (mounted) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              const SnackBar(content: Text('네이버 로그인은 준비 중입니다')),
+            );
+          }
+          setState(() => _isLoading = false);
+          return;
+        case 'google':
+          socialUserData = await socialLoginService.signInWithGoogle(context);
+          break;
+        case 'apple':
+          socialUserData = await socialLoginService.signInWithApple(context);
+          break;
+      }
+
+      if (socialUserData != null) {
+        debugPrint('✅ [LoginScreen] Social data is not null, proceeding with auth...');
+        final authProvider = Provider.of<AuthProvider>(context, listen: false);
+        final success = await authProvider.socialLogin(socialUserData);
+        debugPrint('🎯 [LoginScreen] Auth result: $success');
+
+        if (mounted) {
+          if (success) {
+            debugPrint('🚀 [LoginScreen] Login successful, navigating to MainNavigationScreen...');
+            Navigator.pushReplacement(
+              context,
+              MaterialPageRoute(
+                builder: (context) => const MainNavigationScreen(),
+              ),
+            );
+          } else {
+            debugPrint('❌ [LoginScreen] Login failed');
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(content: Text('$provider 로그인에 실패했습니다')),
+            );
+          }
         }
+      } else {
+        debugPrint('⚠️ [LoginScreen] Social data is null');
       }
     } catch (e) {
       if (mounted) {

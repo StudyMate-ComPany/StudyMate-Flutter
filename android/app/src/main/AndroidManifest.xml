@@ -1,4 +1,5 @@
-<manifest xmlns:android="http://schemas.android.com/apk/res/android">
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools">
     <uses-permission android:name="android.permission.INTERNET"/>
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE"/>
     
@@ -10,7 +11,7 @@
         <activity
             android:name=".MainActivity"
             android:exported="true"
-            android:launchMode="singleTop"
+            android:launchMode="singleTask"
             android:taskAffinity=""
             android:theme="@style/LaunchTheme"
             android:configChanges="orientation|keyboardHidden|keyboard|screenSize|smallestScreenSize|locale|layoutDirection|fontScale|screenLayout|density|uiMode"
@@ -34,30 +35,28 @@
                 <category android:name="android.intent.category.LAUNCHER"/>
             </intent-filter>
             
-            <!-- 카카오 로그인 Redirect URI 설정 -->
-            <intent-filter>
-                <action android:name="android.intent.action.VIEW"/>
-                <category android:name="android.intent.category.DEFAULT"/>
-                <category android:name="android.intent.category.BROWSABLE"/>
-                
-                <!-- 카카오 로그인 Redirect URI: kakao${YOUR_NATIVE_APP_KEY}://oauth -->
-                <data android:scheme="kakao3536690f07026db1260827631e893227" android:host="oauth"/>
-            </intent-filter>
         </activity>
         
-        <!-- 카카오 로그인 설정 -->
-        <activity 
-            android:name="com.kakao.sdk.auth.AuthCodeHandlerActivity"
+        <!-- Kakao OAuth Redirect Activity -->
+        <activity
+            android:name="com.kakao.sdk.flutter.AuthCodeCustomTabsActivity"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.VIEW" />
                 <category android:name="android.intent.category.DEFAULT" />
                 <category android:name="android.intent.category.BROWSABLE" />
                 
-                <!-- 카카오 로그인 Redirect URI: kakao${YOUR_NATIVE_APP_KEY}://oauth -->
-                <data android:scheme="kakao3536690f07026db1260827631e893227" android:host="oauth"/>
+                <!-- Redirect URI: kakao{YOUR_NATIVE_APP_KEY}://oauth -->
+                <data android:scheme="kakao3536690f07026db1260827631e893227" 
+                      android:host="oauth"/>
             </intent-filter>
         </activity>
+        
+        <!-- 카카오 SDK 설정 -->
+        <meta-data
+            android:name="com.kakao.sdk.AppKey"
+            android:value="@string/kakao_app_key" />
+        
         <!-- Don't delete the meta-data below.
              This is used by the Flutter tool to generate GeneratedPluginRegistrant.java -->
         <meta-data

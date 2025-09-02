@@ -1,6 +1,8 @@
 package com.studymate.studymate_flutter
 
+import android.content.Intent
 import android.os.Bundle
+import android.util.Log
 import android.view.WindowManager
 import android.view.inputmethod.InputMethodManager
 import io.flutter.embedding.android.FlutterActivity
@@ -12,6 +14,7 @@ class MainActivity: FlutterActivity() {
     
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        Log.d("MainActivity", "🚀 onCreate called")
         
         // 한글 입력을 위한 소프트 키보드 모드 설정
         window.setSoftInputMode(
@@ -43,4 +46,5 @@ class MainActivity: FlutterActivity() {
             }
         }
     }
+    
 }

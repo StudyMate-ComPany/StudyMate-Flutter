@@ -57,34 +57,81 @@ class AuthProvider with ChangeNotifier {
       _setState(AuthState.loading);
       debugPrint('🔐 AuthProvider: Starting social login');
       debugPrint('📱 Provider: ${socialUserData['provider']}');
+      debugPrint('📦 User Data: $socialUserData');
       
       // 백엔드 API로 소셜 로그인 정보 전송
-      // 실제 백엔드 연동 시 아래 주석 해제
-      // final response = await _apiService.socialLogin(socialUserData);
+      debugPrint('🌐 Calling backend API...');
+      Map<String, dynamic>? response;
       
-      // 임시 로컬 처리 (백엔드 연동 전)
-      final testUser = User(
-        id: socialUserData['id'] ?? DateTime.now().millisecondsSinceEpoch.toString(),
-        email: socialUserData['email'] ?? '${socialUserData['provider']}@studymate.com',
-        name: socialUserData['name'] ?? '${socialUserData['provider']} 사용자',
-        bio: '${socialUserData['provider']} 로그인 사용자',
-        avatarUrl: socialUserData['profileImage'],
-        createdAt: DateTime.now(),
-        lastLoginAt: DateTime.now(),
-      );
+      try {
+        response = await _apiService.socialLogin(socialUserData);
+        debugPrint('📥 API Response: $response');
+      } catch (apiError) {
+        debugPrint('⚠️ API Error: $apiError');
+        debugPrint('📱 Using local fallback for social login');
+        
+        // API 실패 시 로컬 처리 (임시)
+        final localToken = 'local_${socialUserData['provider']}_${DateTime.now().millisecondsSinceEpoch}';
+        response = {
+          'token': localToken,
+          'user': {
+            'id': socialUserData['id'],
+            'email': socialUserData['email'],
+            'username': socialUserData['name']?.replaceAll(' ', '_').toLowerCase() ?? socialUserData['provider'],
+            'name': socialUserData['name'],
+            'first_name': socialUserData['name']?.split(' ').first ?? '',
+            'last_name': socialUserData['name']?.split(' ').skip(1).join(' ') ?? '',
+            'profile': {
+              'profile_image': socialUserData['profileImage'],
+              'name': socialUserData['name'],
+            }
+          },
+          'created': true,
+          'message': '로컬 처리로 로그인되었습니다'
+        };
+      }
       
-      // 임시 토큰 생성
-      final token = 'social_${socialUserData['provider']}_${DateTime.now().millisecondsSinceEpoch}';
-      
-      await LocalStorageService.saveAuthToken(token);
-      _apiService.setAuthToken(token);
-      _user = testUser;
-      await LocalStorageService.saveUser(testUser);
-      
-      debugPrint('✅ Social login successful');
-      _setState(AuthState.authenticated);
-      return true;
+      if (response != null) {
+        final token = response['token'];
+        final userData = response['user'];
+        final bool isNewUser = response['created'] ?? false;
+        
+        debugPrint('🎫 Token received: $token');
+        
+        // 토큰 저장
+        await LocalStorageService.saveAuthToken(token);
+        _apiService.setAuthToken(token);
+        debugPrint('💾 Token saved to local storage');
+        
+        // 사용자 정보 생성
+        _user = User(
+          id: userData['id'].toString(),
+          email: userData['email'] ?? '',
+          name: userData['name'] ?? userData['username'] ?? '',
+          bio: userData['profile']?['name'] ?? '${socialUserData['provider']} 로그인 사용자',
+          avatarUrl: userData['profile']?['profile_image'] ?? socialUserData['profileImage'],
+          createdAt: DateTime.tryParse(userData['created_at'] ?? '') ?? DateTime.now(),
+          lastLoginAt: DateTime.now(),
+        );
+        
+        await LocalStorageService.saveUser(_user!);
+        debugPrint('👤 User saved: ${_user!.email}');
+        
+        // 신규 가입 사용자인 경우 환영 메시지
+        if (isNewUser) {
+          debugPrint('🎉 Welcome new user from ${socialUserData['provider']}!');
+        }
+        
+        debugPrint('✅ Social login successful, setting state to authenticated');
+        _setState(AuthState.authenticated);
+        return true;
+      } else {
+        debugPrint('❌ No response from API');
+        _setError('소셜 로그인 응답이 없습니다');
+        return false;
+      }
     } catch (e) {
+      debugPrint('❌ Social login error: $e');
       _setError('소셜 로그인에 실패했습니다: $e');
       return false;
     }
@@ -149,37 +196,6 @@ class AuthProvider with ChangeNotifier {
     }
   }
 
-  Future<bool> socialLogin(String provider) async {
-    try {
-      _setState(AuthState.loading);
-      debugPrint('🔐 AuthProvider: Starting social login with $provider');
-      
-      // TEST MODE: Mock social login for UI testing
-      debugPrint('🧪 TEST MODE: Using mock social login');
-      final testUser = User(
-        id: '1',
-        email: '$provider@user.com',
-        name: '$provider 사용자',
-        bio: '$provider로 로그인한 사용자입니다',
-        avatarUrl: null,
-        createdAt: DateTime.now(),
-        lastLoginAt: DateTime.now(),
-      );
-      
-      await LocalStorageService.saveAuthToken('${provider}_token_12345');
-      _apiService.setAuthToken('${provider}_token_12345');
-      _user = testUser;
-      await LocalStorageService.saveUser(testUser);
-      
-      debugPrint('✅ SOCIAL LOGIN successful, transitioning to authenticated state');
-      _setState(AuthState.authenticated);
-      return true;
-    } catch (e) {
-      debugPrint('❌ Social login error: $e');
-      _setError('소셜 로그인에 실패했습니다: $e');
-      return false;
-    }
-  }
 
   Future<bool> register(String name, String email, String password, {String? username, String? passwordConfirm, bool termsAccepted = true, bool privacyAccepted = true}) async {
     try {
