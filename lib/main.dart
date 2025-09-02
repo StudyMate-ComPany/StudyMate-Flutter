@@ -3,6 +3,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:provider/provider.dart';
+import 'package:kakao_flutter_sdk/kakao_flutter_sdk.dart';
 
 import 'providers/ai_provider.dart';
 import 'providers/auth_provider.dart';
@@ -11,7 +12,11 @@ import 'providers/notification_provider.dart';
 import 'providers/study_provider.dart';
 import 'providers/theme_provider.dart';
 import 'screens/splash/splash_screen.dart';
+import 'screens/home/main_navigation_screen.dart';
+import 'screens/test_screen.dart';
 import 'screens/onboarding/notification_permission_screen.dart';
+import 'screens/onboarding/notification_permission_screen_exact.dart';
+import 'screens/auth/login_screen.dart';
 import 'services/local_storage_service.dart';
 import 'services/notification_service.dart';
 import 'theme/studymate_theme.dart';
@@ -21,6 +26,12 @@ void main() async {
   
   // Load environment variables
   await dotenv.load(fileName: '.env');
+  
+  // 카카오 SDK 초기화
+  KakaoSdk.init(
+    nativeAppKey: dotenv.env['KAKAO_NATIVE_APP_KEY'] ?? '',
+    javaScriptAppKey: dotenv.env['KAKAO_JAVASCRIPT_APP_KEY'] ?? '',
+  );
   
   // 시스템 UI 오버레이 스타일 설정
   SystemChrome.setSystemUIOverlayStyle(
@@ -87,8 +98,8 @@ class StudyMateApp extends StatelessWidget {
           GlobalCupertinoLocalizations.delegate,
         ],
         
-        // 알림 권한 화면 테스트
-        home: const NotificationPermissionScreen(),
+        // 앱 시작 - 스플래시 화면으로 시작
+        home: const SplashScreen(),
           );
         },
       ),

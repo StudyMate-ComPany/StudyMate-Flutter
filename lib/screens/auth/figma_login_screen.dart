@@ -1,9 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:provider/provider.dart';
 import 'modern_register_screen.dart';
 import 'password_reset_screen.dart';
 import '../home/main_navigation_screen.dart';
+import '../../services/social_login_service.dart';
+import '../../providers/auth_provider.dart';
 
 class FigmaLoginScreen extends StatefulWidget {
   const FigmaLoginScreen({super.key});
@@ -15,6 +18,7 @@ class FigmaLoginScreen extends StatefulWidget {
 class _FigmaLoginScreenState extends State<FigmaLoginScreen> {
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
+  final _socialLoginService = SocialLoginService();
   bool _isPasswordVisible = false;
   bool _isLoading = false;
 
@@ -433,8 +437,23 @@ class _FigmaLoginScreenState extends State<FigmaLoginScreen> {
                     ),
                   ),
                 ),
-                onTap: () {
-                  // 카카오 로그인 처리
+                onTap: () async {
+                  final result = await _socialLoginService.signInWithKakao(context);
+                  if (result != null && mounted) {
+                    // AuthProvider를 통해 로그인 상태 저장
+                    final authProvider = Provider.of<AuthProvider>(context, listen: false);
+                    final success = await authProvider.socialLogin(result);
+                    
+                    if (success && mounted) {
+                      // 로그인 성공 시 메인 화면으로 이동
+                      Navigator.pushReplacement(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => const MainNavigationScreen(),
+                        ),
+                      );
+                    }
+                  }
                 },
               ),
               const SizedBox(width: 30),
@@ -457,8 +476,23 @@ class _FigmaLoginScreenState extends State<FigmaLoginScreen> {
                     ),
                   ),
                 ),
-                onTap: () {
-                  // 네이버 로그인 처리
+                onTap: () async {
+                  final result = await _socialLoginService.signInWithNaver(context);
+                  if (result != null && mounted) {
+                    // AuthProvider를 통해 로그인 상태 저장
+                    final authProvider = Provider.of<AuthProvider>(context, listen: false);
+                    final success = await authProvider.socialLogin(result);
+                    
+                    if (success && mounted) {
+                      // 로그인 성공 시 메인 화면으로 이동
+                      Navigator.pushReplacement(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => const MainNavigationScreen(),
+                        ),
+                      );
+                    }
+                  }
                 },
               ),
               const SizedBox(width: 30),
@@ -486,8 +520,23 @@ class _FigmaLoginScreenState extends State<FigmaLoginScreen> {
                     ),
                   ),
                 ),
-                onTap: () {
-                  // 구글 로그인 처리
+                onTap: () async {
+                  final result = await _socialLoginService.signInWithGoogle(context);
+                  if (result != null && mounted) {
+                    // AuthProvider를 통해 로그인 상태 저장
+                    final authProvider = Provider.of<AuthProvider>(context, listen: false);
+                    final success = await authProvider.socialLogin(result);
+                    
+                    if (success && mounted) {
+                      // 로그인 성공 시 메인 화면으로 이동
+                      Navigator.pushReplacement(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => const MainNavigationScreen(),
+                        ),
+                      );
+                    }
+                  }
                 },
               ),
               const SizedBox(width: 30),
@@ -507,8 +556,17 @@ class _FigmaLoginScreenState extends State<FigmaLoginScreen> {
                     size: 32,
                   ),
                 ),
-                onTap: () {
-                  // 애플 로그인 처리
+                onTap: () async {
+                  final result = await _socialLoginService.signInWithApple(context);
+                  if (result != null && mounted) {
+                    // 로그인 성공 시 메인 화면으로 이동
+                    Navigator.pushReplacement(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => const MainNavigationScreen(),
+                      ),
+                    );
+                  }
                 },
               ),
             ],

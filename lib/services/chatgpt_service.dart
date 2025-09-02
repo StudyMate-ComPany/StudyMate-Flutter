@@ -10,9 +10,9 @@ class ChatGPTService {
 
   final Dio _dio = Dio();
   
-  // OpenAI API 설정
-  static const String _apiUrl = 'https://api.openai.com/v1/chat/completions';
-  static String get _apiKey => dotenv.env['OPENAI_API_KEY'] ?? 'YOUR_OPENAI_API_KEY';
+  // EC2 서버를 통한 API 호출 설정
+  static const String _apiUrl = 'http://54.161.77.144/api/ai/chat';
+  static String get _apiKey => 'not_needed_for_server';
   
   /// 학습 문제 생성
   Future<Map<String, dynamic>> generateQuizQuestions({

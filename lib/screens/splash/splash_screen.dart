@@ -3,7 +3,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../onboarding/onboarding_screen.dart';
-import '../auth/modern_login_screen.dart';
+import '../home/guest_main_screen.dart';
 
 class SplashScreen extends StatefulWidget {
   const SplashScreen({super.key});
@@ -86,12 +86,12 @@ class _SplashScreenState extends State<SplashScreen>
           ),
         );
       } else {
-        // 온보딩을 완료한 사용자는 로그인 화면으로 이동
-        print('🎯 [SplashScreen] 로그인 화면으로 이동');
+        // 온보딩을 완료한 사용자는 게스트 메인 화면으로 이동
+        print('🎯 [SplashScreen] 게스트 메인 화면으로 이동');
         Navigator.pushReplacement(
           context,
           PageRouteBuilder(
-            pageBuilder: (context, animation, secondaryAnimation) => const ModernLoginScreen(),
+            pageBuilder: (context, animation, secondaryAnimation) => const GuestMainScreen(),
             transitionsBuilder: (context, animation, secondaryAnimation, child) {
               return FadeTransition(opacity: animation, child: child);
             },

@@ -48,9 +48,9 @@ class _ModernRegisterScreenState extends State<ModernRegisterScreen> {
       
       final authProvider = Provider.of<AuthProvider>(context, listen: false);
       final success = await authProvider.register(
+        _nameController.text.trim(),
         _emailController.text.trim(),
         _passwordController.text,
-        _nameController.text.trim(),
         termsAccepted: _agreeToTerms,
         privacyAccepted: _agreeToPrivacy,
       );

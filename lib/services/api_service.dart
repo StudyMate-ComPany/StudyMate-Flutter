@@ -241,6 +241,24 @@ class ApiService {
     });
   }
 
+  Future<Map<String, dynamic>> requestPasswordReset(String email) async {
+    return _makeRequest('POST', '/api/auth/password-reset/', data: {
+      'email': email,
+    });
+  }
+
+  Future<Map<String, dynamic>> confirmPasswordReset({
+    required String token,
+    required String password,
+    required String passwordConfirm,
+  }) async {
+    return _makeRequest('POST', '/api/auth/password-reset/confirm/', data: {
+      'token': token,
+      'password': password,
+      'password_confirm': passwordConfirm,
+    });
+  }
+
   // User endpoints
   Future<User> getCurrentUser() async {
     try {
@@ -513,5 +531,24 @@ class ApiService {
 
   Future<Map<String, dynamic>> getStudyStatistics({DateTime? startDate, DateTime? endDate}) async {
     return getStatistics();
+  }
+  
+  // 소셜 로그인
+  Future<Map<String, dynamic>> socialLogin(Map<String, dynamic> socialData) async {
+    try {
+      debugPrint('🔐 [API] Social login request: ${socialData['provider']}');
+      
+      final response = await _dio.post(
+        '/api/auth/social/login/',
+        data: socialData,
+      );
+      
+      debugPrint('✅ [API] Social login successful');
+      return response.data;
+    } on DioException catch (e) {
+      debugPrint('❌ [API] Social login failed: ${e.message}');
+      _handleDioError(e);
+      rethrow;
+    }
   }
 }

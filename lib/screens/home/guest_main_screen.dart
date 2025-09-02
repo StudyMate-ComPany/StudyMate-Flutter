@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_svg/flutter_svg.dart';
-import '../auth/modern_login_screen.dart';
+import '../auth/figma_login_screen.dart';
 
 class GuestMainScreen extends StatefulWidget {
   const GuestMainScreen({super.key});
@@ -171,7 +171,7 @@ class _GuestMainScreenState extends State<GuestMainScreen> {
                       Navigator.push(
                         context,
                         MaterialPageRoute(
-                          builder: (context) => const ModernLoginScreen(),
+                          builder: (context) => const FigmaLoginScreen(),
                         ),
                       );
                     },

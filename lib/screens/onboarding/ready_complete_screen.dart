@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_animate/flutter_animate.dart';
-import '../auth/modern_login_screen.dart';
+import '../home/guest_main_screen.dart';
 
 class ReadyCompleteScreen extends StatefulWidget {
   const ReadyCompleteScreen({super.key});
@@ -27,7 +27,7 @@ class _ReadyCompleteScreenState extends State<ReadyCompleteScreen> {
       context,
       PageRouteBuilder(
         pageBuilder: (context, animation, secondaryAnimation) => 
-          const ModernLoginScreen(),
+          const GuestMainScreen(),
         transitionsBuilder: (context, animation, secondaryAnimation, child) {
           return FadeTransition(opacity: animation, child: child);
         },

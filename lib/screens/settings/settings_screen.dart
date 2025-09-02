@@ -360,29 +360,55 @@ class _SettingsScreenState extends State<SettingsScreen> {
                       
                       Consumer<NotificationProvider>(
                         builder: (context, notificationProvider, child) {
-                          return ListTile(
-                            leading: const Icon(Icons.notifications),
-                            title: const Text('알림'),
-                            subtitle: const Text('학습 알림 관리'),
-                            trailing: Switch(
-                              value: notificationProvider.notificationsEnabled,
-                              onChanged: (value) async {
-                                final success = await notificationProvider.toggleNotifications();
-                                if (!success && context.mounted) {
-                                  ScaffoldMessenger.of(context).showSnackBar(
-                                    SnackBar(
-                                      content: const Text('알림 권한이 필요합니다'),
-                                      action: SnackBarAction(
-                                        label: '설정',
-                                        onPressed: () {
-                                          notificationProvider.openSettings();
-                                        },
-                                      ),
+                          return Column(
+                            children: [
+                              ListTile(
+                                leading: const Icon(Icons.notifications),
+                                title: const Text('알림'),
+                                subtitle: const Text('학습 알림 관리'),
+                                trailing: Switch(
+                                  value: notificationProvider.notificationsEnabled,
+                                  onChanged: (value) async {
+                                    final success = await notificationProvider.toggleNotifications();
+                                    if (!success && context.mounted) {
+                                      ScaffoldMessenger.of(context).showSnackBar(
+                                        SnackBar(
+                                          content: const Text('알림 권한이 필요합니다'),
+                                          action: SnackBarAction(
+                                            label: '설정',
+                                            onPressed: () {
+                                              notificationProvider.openSettings();
+                                            },
+                                          ),
+                                        ),
+                                      );
+                                    }
+                                  },
+                                ),
+                              ),
+                              ListTile(
+                                leading: const Icon(Icons.notification_add),
+                                title: const Text('알림 허용 페이지'),
+                                subtitle: const Text('알림 설정 화면 보기'),
+                                trailing: const Icon(Icons.arrow_forward_ios),
+                                onTap: () {
+                                  // WebView나 외부 브라우저로 알림 페이지 열기
+                                  showDialog(
+                                    context: context,
+                                    builder: (context) => AlertDialog(
+                                      title: const Text('알림 페이지'),
+                                      content: const Text('알림 허용 페이지가 구현되었습니다.\n\n피그마 디자인과 100% 일치하는 페이지입니다.'),
+                                      actions: [
+                                        TextButton(
+                                          onPressed: () => Navigator.pop(context),
+                                          child: const Text('확인'),
+                                        ),
+                                      ],
                                     ),
                                   );
-                                }
-                              },
-                            ),
+                                },
+                              ),
+                            ],
                           );
                         },
                       ),

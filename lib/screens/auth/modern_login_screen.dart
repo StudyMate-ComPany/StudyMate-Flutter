@@ -6,6 +6,9 @@ import '../../providers/auth_provider.dart';
 import '../../theme/studymate_theme.dart';
 import '../../widgets/korean_enabled_text_field.dart';
 import 'modern_register_screen.dart';
+import 'id_frame_screen.dart';
+import 'password_reset_screen.dart';
+import 'password_reset_screen.dart';
 
 class ModernLoginScreen extends StatefulWidget {
   const ModernLoginScreen({super.key});
@@ -46,34 +49,41 @@ class _ModernLoginScreenState extends State<ModernLoginScreen> with TickerProvid
     if (_formKey.currentState!.validate()) {
       HapticFeedback.mediumImpact();
       
-      setState(() {
-        _isLoading = true;
-      });
-      
-      final authProvider = Provider.of<AuthProvider>(context, listen: false);
-      final success = await authProvider.login(
-        _emailController.text.trim(),
-        _passwordController.text,
+      // ID 프레임 화면으로 이동 (이메일만 전달)
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (context) => const IdFrameScreen(),
+        ),
       );
-      
-      setState(() {
-        _isLoading = false;
-      });
-      
-      if (!mounted) return;
-      
-      if (!success) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text(authProvider.errorMessage ?? '로그인에 실패했습니다'),
-            backgroundColor: StudyMateTheme.accentPink,
-            behavior: SnackBarBehavior.floating,
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(12),
-            ),
+    }
+  }
+  
+  Future<void> _handleSocialLogin(String provider) async {
+    setState(() {
+      _isLoading = true;
+    });
+    
+    final authProvider = Provider.of<AuthProvider>(context, listen: false);
+    final success = await authProvider.socialLogin(provider);
+    
+    setState(() {
+      _isLoading = false;
+    });
+    
+    if (!mounted) return;
+    
+    if (!success) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(authProvider.errorMessage ?? '$provider 로그인에 실패했습니다'),
+          backgroundColor: StudyMateTheme.accentPink,
+          behavior: SnackBarBehavior.floating,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(12),
           ),
-        );
-      }
+        ),
+      );
     }
   }
   
@@ -361,7 +371,12 @@ class _ModernLoginScreenState extends State<ModernLoginScreen> with TickerProvid
               TextButton(
                 onPressed: () {
                   HapticFeedback.lightImpact();
-                  // TODO: 비밀번호 찾기 화면으로 이동
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => const PasswordResetScreen(),
+                    ),
+                  );
                 },
                 child: Text(
                   '비밀번호 찾기',
@@ -455,27 +470,36 @@ class _ModernLoginScreenState extends State<ModernLoginScreen> with TickerProvid
             _buildSocialButton(
               icon: Icons.g_mobiledata,
               color: const Color(0xFF4285F4),
-              onTap: () {
+              onTap: () async {
                 HapticFeedback.lightImpact();
-                // TODO: Google 로그인
+                await _handleSocialLogin('google');
               },
             ),
             const SizedBox(width: 12),
             _buildSocialButton(
               icon: Icons.apple,
               color: Colors.black,
-              onTap: () {
+              onTap: () async {
                 HapticFeedback.lightImpact();
-                // TODO: Apple 로그인
+                await _handleSocialLogin('apple');
               },
             ),
             const SizedBox(width: 12),
             _buildSocialButton(
               icon: Icons.chat_bubble,
               color: const Color(0xFFFEE500),
-              onTap: () {
+              onTap: () async {
                 HapticFeedback.lightImpact();
-                // TODO: Kakao 로그인
+                await _handleSocialLogin('kakao');
+              },
+            ),
+            const SizedBox(width: 12),
+            _buildSocialButton(
+              icon: Icons.language,
+              color: const Color(0xFF03C75A),
+              onTap: () async {
+                HapticFeedback.lightImpact();
+                await _handleSocialLogin('naver');
               },
             ),
           ],

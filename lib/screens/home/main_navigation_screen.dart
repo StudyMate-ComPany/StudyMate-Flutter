@@ -242,28 +242,31 @@ class _MainNavigationScreenState extends State<MainNavigationScreen>
             : Colors.transparent,
           borderRadius: BorderRadius.circular(15),
         ),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Icon(
-              icon,
-              color: isSelected 
-                ? StudyMateTheme.primaryBlue 
-                : Colors.grey.shade400,
-              size: 24,
-            ),
-            const SizedBox(height: 4),
-            Text(
-              label,
-              style: TextStyle(
+        child: FittedBox(
+          fit: BoxFit.scaleDown,
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Icon(
+                icon,
                 color: isSelected 
                   ? StudyMateTheme.primaryBlue 
                   : Colors.grey.shade400,
-                fontSize: 12,
-                fontWeight: isSelected ? FontWeight.w600 : FontWeight.w400,
+                size: 24,
               ),
-            ),
-          ],
+              const SizedBox(height: 2),
+                Text(
+                  label,
+                  style: TextStyle(
+                    color: isSelected 
+                    ? StudyMateTheme.primaryBlue 
+                    : Colors.grey.shade400,
+                  fontSize: 12,
+                  fontWeight: isSelected ? FontWeight.w600 : FontWeight.w400,
+                ),
+              ),
+            ],
+          ),
         ),
       ).animate()
         .fadeIn(duration: 300.ms, delay: (index * 100).ms)

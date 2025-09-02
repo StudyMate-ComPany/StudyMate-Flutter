@@ -51,6 +51,45 @@ class AuthProvider with ChangeNotifier {
     }
   }
 
+  // SNS 로그인
+  Future<bool> socialLogin(Map<String, dynamic> socialUserData) async {
+    try {
+      _setState(AuthState.loading);
+      debugPrint('🔐 AuthProvider: Starting social login');
+      debugPrint('📱 Provider: ${socialUserData['provider']}');
+      
+      // 백엔드 API로 소셜 로그인 정보 전송
+      // 실제 백엔드 연동 시 아래 주석 해제
+      // final response = await _apiService.socialLogin(socialUserData);
+      
+      // 임시 로컬 처리 (백엔드 연동 전)
+      final testUser = User(
+        id: socialUserData['id'] ?? DateTime.now().millisecondsSinceEpoch.toString(),
+        email: socialUserData['email'] ?? '${socialUserData['provider']}@studymate.com',
+        name: socialUserData['name'] ?? '${socialUserData['provider']} 사용자',
+        bio: '${socialUserData['provider']} 로그인 사용자',
+        avatarUrl: socialUserData['profileImage'],
+        createdAt: DateTime.now(),
+        lastLoginAt: DateTime.now(),
+      );
+      
+      // 임시 토큰 생성
+      final token = 'social_${socialUserData['provider']}_${DateTime.now().millisecondsSinceEpoch}';
+      
+      await LocalStorageService.saveAuthToken(token);
+      _apiService.setAuthToken(token);
+      _user = testUser;
+      await LocalStorageService.saveUser(testUser);
+      
+      debugPrint('✅ Social login successful');
+      _setState(AuthState.authenticated);
+      return true;
+    } catch (e) {
+      _setError('소셜 로그인에 실패했습니다: $e');
+      return false;
+    }
+  }
+
   Future<bool> login(String email, String password) async {
     try {
       _setState(AuthState.loading);
@@ -224,6 +263,26 @@ class AuthProvider with ChangeNotifier {
       notifyListeners();
     } catch (e) {
       debugPrint('Failed to refresh user data: $e');
+    }
+  }
+
+  Future<bool> requestPasswordReset(String email) async {
+    try {
+      _setState(AuthState.loading);
+      debugPrint('🔐 AuthProvider: Starting password reset request for $email');
+      
+      // TEST MODE: Always succeed for UI testing
+      debugPrint('🧪 TEST MODE: Mock password reset success');
+      
+      await Future.delayed(const Duration(seconds: 2)); // Simulate API call
+      debugPrint('✅ Password reset email sent successfully');
+      
+      _setState(AuthState.unauthenticated);
+      return true;
+    } catch (e) {
+      debugPrint('❌ Password reset error: $e');
+      _setError('비밀번호 재설정 요청에 실패했습니다: $e');
+      return false;
     }
   }
 
