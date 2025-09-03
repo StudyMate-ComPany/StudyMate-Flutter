@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:provider/provider.dart';
 import '../auth/figma_login_screen.dart';
+import '../../providers/auth_provider.dart';
 
 class GuestMainScreen extends StatefulWidget {
   const GuestMainScreen({super.key});
@@ -22,6 +24,10 @@ class _GuestMainScreenState extends State<GuestMainScreen> {
         statusBarBrightness: Brightness.light,
       ),
     );
+    
+    // AuthProvider로 로그인 상태 확인
+    final authProvider = Provider.of<AuthProvider>(context);
+    final isLoggedIn = authProvider.isAuthenticated;
 
     return Scaffold(
       backgroundColor: Colors.white,
@@ -52,26 +58,67 @@ class _GuestMainScreenState extends State<GuestMainScreen> {
                       height: 1.2,
                     ),
                   ),
-                  // 알림 아이콘
-                  Container(
-                    width: 36,
-                    height: 36,
-                    child: IconButton(
-                      padding: EdgeInsets.zero,
-                      icon: const Icon(
-                        Icons.notifications_outlined,
-                        size: 24,
-                        color: Color(0xFF70C4DE),
-                      ),
-                      onPressed: () {
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          const SnackBar(
-                            content: Text('로그인이 필요한 서비스입니다'),
-                            duration: Duration(seconds: 2),
+                  // 알림 아이콘과 임시 로그아웃 버튼
+                  Row(
+                    children: [
+                      // 임시 로그아웃 버튼 (로그인된 경우에만 표시)
+                      if (isLoggedIn) 
+                        Container(
+                          width: 36,
+                          height: 36,
+                          margin: const EdgeInsets.only(right: 8),
+                          child: IconButton(
+                            padding: EdgeInsets.zero,
+                            icon: const Icon(
+                              Icons.logout,
+                              size: 24,
+                              color: Colors.red,
+                            ),
+                            onPressed: () async {
+                              // 로그아웃 처리
+                              await authProvider.logout();
+                              if (mounted) {
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                  const SnackBar(
+                                    content: Text('로그아웃되었습니다'),
+                                    duration: Duration(seconds: 2),
+                                  ),
+                                );
+                              }
+                            },
                           ),
-                        );
-                      },
-                    ),
+                        ),
+                      // 알림 아이콘
+                      Container(
+                        width: 36,
+                        height: 36,
+                        child: IconButton(
+                          padding: EdgeInsets.zero,
+                          icon: const Icon(
+                            Icons.notifications_outlined,
+                            size: 24,
+                            color: Color(0xFF70C4DE),
+                          ),
+                          onPressed: () {
+                            if (isLoggedIn) {
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                const SnackBar(
+                                  content: Text('알림이 없습니다'),
+                                  duration: Duration(seconds: 2),
+                                ),
+                              );
+                            } else {
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                const SnackBar(
+                                  content: Text('로그인이 필요한 서비스입니다'),
+                                  duration: Duration(seconds: 2),
+                                ),
+                              );
+                            }
+                          },
+                        ),
+                      ),
+                    ],
                   ),
                 ],
               ),
@@ -96,7 +143,7 @@ class _GuestMainScreenState extends State<GuestMainScreen> {
                   ),
                 ),
                 
-                // 캐릭터와 메시지 - 회색 박스 내부 중앙
+                // 캐릭터와 메시지 - 회색 박스 내부 중앙 (로그인 상태에 따라 다른 메시지)
                 Positioned(
                   left: 40,
                   right: 40,
@@ -133,9 +180,9 @@ class _GuestMainScreenState extends State<GuestMainScreen> {
                           crossAxisAlignment: CrossAxisAlignment.start,
                           mainAxisSize: MainAxisSize.min,
                           children: [
-                            const Text(
-                              '아직 로그인을 하지 않으셨네요!',
-                              style: TextStyle(
+                            Text(
+                              isLoggedIn ? '환영합니다! 학습을 시작해볼까요?' : '아직 로그인을 하지 않으셨네요!',
+                              style: const TextStyle(
                                 fontFamily: 'Pretendard',
                                 fontSize: 18,
                                 fontWeight: FontWeight.w600,
@@ -144,9 +191,11 @@ class _GuestMainScreenState extends State<GuestMainScreen> {
                               ),
                             ),
                             const SizedBox(height: 5),
-                            const Text(
-                              '로그인 후 스터디메이트와 함께 학습하세요',
-                              style: TextStyle(
+                            Text(
+                              isLoggedIn 
+                                ? '스터디메이트와 함께 효율적인 학습을 시작하세요' 
+                                : '로그인 후 스터디메이트와 함께 학습하세요',
+                              style: const TextStyle(
                                 fontFamily: 'Pretendard',
                                 fontSize: 13,
                                 fontWeight: FontWeight.w400,
@@ -161,38 +210,49 @@ class _GuestMainScreenState extends State<GuestMainScreen> {
                   ),
                 ),
                 
-                // 로그인 버튼 - 회색 박스 아래
+                // 로그인/학습 시작 버튼 - 회색 박스 아래
                 Positioned(
                   left: 30,
                   right: 30,
                   top: 140,
                   child: GestureDetector(
                     onTap: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => const FigmaLoginScreen(),
-                        ),
-                      );
+                      if (isLoggedIn) {
+                        // 로그인된 사용자는 학습 화면으로 (예: 퀴즈, 포모도로 등)
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          const SnackBar(
+                            content: Text('학습 기능을 준비 중입니다'),
+                            duration: Duration(seconds: 2),
+                          ),
+                        );
+                      } else {
+                        // 로그인 안 한 사용자는 로그인 화면으로
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => const FigmaLoginScreen(),
+                          ),
+                        );
+                      }
                     },
                     child: Container(
                       height: 60,
                       decoration: BoxDecoration(
-                        color: Colors.white,
+                        color: isLoggedIn ? const Color(0xFF70C4DE) : Colors.white,
                         borderRadius: BorderRadius.circular(16),
                         border: Border.all(
-                          color: const Color(0xFFE0E0E0),
+                          color: isLoggedIn ? const Color(0xFF70C4DE) : const Color(0xFFE0E0E0),
                           width: 1,
                         ),
                       ),
-                      child: const Center(
+                      child: Center(
                         child: Text(
-                          '로그인 또는 회원가입 하기',
+                          isLoggedIn ? '학습 시작하기' : '로그인 또는 회원가입 하기',
                           style: TextStyle(
                             fontFamily: 'Pretendard',
                             fontSize: 16,
                             fontWeight: FontWeight.w600,
-                            color: Color(0xFF555555),
+                            color: isLoggedIn ? Colors.white : const Color(0xFF555555),
                             height: 1.5,
                           ),
                         ),
@@ -243,20 +303,34 @@ class _GuestMainScreenState extends State<GuestMainScreen> {
 
   Widget _buildNavItemWithCustomIcon(int index, Widget Function(bool) iconBuilder, String label) {
     final isSelected = _selectedIndex == index;
+    final authProvider = Provider.of<AuthProvider>(context);
+    final isLoggedIn = authProvider.isAuthenticated;
     
     return GestureDetector(
       onTap: () {
-        setState(() {
-          _selectedIndex = index;
-        });
-        
-        if (index != 0) {
+        if (index != 0 && !isLoggedIn) {
+          // 로그인하지 않은 경우 탭 선택 안 함
           ScaffoldMessenger.of(context).showSnackBar(
             const SnackBar(
               content: Text('로그인이 필요한 서비스입니다'),
               duration: Duration(seconds: 2),
             ),
           );
+        } else {
+          // 홈 탭이거나 로그인된 경우에만 탭 선택
+          setState(() {
+            _selectedIndex = index;
+          });
+          
+          if (index != 0 && isLoggedIn) {
+            // 로그인된 사용자는 해당 기능 사용 가능
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(
+                content: Text('$label 기능을 준비 중입니다'),
+                duration: const Duration(seconds: 2),
+              ),
+            );
+          }
         }
       },
       child: Container(

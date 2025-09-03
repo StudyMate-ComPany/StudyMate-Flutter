@@ -5,7 +5,8 @@ import 'package:flutter_animate/flutter_animate.dart';
 import '../../providers/auth_provider.dart';
 import '../../theme/studymate_theme.dart';
 import '../../widgets/korean_enabled_text_field.dart';
-import '../home/new_home_screen.dart';
+import 'terms_of_service_screen.dart';
+import 'studymate_ready_screen.dart';
 
 class ModernRegisterScreen extends StatefulWidget {
   const ModernRegisterScreen({super.key});
@@ -23,8 +24,6 @@ class _ModernRegisterScreenState extends State<ModernRegisterScreen> {
   
   bool _isPasswordVisible = false;
   bool _isConfirmPasswordVisible = false;
-  bool _agreeToTerms = false;
-  bool _agreeToPrivacy = false;
   bool _isLoading = false;
   
   int _currentStep = 0;
@@ -39,56 +38,60 @@ class _ModernRegisterScreenState extends State<ModernRegisterScreen> {
   }
   
   Future<void> _handleRegister() async {
-    if (_formKey.currentState!.validate() && _agreeToTerms && _agreeToPrivacy) {
-      HapticFeedback.mediumImpact();
-      
-      setState(() {
-        _isLoading = true;
-      });
-      
+    if (_formKey.currentState!.validate()) {
+      // BuildContext와 필요한 서비스들을 미리 저장
+      final navigatorState = Navigator.of(context);
+      final scaffoldState = ScaffoldMessenger.of(context);
       final authProvider = Provider.of<AuthProvider>(context, listen: false);
-      final success = await authProvider.register(
-        _nameController.text.trim(),
-        _emailController.text.trim(),
-        _passwordController.text,
-        termsAccepted: _agreeToTerms,
-        privacyAccepted: _agreeToPrivacy,
-      );
+      final name = _nameController.text.trim();
+      final email = _emailController.text.trim();
+      final password = _passwordController.text;
       
-      setState(() {
-        _isLoading = false;
-      });
-      
-      if (!mounted) return;
-      
-      if (success) {
-        // 회원가입 성공 시 바로 메인 화면으로 이동 (AuthProvider에서 이미 자동 로그인 처리됨)
-        Navigator.of(context).pushAndRemoveUntil(
-          MaterialPageRoute(
-            builder: (context) => const NewHomeScreen(),
-          ),
-          (route) => false, // 모든 이전 화면을 스택에서 제거하여 뒤로가기 방지
-        );
-      } else {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text(authProvider.errorMessage ?? '회원가입에 실패했습니다'),
-            backgroundColor: StudyMateTheme.accentPink,
-            behavior: SnackBarBehavior.floating,
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(12),
-            ),
-          ),
-        );
-      }
-    } else if (!_agreeToTerms || !_agreeToPrivacy) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: const Text('약관에 동의해주세요'),
-          backgroundColor: StudyMateTheme.accentPink,
-          behavior: SnackBarBehavior.floating,
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(12),
+      // 먼저 이용약관 동의 화면으로 이동
+      navigatorState.push(
+        MaterialPageRoute(
+          builder: (context) => TermsOfServiceScreen(
+            onAgreementComplete: () async {
+              // 약관 동의 완료 후 회원가입 진행
+              HapticFeedback.mediumImpact();
+              
+              setState(() {
+                _isLoading = true;
+              });
+              
+              final success = await authProvider.register(
+                name,
+                email,
+                password,
+                termsAccepted: true,
+                privacyAccepted: true,
+              );
+              
+              setState(() {
+                _isLoading = false;
+              });
+              
+              if (success) {
+                // 회원가입 성공 시 준비 완료 화면으로 이동
+                navigatorState.pushAndRemoveUntil(
+                  MaterialPageRoute(
+                    builder: (context) => const StudyMateReadyScreen(),
+                  ),
+                  (route) => false,
+                );
+              } else {
+                scaffoldState.showSnackBar(
+                  SnackBar(
+                    content: Text(authProvider.errorMessage ?? '회원가입에 실패했습니다'),
+                    backgroundColor: StudyMateTheme.accentPink,
+                    behavior: SnackBarBehavior.floating,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                  ),
+                );
+              }
+            },
           ),
         ),
       );
@@ -151,9 +154,6 @@ class _ModernRegisterScreenState extends State<ModernRegisterScreen> {
               _buildRegisterForm(),
               
               const SizedBox(height: 24),
-              
-              // Terms Agreement
-              _buildTermsAgreement(),
               
               const SizedBox(height: 32),
               
@@ -443,160 +443,17 @@ class _ModernRegisterScreenState extends State<ModernRegisterScreen> {
     );
   }
   
-  Widget _buildTermsAgreement() {
-    return Container(
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(16),
-        boxShadow: [
-          BoxShadow(
-            color: StudyMateTheme.primaryBlue.withOpacity(0.08),
-            blurRadius: 20,
-            offset: const Offset(0, 4),
-          ),
-        ],
-      ),
-      child: Column(
-        children: [
-          // 전체 동의
-          InkWell(
-            onTap: () {
-              setState(() {
-                final newValue = !(_agreeToTerms && _agreeToPrivacy);
-                _agreeToTerms = newValue;
-                _agreeToPrivacy = newValue;
-              });
-            },
-            borderRadius: BorderRadius.circular(12),
-            child: Container(
-              padding: const EdgeInsets.all(12),
-              decoration: BoxDecoration(
-                color: (_agreeToTerms && _agreeToPrivacy)
-                    ? StudyMateTheme.primaryBlue.withOpacity(0.1)
-                    : Colors.grey[50],
-                borderRadius: BorderRadius.circular(12),
-              ),
-              child: Row(
-                children: [
-                  Icon(
-                    (_agreeToTerms && _agreeToPrivacy)
-                        ? Icons.check_circle
-                        : Icons.check_circle_outline,
-                    color: (_agreeToTerms && _agreeToPrivacy)
-                        ? StudyMateTheme.primaryBlue
-                        : Colors.grey[400],
-                    size: 24,
-                  ),
-                  const SizedBox(width: 12),
-                  const Text(
-                    '전체 동의',
-                    style: TextStyle(
-                      fontSize: 16,
-                      fontWeight: FontWeight.w700,
-                      color: StudyMateTheme.darkNavy,
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          ),
-          
-          const SizedBox(height: 8),
-          const Divider(height: 1),
-          const SizedBox(height: 8),
-          
-          // 이용약관
-          _buildCheckboxItem(
-            value: _agreeToTerms,
-            onChanged: (value) {
-              setState(() {
-                _agreeToTerms = value ?? false;
-              });
-            },
-            title: '[필수] 이용약관 동의',
-            onTap: () {
-              // TODO: 이용약관 보기
-            },
-          ),
-          
-          // 개인정보처리방침
-          _buildCheckboxItem(
-            value: _agreeToPrivacy,
-            onChanged: (value) {
-              setState(() {
-                _agreeToPrivacy = value ?? false;
-              });
-            },
-            title: '[필수] 개인정보처리방침 동의',
-            onTap: () {
-              // TODO: 개인정보처리방침 보기
-            },
-          ),
-        ],
-      ),
-    ).animate()
-      .fadeIn(delay: 800.ms, duration: 600.ms)
-      .slideY(begin: 0.1, end: 0);
-  }
-  
-  Widget _buildCheckboxItem({
-    required bool value,
-    required ValueChanged<bool?> onChanged,
-    required String title,
-    required VoidCallback onTap,
-  }) {
-    return InkWell(
-      onTap: () => onChanged(!value),
-      borderRadius: BorderRadius.circular(8),
-      child: Padding(
-        padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 4),
-        child: Row(
-          children: [
-            SizedBox(
-              width: 24,
-              height: 24,
-              child: Checkbox(
-                value: value,
-                onChanged: onChanged,
-                activeColor: StudyMateTheme.primaryBlue,
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(4),
-                ),
-              ),
-            ),
-            const SizedBox(width: 12),
-            Expanded(
-              child: Text(
-                title,
-                style: const TextStyle(
-                  fontSize: 14,
-                  color: StudyMateTheme.darkNavy,
-                ),
-              ),
-            ),
-            IconButton(
-              onPressed: onTap,
-              icon: const Icon(
-                Icons.arrow_forward_ios,
-                size: 16,
-                color: StudyMateTheme.grayText,
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-  
   Widget _buildRegisterButton() {
-    final isValid = _agreeToTerms && _agreeToPrivacy;
+    final isValid = _nameController.text.isNotEmpty &&
+                    _emailController.text.isNotEmpty &&
+                    _passwordController.text.isNotEmpty &&
+                    _confirmPasswordController.text.isNotEmpty;
     
     return SizedBox(
       width: double.infinity,
       height: 56,
       child: ElevatedButton(
-        onPressed: (_isLoading || !isValid) ? null : _handleRegister,
+        onPressed: _isLoading ? null : _handleRegister,
         style: ElevatedButton.styleFrom(
           backgroundColor: isValid ? StudyMateTheme.primaryBlue : Colors.grey[300],
           foregroundColor: Colors.white,

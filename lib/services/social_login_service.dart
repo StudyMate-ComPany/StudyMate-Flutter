@@ -78,10 +78,8 @@ class SocialLoginService {
           debugPrint('🌐 [SocialLogin] Attempting Kakao account login (no KakaoTalk)...');
           debugPrint('📍 [Debug] Calling loginWithKakaoAccount...');
           
-          // 명시적으로 스코프 지정
-          final OAuthToken token = await UserApi.instance.loginWithKakaoAccount(
-            prompts: [Prompt.login], // 항상 로그인 프롬프트 표시
-          );
+          // 카카오 계정으로 로그인
+          final OAuthToken token = await UserApi.instance.loginWithKakaoAccount();
           debugPrint('✅ [SocialLogin] Kakao account login successful');
           debugPrint('✅ [Debug] Token received from Kakao');
           debugPrint('🔑 [Response] Access Token: ${token.accessToken}');

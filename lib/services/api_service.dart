@@ -59,7 +59,7 @@ class ApiService {
     _dio.interceptors.add(InterceptorsWrapper(
       onRequest: (options, handler) {
         // 회원가입과 로그인 엔드포인트에서는 Authorization 헤더를 보내지 않음
-        final publicEndpoints = ['/api/auth/register/', '/api/auth/login/', '/api/auth/refresh/'];
+        final publicEndpoints = ['/api/auth/register/', '/api/auth/login/', '/api/auth/refresh/', '/api/auth/social/login/'];
         final isPublicEndpoint = publicEndpoints.any((endpoint) => options.path.contains(endpoint));
         
         if (_authToken != null && !isPublicEndpoint) {
@@ -191,7 +191,7 @@ class ApiService {
         'username': finalUsername,
         'password': password,
         'password_confirm': passwordConfirm ?? password,
-        'name': name,  // API expects name field
+        'profile_name': name,  // Add profile_name field for server compatibility
         'terms_accepted': termsAccepted,
         'privacy_accepted': privacyAccepted,
       });
@@ -315,7 +315,7 @@ class ApiService {
         return User.fromJson(response);
       } catch (_) {
         // Fallback to alternative endpoint
-        final response = await _makeRequest('GET', '/api/user/');
+        final response = await _makeRequest('GET', '/api/users/');
         return User.fromJson(response);
       }
     } catch (e) {
@@ -333,7 +333,7 @@ class ApiService {
   }
 
   Future<User> updateProfile(Map<String, dynamic> data) async {
-    final response = await _makeRequest('PUT', '/api/user/profile/', data: data);
+    final response = await _makeRequest('PUT', '/api/users/profile/', data: data);
     return User.fromJson(response);
   }
 

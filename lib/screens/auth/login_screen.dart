@@ -8,6 +8,7 @@ import '../../providers/auth_provider.dart';
 import '../../services/social_login_service.dart';
 import '../home/main_navigation_screen.dart';
 import 'signup_screen.dart';
+import 'login_success_screen.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -67,7 +68,7 @@ class _LoginScreenState extends State<LoginScreen> {
           Navigator.pushReplacement(
             context,
             MaterialPageRoute(
-              builder: (context) => const MainNavigationScreen(),
+              builder: (context) => const LoginSuccessScreen(),
             ),
           );
         } else {
@@ -136,11 +137,11 @@ class _LoginScreenState extends State<LoginScreen> {
 
         if (mounted) {
           if (success) {
-            debugPrint('🚀 [LoginScreen] Login successful, navigating to MainNavigationScreen...');
+            debugPrint('🚀 [LoginScreen] Login successful, navigating to LoginSuccessScreen...');
             Navigator.pushReplacement(
               context,
               MaterialPageRoute(
-                builder: (context) => const MainNavigationScreen(),
+                builder: (context) => const LoginSuccessScreen(),
               ),
             );
           } else {

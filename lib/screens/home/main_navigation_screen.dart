@@ -7,6 +7,7 @@ import 'learning_dashboard.dart';
 import '../study/quiz_screen.dart';
 import '../study/pomodoro_timer_screen.dart';
 import '../auth/login_screen.dart';
+import '../profile/profile_screen.dart';
 
 class MainNavigationScreen extends StatefulWidget {
   const MainNavigationScreen({super.key});
@@ -24,12 +25,14 @@ class _MainNavigationScreenState extends State<MainNavigationScreen>
     const LearningDashboard(),
     const QuizScreen(subject: 'AI 생성 퀴즈'),
     const PomodoroTimerScreen(subject: '집중 학습'),
+    const ProfileScreen(),
   ];
 
   final List<String> _titles = [
     'StudyMate',
     'AI 퀴즈',
     '포모도로',
+    '내 프로필',
   ];
 
   @override
@@ -208,13 +211,18 @@ class _MainNavigationScreenState extends State<MainNavigationScreen>
                 ),
                 _buildNavItem(
                   icon: Icons.quiz_rounded,
-                  label: 'AI 퀴즈',
+                  label: '퀴즈',
                   index: 1,
                 ),
                 _buildNavItem(
                   icon: Icons.timer_rounded,
-                  label: '포모도로',
+                  label: '타이머',
                   index: 2,
+                ),
+                _buildNavItem(
+                  icon: Icons.person_rounded,
+                  label: '프로필',
+                  index: 3,
                 ),
               ],
             ),

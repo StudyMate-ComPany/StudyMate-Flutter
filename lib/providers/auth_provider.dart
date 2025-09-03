@@ -25,6 +25,7 @@ class AuthProvider with ChangeNotifier {
     try {
       _setState(AuthState.loading);
       
+      // 저장된 토큰과 사용자 정보 확인
       final token = LocalStorageService.getAuthToken();
       final user = LocalStorageService.getUser();
       
@@ -32,19 +33,23 @@ class AuthProvider with ChangeNotifier {
         _apiService.setAuthToken(token);
         _user = user;
         _setState(AuthState.authenticated);
+        debugPrint('✅ Login state restored - User: ${user.email}');
         
-        // Verify token is still valid by fetching current user
+        // 토큰이 여전히 유효한지 확인 (서버 검증)
         try {
           final currentUser = await _apiService.getCurrentUser();
           _user = currentUser;
           await LocalStorageService.saveUser(currentUser);
+          debugPrint('✅ Token is still valid');
           notifyListeners();
         } catch (e) {
-          // Token is invalid, clear auth data
+          // 토큰이 만료되었거나 유효하지 않으면 로그아웃
+          debugPrint('❌ Token expired or invalid, logging out: $e');
           await logout();
         }
       } else {
         _setState(AuthState.unauthenticated);
+        debugPrint('🔓 No saved login state');
       }
     } catch (e) {
       _setError('인증을 초기화하는데 실패했습니다: $e');
@@ -325,5 +330,26 @@ class AuthProvider with ChangeNotifier {
 
   Future<bool> checkLoginStatus() async {
     return isAuthenticated;
+  }
+
+  // 저장된 토큰과 사용자 정보를 확인하여 인증 상태를 복원하는 메소드
+  Future<void> checkAuthStatus() async {
+    try {
+      final token = LocalStorageService.getAuthToken();
+      final user = LocalStorageService.getUser();
+      
+      if (token != null && user != null) {
+        _apiService.setAuthToken(token);
+        _user = user;
+        _setState(AuthState.authenticated);
+        debugPrint('✅ Auth status restored - User: ${user.email}');
+      } else {
+        _setState(AuthState.unauthenticated);
+        debugPrint('❌ No auth token or user found');
+      }
+    } catch (e) {
+      debugPrint('❌ Failed to check auth status: $e');
+      _setState(AuthState.unauthenticated);
+    }
   }
 }

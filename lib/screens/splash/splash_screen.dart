@@ -2,8 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:provider/provider.dart';
 import '../onboarding/onboarding_screen.dart';
 import '../home/guest_main_screen.dart';
+import '../auth/figma_login_screen.dart';
+import '../../providers/auth_provider.dart';
 
 class SplashScreen extends StatefulWidget {
   const SplashScreen({super.key});
@@ -66,6 +69,11 @@ class _SplashScreenState extends State<SplashScreen>
       final prefs = await SharedPreferences.getInstance();
       final hasCompletedOnboarding = prefs.getBool('hasCompletedOnboarding') ?? false;
       print('📱 [SplashScreen] 온보딩 완료 여부: $hasCompletedOnboarding');
+      
+      // 로그인 여부 확인
+      final authProvider = Provider.of<AuthProvider>(context, listen: false);
+      final isLoggedIn = authProvider.isAuthenticated;
+      print('🔐 [SplashScreen] 로그인 여부: $isLoggedIn');
 
       if (!mounted) {
         print('⚠️ [SplashScreen] Widget이 mounted 상태가 아님 (2차 체크)');
@@ -86,12 +94,25 @@ class _SplashScreenState extends State<SplashScreen>
           ),
         );
       } else {
-        // 온보딩을 완료한 사용자는 게스트 메인 화면으로 이동
-        print('🎯 [SplashScreen] 게스트 메인 화면으로 이동');
-        Navigator.pushReplacement(
-          context,
-          PageRouteBuilder(
-            pageBuilder: (context, animation, secondaryAnimation) => const GuestMainScreen(),
+        // 온보딩을 완료한 사용자 - 로그인 여부에 따라 분기
+        if (isLoggedIn) {
+          print('🎯 [SplashScreen] 로그인된 사용자 - 게스트 메인 화면으로 이동');
+          Navigator.pushReplacement(
+            context,
+            PageRouteBuilder(
+              pageBuilder: (context, animation, secondaryAnimation) => const GuestMainScreen(),
+              transitionsBuilder: (context, animation, secondaryAnimation, child) {
+                return FadeTransition(opacity: animation, child: child);
+              },
+              transitionDuration: const Duration(milliseconds: 500),
+            ),
+          );
+        } else {
+          print('🎯 [SplashScreen] 로그인되지 않은 사용자 - 로그인 화면으로 이동');
+          Navigator.pushReplacement(
+            context,
+            PageRouteBuilder(
+              pageBuilder: (context, animation, secondaryAnimation) => const FigmaLoginScreen(),
             transitionsBuilder: (context, animation, secondaryAnimation, child) {
               return FadeTransition(opacity: animation, child: child);
             },
@@ -99,6 +120,7 @@ class _SplashScreenState extends State<SplashScreen>
           ),
         );
       }
+    }
     } catch (e, stackTrace) {
       print('❌ [SplashScreen] 에러 발생: $e');
       print('📍 Stack trace: $stackTrace');
