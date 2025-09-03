@@ -56,8 +56,8 @@ class AuthProvider with ChangeNotifier {
     }
   }
 
-  // SNS 로그인
-  Future<bool> socialLogin(Map<String, dynamic> socialUserData) async {
+  // SNS 로그인 (응답 데이터 포함)
+  Future<Map<String, dynamic>?> socialLoginWithResponse(Map<String, dynamic> socialUserData) async {
     try {
       _setState(AuthState.loading);
       debugPrint('🔐 AuthProvider: Starting social login');
@@ -129,17 +129,26 @@ class AuthProvider with ChangeNotifier {
         
         debugPrint('✅ Social login successful, setting state to authenticated');
         _setState(AuthState.authenticated);
-        return true;
+        
+        // response에 성공 플래그 추가
+        response['success'] = true;
+        return response;
       } else {
         debugPrint('❌ No response from API');
         _setError('소셜 로그인 응답이 없습니다');
-        return false;
+        return null;
       }
     } catch (e) {
       debugPrint('❌ Social login error: $e');
       _setError('소셜 로그인에 실패했습니다: $e');
-      return false;
+      return null;
     }
+  }
+  
+  // SNS 로그인 (기존 메서드 - 호환성 유지)
+  Future<bool> socialLogin(Map<String, dynamic> socialUserData) async {
+    final response = await socialLoginWithResponse(socialUserData);
+    return response != null && response['success'] == true;
   }
 
   Future<bool> login(String email, String password) async {

@@ -209,13 +209,8 @@ class _PrivacyPolicyScreenState extends State<PrivacyPolicyScreen> {
                               Navigator.popUntil(context, (route) => route.isFirst);
                               widget.onAgreementComplete!();
                             } else {
-                              // 콜백이 없으면 기존처럼 준비 화면으로 이동
-                              Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                  builder: (context) => const StudyMateReadyScreen(),
-                                ),
-                              );
+                              // 콜백이 없으면 true를 반환하며 이전 화면으로
+                              Navigator.pop(context, true);
                             }
                           }
                         : null,

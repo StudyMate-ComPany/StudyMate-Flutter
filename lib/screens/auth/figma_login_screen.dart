@@ -6,6 +6,7 @@ import 'modern_register_screen.dart';
 import 'password_reset_screen.dart';
 import 'terms_of_service_screen.dart';
 import 'studymate_ready_screen.dart';
+import '../home/guest_main_screen.dart';
 import '../../services/social_login_service.dart';
 import '../../providers/auth_provider.dart';
 
@@ -41,49 +42,39 @@ class _FigmaLoginScreenState extends State<FigmaLoginScreen> {
       return;
     }
 
-    // BuildContext와 필요한 서비스들을 미리 저장
-    final navigatorState = Navigator.of(context);
-    final scaffoldState = ScaffoldMessenger.of(context);
+    setState(() {
+      _isLoading = true;
+    });
+
     final authProvider = Provider.of<AuthProvider>(context, listen: false);
-    final email = _emailController.text.trim();
-    final password = _passwordController.text;
-    
-    // 먼저 이용약관 동의 화면으로 이동
-    navigatorState.push(
-      MaterialPageRoute(
-        builder: (context) => TermsOfServiceScreen(
-          onAgreementComplete: () async {
-            // 약관 동의 완료 후 이메일 로그인 진행
-            setState(() {
-              _isLoading = true;
-            });
-
-            final success = await authProvider.login(email, password);
-
-            setState(() {
-              _isLoading = false;
-            });
-
-            if (success) {
-              // 로그인 성공 시 준비 완료 화면으로 이동
-              navigatorState.pushAndRemoveUntil(
-                MaterialPageRoute(
-                  builder: (context) => const StudyMateReadyScreen(),
-                ),
-                (route) => false,
-              );
-            } else {
-              scaffoldState.showSnackBar(
-                SnackBar(
-                  content: Text(authProvider.errorMessage ?? '로그인에 실패했습니다'),
-                  duration: const Duration(seconds: 2),
-                ),
-              );
-            }
-          },
-        ),
-      ),
+    final success = await authProvider.login(
+      _emailController.text.trim(),
+      _passwordController.text,
     );
+
+    if (!mounted) return;
+
+    setState(() {
+      _isLoading = false;
+    });
+
+    if (success) {
+      // 로그인 성공 시 메인 화면으로 바로 이동
+      Navigator.pushAndRemoveUntil(
+        context,
+        MaterialPageRoute(
+          builder: (context) => const GuestMainScreen(),
+        ),
+        (route) => false,
+      );
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(authProvider.errorMessage ?? '로그인에 실패했습니다'),
+          duration: const Duration(seconds: 2),
+        ),
+      );
+    }
   }
 
   @override
@@ -463,50 +454,47 @@ class _FigmaLoginScreenState extends State<FigmaLoginScreen> {
                   ),
                 ),
                 onTap: () async {
-                  // BuildContext와 필요한 서비스들을 미리 저장
-                  final navigatorState = Navigator.of(context);
-                  final scaffoldState = ScaffoldMessenger.of(context);
-                  final authProvider = Provider.of<AuthProvider>(context, listen: false);
-                  
-                  // 먼저 이용약관 동의 화면으로 이동
-                  navigatorState.push(
-                    MaterialPageRoute(
-                      builder: (context) => TermsOfServiceScreen(
-                        onAgreementComplete: () async {
-                          // 약관 동의 완료 후 카카오 로그인 진행
-                          debugPrint('🎯 Starting Kakao login after agreement');
-                          
-                          // 여기서는 context가 아닌 navigatorState의 context를 사용
-                          final result = await _socialLoginService.signInWithKakao(navigatorState.context);
-                          
-                          if (result != null) {
-                            debugPrint('✅ Kakao login result received');
-                            final success = await authProvider.socialLogin(result);
-                            
-                            if (success) {
-                              debugPrint('✅ Social login successful, navigating to ready screen');
-                              // 로그인 성공 시 준비 완료 화면으로 이동
-                              navigatorState.pushAndRemoveUntil(
-                                MaterialPageRoute(
-                                  builder: (context) => const StudyMateReadyScreen(),
-                                ),
-                                (route) => false,
-                              );
-                            } else {
-                              scaffoldState.showSnackBar(
-                                const SnackBar(
-                                  content: Text('카카오 로그인에 실패했습니다'),
-                                  duration: Duration(seconds: 2),
-                                ),
-                              );
-                            }
-                          } else {
-                            debugPrint('❌ Kakao login result is null');
-                          }
-                        },
-                      ),
-                    ),
-                  );
+                  final result = await _socialLoginService.signInWithKakao(context);
+                  if (result != null && mounted) {
+                    final authProvider = Provider.of<AuthProvider>(context, listen: false);
+                    
+                    // 신규 가입인지 확인하기 위해 socialLogin의 결과를 확인
+                    final response = await authProvider.socialLoginWithResponse(result);
+                    
+                    if (response != null && response['success'] == true) {
+                      final isNewUser = response['created'] ?? false;
+                      
+                      if (isNewUser && mounted) {
+                        // 신규 가입인 경우 약관 동의 화면으로 이동
+                        Navigator.pushReplacement(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => TermsOfServiceScreen(
+                              onAgreementComplete: () {
+                                // 약관 동의 완료 후 메인 화면으로 이동
+                                Navigator.pushAndRemoveUntil(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (context) => const GuestMainScreen(),
+                                  ),
+                                  (route) => false,
+                                );
+                              },
+                            ),
+                          ),
+                        );
+                      } else if (mounted) {
+                        // 기존 회원인 경우 바로 메인 화면으로 이동
+                        Navigator.pushAndRemoveUntil(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => const GuestMainScreen(),
+                          ),
+                          (route) => false,
+                        );
+                      }
+                    }
+                  }
                 },
               ),
               const SizedBox(width: 30),
@@ -530,43 +518,47 @@ class _FigmaLoginScreenState extends State<FigmaLoginScreen> {
                   ),
                 ),
                 onTap: () async {
-                  // BuildContext와 필요한 서비스들을 미리 저장
-                  final navigatorState = Navigator.of(context);
-                  final scaffoldState = ScaffoldMessenger.of(context);
-                  final authProvider = Provider.of<AuthProvider>(context, listen: false);
-                  
-                  // 먼저 이용약관 동의 화면으로 이동
-                  navigatorState.push(
-                    MaterialPageRoute(
-                      builder: (context) => TermsOfServiceScreen(
-                        onAgreementComplete: () async {
-                          // 약관 동의 완료 후 네이버 로그인 진행
-                          final result = await _socialLoginService.signInWithNaver(navigatorState.context);
-                          
-                          if (result != null) {
-                            final success = await authProvider.socialLogin(result);
-                            
-                            if (success) {
-                              // 로그인 성공 시 준비 완료 화면으로 이동
-                              navigatorState.pushAndRemoveUntil(
-                                MaterialPageRoute(
-                                  builder: (context) => const StudyMateReadyScreen(),
-                                ),
-                                (route) => false,
-                              );
-                            } else {
-                              scaffoldState.showSnackBar(
-                                const SnackBar(
-                                  content: Text('네이버 로그인에 실패했습니다'),
-                                  duration: Duration(seconds: 2),
-                                ),
-                              );
-                            }
-                          }
-                        },
-                      ),
-                    ),
-                  );
+                  final result = await _socialLoginService.signInWithNaver(context);
+                  if (result != null && mounted) {
+                    final authProvider = Provider.of<AuthProvider>(context, listen: false);
+                    
+                    // 신규 가입인지 확인하기 위해 socialLogin의 결과를 확인
+                    final response = await authProvider.socialLoginWithResponse(result);
+                    
+                    if (response != null && response['success'] == true) {
+                      final isNewUser = response['created'] ?? false;
+                      
+                      if (isNewUser && mounted) {
+                        // 신규 가입인 경우 약관 동의 화면으로 이동
+                        Navigator.pushReplacement(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => TermsOfServiceScreen(
+                              onAgreementComplete: () {
+                                // 약관 동의 완료 후 메인 화면으로 이동
+                                Navigator.pushAndRemoveUntil(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (context) => const GuestMainScreen(),
+                                  ),
+                                  (route) => false,
+                                );
+                              },
+                            ),
+                          ),
+                        );
+                      } else if (mounted) {
+                        // 기존 회원인 경우 바로 메인 화면으로 이동
+                        Navigator.pushAndRemoveUntil(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => const GuestMainScreen(),
+                          ),
+                          (route) => false,
+                        );
+                      }
+                    }
+                  }
                 },
               ),
               const SizedBox(width: 30),
@@ -595,43 +587,47 @@ class _FigmaLoginScreenState extends State<FigmaLoginScreen> {
                   ),
                 ),
                 onTap: () async {
-                  // BuildContext와 필요한 서비스들을 미리 저장
-                  final navigatorState = Navigator.of(context);
-                  final scaffoldState = ScaffoldMessenger.of(context);
-                  final authProvider = Provider.of<AuthProvider>(context, listen: false);
-                  
-                  // 먼저 이용약관 동의 화면으로 이동
-                  navigatorState.push(
-                    MaterialPageRoute(
-                      builder: (context) => TermsOfServiceScreen(
-                        onAgreementComplete: () async {
-                          // 약관 동의 완료 후 구글 로그인 진행
-                          final result = await _socialLoginService.signInWithGoogle(navigatorState.context);
-                          
-                          if (result != null) {
-                            final success = await authProvider.socialLogin(result);
-                            
-                            if (success) {
-                              // 로그인 성공 시 준비 완료 화면으로 이동
-                              navigatorState.pushAndRemoveUntil(
-                                MaterialPageRoute(
-                                  builder: (context) => const StudyMateReadyScreen(),
-                                ),
-                                (route) => false,
-                              );
-                            } else {
-                              scaffoldState.showSnackBar(
-                                const SnackBar(
-                                  content: Text('구글 로그인에 실패했습니다'),
-                                  duration: Duration(seconds: 2),
-                                ),
-                              );
-                            }
-                          }
-                        },
-                      ),
-                    ),
-                  );
+                  final result = await _socialLoginService.signInWithGoogle(context);
+                  if (result != null && mounted) {
+                    final authProvider = Provider.of<AuthProvider>(context, listen: false);
+                    
+                    // 신규 가입인지 확인하기 위해 socialLogin의 결과를 확인
+                    final response = await authProvider.socialLoginWithResponse(result);
+                    
+                    if (response != null && response['success'] == true) {
+                      final isNewUser = response['created'] ?? false;
+                      
+                      if (isNewUser && mounted) {
+                        // 신규 가입인 경우 약관 동의 화면으로 이동
+                        Navigator.pushReplacement(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => TermsOfServiceScreen(
+                              onAgreementComplete: () {
+                                // 약관 동의 완료 후 메인 화면으로 이동
+                                Navigator.pushAndRemoveUntil(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (context) => const GuestMainScreen(),
+                                  ),
+                                  (route) => false,
+                                );
+                              },
+                            ),
+                          ),
+                        );
+                      } else if (mounted) {
+                        // 기존 회원인 경우 바로 메인 화면으로 이동
+                        Navigator.pushAndRemoveUntil(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => const GuestMainScreen(),
+                          ),
+                          (route) => false,
+                        );
+                      }
+                    }
+                  }
                 },
               ),
               const SizedBox(width: 30),
@@ -652,43 +648,47 @@ class _FigmaLoginScreenState extends State<FigmaLoginScreen> {
                   ),
                 ),
                 onTap: () async {
-                  // BuildContext와 필요한 서비스들을 미리 저장
-                  final navigatorState = Navigator.of(context);
-                  final scaffoldState = ScaffoldMessenger.of(context);
-                  final authProvider = Provider.of<AuthProvider>(context, listen: false);
-                  
-                  // 먼저 이용약관 동의 화면으로 이동
-                  navigatorState.push(
-                    MaterialPageRoute(
-                      builder: (context) => TermsOfServiceScreen(
-                        onAgreementComplete: () async {
-                          // 약관 동의 완료 후 애플 로그인 진행
-                          final result = await _socialLoginService.signInWithApple(navigatorState.context);
-                          
-                          if (result != null) {
-                            final success = await authProvider.socialLogin(result);
-                            
-                            if (success) {
-                              // 로그인 성공 시 준비 완료 화면으로 이동
-                              navigatorState.pushAndRemoveUntil(
-                                MaterialPageRoute(
-                                  builder: (context) => const StudyMateReadyScreen(),
-                                ),
-                                (route) => false,
-                              );
-                            } else {
-                              scaffoldState.showSnackBar(
-                                const SnackBar(
-                                  content: Text('애플 로그인에 실패했습니다'),
-                                  duration: Duration(seconds: 2),
-                                ),
-                              );
-                            }
-                          }
-                        },
-                      ),
-                    ),
-                  );
+                  final result = await _socialLoginService.signInWithApple(context);
+                  if (result != null && mounted) {
+                    final authProvider = Provider.of<AuthProvider>(context, listen: false);
+                    
+                    // 신규 가입인지 확인하기 위해 socialLogin의 결과를 확인
+                    final response = await authProvider.socialLoginWithResponse(result);
+                    
+                    if (response != null && response['success'] == true) {
+                      final isNewUser = response['created'] ?? false;
+                      
+                      if (isNewUser && mounted) {
+                        // 신규 가입인 경우 약관 동의 화면으로 이동
+                        Navigator.pushReplacement(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => TermsOfServiceScreen(
+                              onAgreementComplete: () {
+                                // 약관 동의 완료 후 메인 화면으로 이동
+                                Navigator.pushAndRemoveUntil(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (context) => const GuestMainScreen(),
+                                  ),
+                                  (route) => false,
+                                );
+                              },
+                            ),
+                          ),
+                        );
+                      } else if (mounted) {
+                        // 기존 회원인 경우 바로 메인 화면으로 이동
+                        Navigator.pushAndRemoveUntil(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => const GuestMainScreen(),
+                          ),
+                          (route) => false,
+                        );
+                      }
+                    }
+                  }
                 },
               ),
             ],

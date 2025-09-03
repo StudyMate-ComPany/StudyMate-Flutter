@@ -48,53 +48,60 @@ class _ModernRegisterScreenState extends State<ModernRegisterScreen> {
       final password = _passwordController.text;
       
       // 먼저 이용약관 동의 화면으로 이동
-      navigatorState.push(
+      final agreed = await navigatorState.push<bool>(
         MaterialPageRoute(
-          builder: (context) => TermsOfServiceScreen(
-            onAgreementComplete: () async {
-              // 약관 동의 완료 후 회원가입 진행
-              HapticFeedback.mediumImpact();
-              
-              setState(() {
-                _isLoading = true;
-              });
-              
-              final success = await authProvider.register(
-                name,
-                email,
-                password,
-                termsAccepted: true,
-                privacyAccepted: true,
-              );
-              
-              setState(() {
-                _isLoading = false;
-              });
-              
-              if (success) {
-                // 회원가입 성공 시 준비 완료 화면으로 이동
-                navigatorState.pushAndRemoveUntil(
-                  MaterialPageRoute(
-                    builder: (context) => const StudyMateReadyScreen(),
-                  ),
-                  (route) => false,
-                );
-              } else {
-                scaffoldState.showSnackBar(
-                  SnackBar(
-                    content: Text(authProvider.errorMessage ?? '회원가입에 실패했습니다'),
-                    backgroundColor: StudyMateTheme.accentPink,
-                    behavior: SnackBarBehavior.floating,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                  ),
-                );
-              }
-            },
-          ),
+          builder: (context) => const TermsOfServiceScreen(),
         ),
       );
+      
+      // 약관 동의를 완료한 경우에만 회원가입 진행
+      if (agreed == true) {
+        // 약관 동의 완료 후 회원가입 진행
+        HapticFeedback.mediumImpact();
+        
+        // mounted 체크 추가
+        if (!mounted) return;
+        
+        setState(() {
+          _isLoading = true;
+        });
+        
+        final success = await authProvider.register(
+          name,
+          email,
+          password,
+          termsAccepted: true,
+          privacyAccepted: true,
+        );
+        
+        // mounted 체크 추가
+        if (!mounted) return;
+        
+        setState(() {
+          _isLoading = false;
+        });
+        
+        if (success) {
+          // 회원가입 성공 시 준비 완료 화면으로 이동
+          navigatorState.pushAndRemoveUntil(
+            MaterialPageRoute(
+              builder: (context) => const StudyMateReadyScreen(),
+            ),
+            (route) => false,
+          );
+        } else {
+          scaffoldState.showSnackBar(
+            SnackBar(
+              content: Text(authProvider.errorMessage ?? '회원가입에 실패했습니다'),
+              backgroundColor: StudyMateTheme.accentPink,
+              behavior: SnackBarBehavior.floating,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(12),
+              ),
+            ),
+          );
+        }
+      }
     }
   }
   

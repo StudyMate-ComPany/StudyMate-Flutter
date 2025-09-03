@@ -196,15 +196,29 @@ class _TermsOfServiceScreenState extends State<TermsOfServiceScreen> {
                   height: 56,
                   child: ElevatedButton(
                     onPressed: _isAgreed
-                        ? () {
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                builder: (context) => PrivacyPolicyScreen(
-                                  onAgreementComplete: widget.onAgreementComplete,
+                        ? () async {
+                            if (widget.onAgreementComplete != null) {
+                              // 콜백이 있으면 콜백용 화면으로 이동
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) => PrivacyPolicyScreen(
+                                    onAgreementComplete: widget.onAgreementComplete,
+                                  ),
                                 ),
-                              ),
-                            );
+                              );
+                            } else {
+                              // 콜백이 없으면 결과 반환용 화면으로 이동
+                              final result = await Navigator.push<bool>(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) => const PrivacyPolicyScreen(),
+                                ),
+                              );
+                              if (result == true && mounted) {
+                                Navigator.pop(context, true);
+                              }
+                            }
                           }
                         : null,
                     style: ElevatedButton.styleFrom(
