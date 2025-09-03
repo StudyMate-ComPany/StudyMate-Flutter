@@ -205,9 +205,13 @@ class _PrivacyPolicyScreenState extends State<PrivacyPolicyScreen> {
                     onPressed: _isAgreed
                         ? () {
                             if (widget.onAgreementComplete != null) {
-                              // 콜백이 있으면 약관 동의만 완료하고 콜백 실행
-                              Navigator.popUntil(context, (route) => route.isFirst);
+                              // 콜백 실행
                               widget.onAgreementComplete!();
+                              // 두 약관 화면을 모두 닫고 원래 화면으로 돌아감
+                              int count = 0;
+                              Navigator.of(context).popUntil((route) {
+                                return count++ == 2;
+                              });
                             } else {
                               // 콜백이 없으면 true를 반환하며 이전 화면으로
                               Navigator.pop(context, true);

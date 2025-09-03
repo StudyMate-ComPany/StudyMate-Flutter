@@ -78,7 +78,7 @@ dependencies:
   
   # Social Login
   kakao_flutter_sdk_user: ^1.9.6  # 카카오 로그인 (최신 안정 버전)
-  # flutter_naver_login: ^1.8.0  # 네이버 로그인 (일시적 주석)
+  flutter_naver_login: ^1.8.0  # 네이버 로그인
   google_sign_in: ^6.2.1  # 구글 로그인
   sign_in_with_apple: ^6.1.3  # 애플 로그인
   crypto: ^3.0.5  # 애플 로그인용 nonce 생성

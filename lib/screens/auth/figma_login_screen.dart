@@ -6,6 +6,7 @@ import 'modern_register_screen.dart';
 import 'password_reset_screen.dart';
 import 'terms_of_service_screen.dart';
 import 'studymate_ready_screen.dart';
+import 'social_login_complete_screen.dart';
 import '../home/guest_main_screen.dart';
 import '../../services/social_login_service.dart';
 import '../../providers/auth_provider.dart';
@@ -23,12 +24,118 @@ class _FigmaLoginScreenState extends State<FigmaLoginScreen> {
   final _socialLoginService = SocialLoginService();
   bool _isPasswordVisible = false;
   bool _isLoading = false;
+  bool _isSocialLoading = false;
 
   @override
   void dispose() {
     _emailController.dispose();
     _passwordController.dispose();
     super.dispose();
+  }
+
+  // Helper method to handle social login with terms agreement
+  Future<void> _handleSocialLoginWithTerms(String provider) async {
+    if (_isSocialLoading) return;
+    
+    setState(() {
+      _isSocialLoading = true;
+    });
+    
+    try {
+      // Store the provider for later use
+      final selectedProvider = provider;
+      
+      // Navigate to terms agreement screen first
+      await Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (context) => TermsOfServiceScreen(
+            onAgreementComplete: () {
+              // After terms are accepted, just close the screens
+              // Social login will be performed after navigation completes
+            },
+          ),
+        ),
+      );
+      
+      // After returning from terms screens, proceed with social login
+      if (mounted) {
+        await _performSocialLogin(selectedProvider);
+      }
+    } finally {
+      // Reset loading state after everything completes
+      if (mounted) {
+        setState(() {
+          _isSocialLoading = false;
+        });
+      }
+    }
+  }
+  
+  // Actual social login implementation
+  Future<void> _performSocialLogin(String provider) async {
+    setState(() {
+      _isSocialLoading = true;
+    });
+    
+    try {
+      dynamic result;
+      
+      switch (provider) {
+        case 'kakao':
+          result = await _socialLoginService.signInWithKakao(context);
+          break;
+        case 'naver':
+          result = await _socialLoginService.signInWithNaver(context);
+          break;
+        case 'google':
+          result = await _socialLoginService.signInWithGoogle(context);
+          break;
+        case 'apple':
+          result = await _socialLoginService.signInWithApple(context);
+          break;
+        default:
+          throw Exception('Unknown provider: $provider');
+      }
+      
+      if (result != null && mounted) {
+        final authProvider = Provider.of<AuthProvider>(context, listen: false);
+        
+        // 신규 가입인지 확인하기 위해 socialLogin의 결과를 확인
+        final response = await authProvider.socialLoginWithResponse(result);
+        
+        if (response != null && response['success'] == true) {
+          final isNewUser = response['created'] ?? false;
+          
+          if (isNewUser && mounted) {
+            // 신규 가입인 경우 로그인 완료 화면 표시
+            Navigator.pushReplacement(
+              context,
+              MaterialPageRoute(
+                builder: (context) => SocialLoginCompleteScreen(
+                  provider: provider,
+                ),
+              ),
+            );
+          } else if (mounted) {
+            // 기존 회원인 경우 바로 메인 화면으로 이동
+            Navigator.pushAndRemoveUntil(
+              context,
+              MaterialPageRoute(
+                builder: (context) => const GuestMainScreen(),
+              ),
+              (route) => false,
+            );
+          }
+        }
+      }
+    } finally {
+      if (mounted) {
+        setState(() {
+          _isSocialLoading = false;
+        });
+      }
+    }
   }
 
   Future<void> _handleLogin() async {
@@ -193,36 +300,37 @@ class _FigmaLoginScreenState extends State<FigmaLoginScreen> {
               width: 1,
             ),
           ),
-          padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 13),
-          child: TextField(
-            controller: _emailController,
-            keyboardType: TextInputType.emailAddress,
-            decoration: const InputDecoration(
-              hintText: '이메일을 입력해주세요',
-              hintStyle: TextStyle(
-                fontFamily: 'Pretendard',
-                fontSize: 16,
-                fontWeight: FontWeight.w600,  // 피그마: 600
-                color: Color(0xFF555555),  // 피그마: #555555
-                height: 1.5,
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 10),
+            child: Center(
+              child: TextField(
+                controller: _emailController,
+                keyboardType: TextInputType.emailAddress,
+                decoration: const InputDecoration(
+                  hintText: '이메일을 입력해주세요',
+                  hintStyle: TextStyle(
+                    fontFamily: 'Pretendard',
+                    fontSize: 16,
+                    fontWeight: FontWeight.w600,
+                    color: Color(0xFF555555),
+                  ),
+                  border: InputBorder.none,
+                  contentPadding: EdgeInsets.zero,
+                ),
+                style: const TextStyle(
+                  fontFamily: 'Pretendard',
+                  fontSize: 16,
+                  fontWeight: FontWeight.w600,
+                  color: Color(0xFF555555),
+                ),
               ),
-              border: InputBorder.none,
-              contentPadding: EdgeInsets.zero,
-              isDense: true,
-            ),
-            style: const TextStyle(
-              fontFamily: 'Pretendard',
-              fontSize: 16,
-              fontWeight: FontWeight.w600,
-              color: Color(0xFF555555),
-              height: 1.5,
             ),
           ),
         ),
         
         const SizedBox(height: 10),
         
-        // 비밀번호 입력 필드 - Component 4 (라벨 "비밀번호"가 있음)
+        // 비밀번호 입력 필드 - placeholder 방식으로 변경
         Container(
           height: 50,
           decoration: BoxDecoration(
@@ -233,66 +341,55 @@ class _FigmaLoginScreenState extends State<FigmaLoginScreen> {
               width: 1,
             ),
           ),
-          padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              // 비밀번호 라벨과 입력 필드
-              Expanded(
-                child: Row(
-                  children: [
-                    const Text(
-                      '비밀번호',
-                      style: TextStyle(
-                        fontFamily: 'Pretendard',
-                        fontSize: 16,
-                        fontWeight: FontWeight.w600,  // 피그마: 600
-                        color: Color(0xFF555555),  // 피그마: #555555
-                        height: 1.5,
-                      ),
-                    ),
-                    const SizedBox(width: 10),
-                    Expanded(
-                      child: TextField(
-                        controller: _passwordController,
-                        obscureText: !_isPasswordVisible,
-                        decoration: const InputDecoration(
-                          hintText: '',
-                          border: InputBorder.none,
-                          contentPadding: EdgeInsets.zero,
-                          isDense: true,
-                        ),
-                        style: const TextStyle(
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 10),
+            child: Row(
+              children: [
+                Expanded(
+                  child: Center(
+                    child: TextField(
+                      controller: _passwordController,
+                      obscureText: !_isPasswordVisible,
+                      decoration: const InputDecoration(
+                        hintText: '비밀번호를 입력해주세요',
+                        hintStyle: TextStyle(
                           fontFamily: 'Pretendard',
                           fontSize: 16,
                           fontWeight: FontWeight.w600,
                           color: Color(0xFF555555),
-                          height: 1.5,
                         ),
+                        border: InputBorder.none,
+                        contentPadding: EdgeInsets.zero,
+                      ),
+                      style: const TextStyle(
+                        fontFamily: 'Pretendard',
+                        fontSize: 16,
+                        fontWeight: FontWeight.w600,
+                        color: Color(0xFF555555),
                       ),
                     ),
-                  ],
-                ),
-              ),
-              // 비밀번호 토글 아이콘
-              GestureDetector(
-                onTap: () {
-                  setState(() {
-                    _isPasswordVisible = !_isPasswordVisible;
-                  });
-                },
-                child: Container(
-                  width: 26,
-                  height: 26,
-                  alignment: Alignment.center,
-                  child: Icon(
-                    _isPasswordVisible ? Icons.visibility : Icons.visibility_off,
-                    color: const Color(0xFF888888),
-                    size: 20,
                   ),
                 ),
-              ),
-            ],
+                // 비밀번호 토글 아이콘
+                GestureDetector(
+                  onTap: () {
+                    setState(() {
+                      _isPasswordVisible = !_isPasswordVisible;
+                    });
+                  },
+                  child: Container(
+                    width: 26,
+                    height: 26,
+                    alignment: Alignment.center,
+                    child: Icon(
+                      _isPasswordVisible ? Icons.visibility : Icons.visibility_off,
+                      color: const Color(0xFF888888),
+                      size: 20,
+                    ),
+                  ),
+                ),
+              ],
+            ),
           ),
         ),
       ],
@@ -382,10 +479,21 @@ class _FigmaLoginScreenState extends State<FigmaLoginScreen> {
         ),
         TextButton(
           onPressed: () {
+            // 약관 동의 화면을 먼저 표시
             Navigator.push(
               context,
               MaterialPageRoute(
-                builder: (context) => const ModernRegisterScreen(),
+                builder: (context) => TermsOfServiceScreen(
+                  onAgreementComplete: () {
+                    // 약관 동의 완료 후 회원가입 화면으로 이동
+                    Navigator.pushReplacement(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => const ModernRegisterScreen(),
+                      ),
+                    );
+                  },
+                ),
               ),
             );
           },
@@ -453,48 +561,8 @@ class _FigmaLoginScreenState extends State<FigmaLoginScreen> {
                     ),
                   ),
                 ),
-                onTap: () async {
-                  final result = await _socialLoginService.signInWithKakao(context);
-                  if (result != null && mounted) {
-                    final authProvider = Provider.of<AuthProvider>(context, listen: false);
-                    
-                    // 신규 가입인지 확인하기 위해 socialLogin의 결과를 확인
-                    final response = await authProvider.socialLoginWithResponse(result);
-                    
-                    if (response != null && response['success'] == true) {
-                      final isNewUser = response['created'] ?? false;
-                      
-                      if (isNewUser && mounted) {
-                        // 신규 가입인 경우 약관 동의 화면으로 이동
-                        Navigator.pushReplacement(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => TermsOfServiceScreen(
-                              onAgreementComplete: () {
-                                // 약관 동의 완료 후 메인 화면으로 이동
-                                Navigator.pushAndRemoveUntil(
-                                  context,
-                                  MaterialPageRoute(
-                                    builder: (context) => const GuestMainScreen(),
-                                  ),
-                                  (route) => false,
-                                );
-                              },
-                            ),
-                          ),
-                        );
-                      } else if (mounted) {
-                        // 기존 회원인 경우 바로 메인 화면으로 이동
-                        Navigator.pushAndRemoveUntil(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => const GuestMainScreen(),
-                          ),
-                          (route) => false,
-                        );
-                      }
-                    }
-                  }
+                onTap: _isSocialLoading ? () {} : () async {
+                  await _handleSocialLoginWithTerms('kakao');
                 },
               ),
               const SizedBox(width: 30),
@@ -517,48 +585,8 @@ class _FigmaLoginScreenState extends State<FigmaLoginScreen> {
                     ),
                   ),
                 ),
-                onTap: () async {
-                  final result = await _socialLoginService.signInWithNaver(context);
-                  if (result != null && mounted) {
-                    final authProvider = Provider.of<AuthProvider>(context, listen: false);
-                    
-                    // 신규 가입인지 확인하기 위해 socialLogin의 결과를 확인
-                    final response = await authProvider.socialLoginWithResponse(result);
-                    
-                    if (response != null && response['success'] == true) {
-                      final isNewUser = response['created'] ?? false;
-                      
-                      if (isNewUser && mounted) {
-                        // 신규 가입인 경우 약관 동의 화면으로 이동
-                        Navigator.pushReplacement(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => TermsOfServiceScreen(
-                              onAgreementComplete: () {
-                                // 약관 동의 완료 후 메인 화면으로 이동
-                                Navigator.pushAndRemoveUntil(
-                                  context,
-                                  MaterialPageRoute(
-                                    builder: (context) => const GuestMainScreen(),
-                                  ),
-                                  (route) => false,
-                                );
-                              },
-                            ),
-                          ),
-                        );
-                      } else if (mounted) {
-                        // 기존 회원인 경우 바로 메인 화면으로 이동
-                        Navigator.pushAndRemoveUntil(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => const GuestMainScreen(),
-                          ),
-                          (route) => false,
-                        );
-                      }
-                    }
-                  }
+                onTap: _isSocialLoading ? () {} : () async {
+                  await _handleSocialLoginWithTerms('naver');
                 },
               ),
               const SizedBox(width: 30),
@@ -586,48 +614,8 @@ class _FigmaLoginScreenState extends State<FigmaLoginScreen> {
                     ),
                   ),
                 ),
-                onTap: () async {
-                  final result = await _socialLoginService.signInWithGoogle(context);
-                  if (result != null && mounted) {
-                    final authProvider = Provider.of<AuthProvider>(context, listen: false);
-                    
-                    // 신규 가입인지 확인하기 위해 socialLogin의 결과를 확인
-                    final response = await authProvider.socialLoginWithResponse(result);
-                    
-                    if (response != null && response['success'] == true) {
-                      final isNewUser = response['created'] ?? false;
-                      
-                      if (isNewUser && mounted) {
-                        // 신규 가입인 경우 약관 동의 화면으로 이동
-                        Navigator.pushReplacement(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => TermsOfServiceScreen(
-                              onAgreementComplete: () {
-                                // 약관 동의 완료 후 메인 화면으로 이동
-                                Navigator.pushAndRemoveUntil(
-                                  context,
-                                  MaterialPageRoute(
-                                    builder: (context) => const GuestMainScreen(),
-                                  ),
-                                  (route) => false,
-                                );
-                              },
-                            ),
-                          ),
-                        );
-                      } else if (mounted) {
-                        // 기존 회원인 경우 바로 메인 화면으로 이동
-                        Navigator.pushAndRemoveUntil(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => const GuestMainScreen(),
-                          ),
-                          (route) => false,
-                        );
-                      }
-                    }
-                  }
+                onTap: _isSocialLoading ? () {} : () async {
+                  await _handleSocialLoginWithTerms('google');
                 },
               ),
               const SizedBox(width: 30),
@@ -647,48 +635,8 @@ class _FigmaLoginScreenState extends State<FigmaLoginScreen> {
                     size: 32,
                   ),
                 ),
-                onTap: () async {
-                  final result = await _socialLoginService.signInWithApple(context);
-                  if (result != null && mounted) {
-                    final authProvider = Provider.of<AuthProvider>(context, listen: false);
-                    
-                    // 신규 가입인지 확인하기 위해 socialLogin의 결과를 확인
-                    final response = await authProvider.socialLoginWithResponse(result);
-                    
-                    if (response != null && response['success'] == true) {
-                      final isNewUser = response['created'] ?? false;
-                      
-                      if (isNewUser && mounted) {
-                        // 신규 가입인 경우 약관 동의 화면으로 이동
-                        Navigator.pushReplacement(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => TermsOfServiceScreen(
-                              onAgreementComplete: () {
-                                // 약관 동의 완료 후 메인 화면으로 이동
-                                Navigator.pushAndRemoveUntil(
-                                  context,
-                                  MaterialPageRoute(
-                                    builder: (context) => const GuestMainScreen(),
-                                  ),
-                                  (route) => false,
-                                );
-                              },
-                            ),
-                          ),
-                        );
-                      } else if (mounted) {
-                        // 기존 회원인 경우 바로 메인 화면으로 이동
-                        Navigator.pushAndRemoveUntil(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => const GuestMainScreen(),
-                          ),
-                          (route) => false,
-                        );
-                      }
-                    }
-                  }
+                onTap: _isSocialLoading ? () {} : () async {
+                  await _handleSocialLoginWithTerms('apple');
                 },
               ),
             ],
