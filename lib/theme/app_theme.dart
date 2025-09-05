@@ -98,7 +98,7 @@ class AppTheme {
       ),
       
       // 카드 테마
-      cardTheme: CardTheme(
+      cardTheme: CardThemeData(
         elevation: 4,
         shadowColor: primaryColor.withOpacity(0.1),
         shape: RoundedRectangleBorder(
@@ -204,7 +204,7 @@ class AppTheme {
       ),
       
       // Dialog 테마
-      dialogTheme: DialogTheme(
+      dialogTheme: DialogThemeData(
         backgroundColor: Colors.white,
         elevation: 16,
         shape: RoundedRectangleBorder(

@@ -99,7 +99,7 @@ class ModernTheme {
     ),
     
     // Card 테마
-    cardTheme: CardTheme(
+    cardTheme: CardThemeData(
       color: cardColor,
       elevation: 0,
       shape: RoundedRectangleBorder(

@@ -170,13 +170,15 @@ class LocalDatabaseService {
         'id': goal.id,
         'title': goal.title,
         'description': goal.description,
-        'target_date': goal.targetDate?.toIso8601String(),
-        'category': goal.category,
-        'priority': goal.priority,
+        'goal_type': goal.goalType,
         'status': goal.status,
-        'progress': goal.progress,
+        'start_date': goal.startDate.toIso8601String(),
+        'end_date': goal.endDate.toIso8601String(),
+        'target_summaries': goal.targetSummaries,
+        'target_quizzes': goal.targetQuizzes,
+        'target_study_time': goal.targetStudyTime,
         'created_at': goal.createdAt.toIso8601String(),
-        'updated_at': DateTime.now().toIso8601String(),
+        'updated_at': goal.updatedAt.toIso8601String(),
         'is_synced': 0,
       },
       conflictAlgorithm: ConflictAlgorithm.replace,
@@ -195,12 +197,15 @@ class LocalDatabaseService {
       id: map['id'],
       title: map['title'],
       description: map['description'],
-      targetDate: map['target_date'] != null ? DateTime.parse(map['target_date']) : null,
-      category: map['category'],
-      priority: map['priority'],
-      status: map['status'],
-      progress: map['progress'],
+      goalType: map['goal_type'] ?? 'custom',
+      status: map['status'] ?? 'active',
+      startDate: DateTime.parse(map['start_date']),
+      endDate: DateTime.parse(map['end_date']),
+      targetSummaries: map['target_summaries'] ?? 0,
+      targetQuizzes: map['target_quizzes'] ?? 0,
+      targetStudyTime: map['target_study_time'] ?? '00:00:00',
       createdAt: DateTime.parse(map['created_at']),
+      updatedAt: DateTime.parse(map['updated_at']),
     )).toList();
   }
 
@@ -223,13 +228,18 @@ class LocalDatabaseService {
       'study_sessions',
       {
         'id': session.id,
+        'user_id': session.userId,
         'goal_id': session.goalId,
+        'subject': session.subject,
+        'topic': session.topic,
+        'type': session.type.name,
+        'status': session.status.name,
         'start_time': session.startTime.toIso8601String(),
         'end_time': session.endTime?.toIso8601String(),
-        'duration': session.duration,
+        'planned_duration': session.plannedDuration,
+        'actual_duration': session.actualDuration,
         'notes': session.notes,
         'focus_score': session.focusScore,
-        'created_at': session.createdAt.toIso8601String(),
         'is_synced': 0,
       },
       conflictAlgorithm: ConflictAlgorithm.replace,
@@ -246,13 +256,24 @@ class LocalDatabaseService {
 
     return maps.map((map) => StudySession(
       id: map['id'],
+      userId: map['user_id'] ?? '',
       goalId: map['goal_id'],
+      subject: map['subject'] ?? '',
+      topic: map['topic'],
+      type: SessionType.values.firstWhere(
+        (e) => e.name == map['type'],
+        orElse: () => SessionType.focused,
+      ),
+      status: SessionStatus.values.firstWhere(
+        (e) => e.name == map['status'],
+        orElse: () => SessionStatus.active,
+      ),
       startTime: DateTime.parse(map['start_time']),
       endTime: map['end_time'] != null ? DateTime.parse(map['end_time']) : null,
-      duration: map['duration'],
+      plannedDuration: map['planned_duration'] ?? 0,
+      actualDuration: map['actual_duration'],
       notes: map['notes'],
       focusScore: map['focus_score'],
-      createdAt: DateTime.parse(map['created_at']),
     )).toList();
   }
 
@@ -268,13 +289,24 @@ class LocalDatabaseService {
 
     return maps.map((map) => StudySession(
       id: map['id'],
+      userId: map['user_id'] ?? '',
       goalId: map['goal_id'],
+      subject: map['subject'] ?? '',
+      topic: map['topic'],
+      type: SessionType.values.firstWhere(
+        (e) => e.name == map['type'],
+        orElse: () => SessionType.focused,
+      ),
+      status: SessionStatus.values.firstWhere(
+        (e) => e.name == map['status'],
+        orElse: () => SessionStatus.active,
+      ),
       startTime: DateTime.parse(map['start_time']),
       endTime: map['end_time'] != null ? DateTime.parse(map['end_time']) : null,
-      duration: map['duration'],
+      plannedDuration: map['planned_duration'] ?? 0,
+      actualDuration: map['actual_duration'],
       notes: map['notes'],
       focusScore: map['focus_score'],
-      createdAt: DateTime.parse(map['created_at']),
     )).toList();
   }
 

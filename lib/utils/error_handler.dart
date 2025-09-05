@@ -21,7 +21,7 @@ class ErrorHandler {
     } else if (error is RangeError) {
       return ErrorType.range;
     } else if (error is NoSuchMethodError) {
-      return ErrorType.noSuchMethod;
+      return ErrorType.methodNotFound;
     } else {
       return ErrorType.unknown;
     }
@@ -125,7 +125,7 @@ class ErrorHandler {
 
     // 개발 환경에서는 상세 정보 출력
     if (Environment.enableDebugMode) {
-      Logger.debug('Error Details: ${Logger._formatJson(errorInfo)}', tag: 'ErrorHandler');
+      Logger.debug('Error Details: ${errorInfo.toString()}', tag: 'ErrorHandler');
     }
 
     // 프로덕션/스테이징에서는 외부 서비스로 전송
@@ -272,7 +272,7 @@ enum ErrorType {
   parsing,
   type,
   range,
-  noSuchMethod,
+  methodNotFound,
   cancelled,
   unknown,
 }
