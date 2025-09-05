@@ -45,5 +45,14 @@ app.*.map.json
 # Environment variables
 .env
 
+# Python
+backend/venv/
+venv/
+*.py[cod]
+__pycache__/
+.Python
+env/
+*.egg-info/
+
 # Claude project information (CONFIDENTIAL)
 .claude-project-info.md
