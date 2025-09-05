@@ -14,6 +14,13 @@ subprojects {
     project.evaluationDependsOn(":app")
 }
 
+// app_links를 위한 전역 설정
+ext {
+    compileSdkVersion = 35
+    minSdkVersion = 23  
+    targetSdkVersion = 35
+}
+
 tasks.register("clean", Delete) {
     delete rootProject.buildDir
 }

@@ -145,6 +145,39 @@ class AuthProvider with ChangeNotifier {
     }
   }
   
+  // 소셜 토큰으로 로그인 (딥링크 핸들러용)
+  Future<void> loginWithSocialToken({
+    required String token,
+    required Map<String, dynamic> user,
+  }) async {
+    try {
+      _setState(AuthState.loading);
+      
+      // 토큰 저장
+      await LocalStorageService.saveAuthToken(token);
+      _apiService.setAuthToken(token);
+      
+      // 사용자 정보 생성
+      _user = User(
+        id: user['id'].toString(),
+        email: user['email'] ?? '',
+        name: user['name'] ?? user['username'] ?? '',
+        bio: user['profile']?['name'] ?? '소셜 로그인 사용자',
+        avatarUrl: user['profile']?['profile_image'] ?? '',
+        createdAt: DateTime.now(),
+        lastLoginAt: DateTime.now(),
+      );
+      
+      await LocalStorageService.saveUser(_user!);
+      _setState(AuthState.authenticated);
+      
+      debugPrint('✅ Social token login successful');
+    } catch (e) {
+      debugPrint('❌ Social token login error: $e');
+      _setError('소셜 토큰 로그인에 실패했습니다: $e');
+    }
+  }
+  
   // SNS 로그인 (기존 메서드 - 호환성 유지)
   Future<bool> socialLogin(Map<String, dynamic> socialUserData) async {
     final response = await socialLoginWithResponse(socialUserData);

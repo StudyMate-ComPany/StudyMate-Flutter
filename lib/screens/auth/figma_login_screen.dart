@@ -7,6 +7,7 @@ import 'password_reset_screen.dart';
 import 'terms_of_service_screen.dart';
 import 'studymate_ready_screen.dart';
 import 'social_login_complete_screen.dart';
+// WebView 기반 네이버 로그인 제거됨
 import '../home/guest_main_screen.dart';
 import '../../services/social_login_service.dart';
 import '../../providers/auth_provider.dart';
@@ -586,7 +587,20 @@ class _FigmaLoginScreenState extends State<FigmaLoginScreen> {
                   ),
                 ),
                 onTap: _isSocialLoading ? () {} : () async {
-                  await _handleSocialLoginWithTerms('naver');
+                  // 네이버는 자체 약관 동의가 있으므로 바로 로그인
+                  if (_isSocialLoading) return;
+                  setState(() {
+                    _isSocialLoading = true;
+                  });
+                  try {
+                    await _performSocialLogin('naver');
+                  } finally {
+                    if (mounted) {
+                      setState(() {
+                        _isSocialLoading = false;
+                      });
+                    }
+                  }
                 },
               ),
               const SizedBox(width: 30),

@@ -3,4 +3,9 @@
     <string name="app_name">StudyMate</string>
     <string name="kakao_app_key">3536690f07026db1260827631e893227</string>
     <string name="kakao_scheme">kakao3536690f07026db1260827631e893227</string>
+    
+    <!-- 네이버 로그인 설정 -->
+    <string name="naver_client_id">3GhqSVoT4bk045ohLmcW</string>
+    <string name="naver_client_secret">jCdAcwX_M3</string>
+    <string name="naver_client_name">StudyMate</string>
 </resources>

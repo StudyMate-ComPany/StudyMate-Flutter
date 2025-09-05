@@ -33,6 +33,8 @@ void main() async {
     javaScriptAppKey: dotenv.env['KAKAO_JAVASCRIPT_APP_KEY'] ?? '',
   );
   
+  // 네이버 SDK 초기화 제거 - 커스텀 OAuth2 구현으로 대체
+  
   // 시스템 UI 오버레이 스타일 설정
   SystemChrome.setSystemUIOverlayStyle(
     const SystemUiOverlayStyle(
@@ -57,9 +59,14 @@ void main() async {
   runApp(const StudyMateApp());
 }
 
-class StudyMateApp extends StatelessWidget {
+class StudyMateApp extends StatefulWidget {
   const StudyMateApp({super.key});
 
+  @override
+  State<StudyMateApp> createState() => _StudyMateAppState();
+}
+
+class _StudyMateAppState extends State<StudyMateApp> {
   @override
   Widget build(BuildContext context) {
     return MultiProvider(

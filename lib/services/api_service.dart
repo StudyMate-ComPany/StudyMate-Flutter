@@ -247,6 +247,16 @@ class ApiService {
         'nickname': socialData['name'] ?? '',
         'profile_image': socialData['profileImage'] ?? '',
       };
+    } else if (socialData['provider'] == 'naver') {
+      // 네이버 로그인용 데이터
+      requestData = {
+        'provider': 'naver',
+        'access_token': socialData['access_token'] ?? '',
+        'id': socialData['id'],
+        'email': socialData['email'] ?? '',
+        'name': socialData['name'] ?? '',
+        'profileImage': socialData['profileImage'] ?? '',
+      };
     } else {
       // 다른 소셜 로그인 제공자
       requestData = {

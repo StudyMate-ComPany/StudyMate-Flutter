@@ -26,6 +26,7 @@ class _ModernLoginScreenState extends State<ModernLoginScreen> with TickerProvid
   bool _isPasswordVisible = false;
   bool _rememberMe = false;
   bool _isLoading = false;
+  bool _isSocialLoginInProgress = false; // 소셜 로그인 진행 중 플래그
   
   late AnimationController _animationController;
   
@@ -61,8 +62,15 @@ class _ModernLoginScreenState extends State<ModernLoginScreen> with TickerProvid
   }
   
   Future<void> _handleSocialLogin(String provider) async {
+    // 이미 소셜 로그인이 진행 중이면 무시
+    if (_isSocialLoginInProgress) {
+      debugPrint('⚠️ 소셜 로그인이 이미 진행 중입니다');
+      return;
+    }
+    
     setState(() {
       _isLoading = true;
+      _isSocialLoginInProgress = true;
     });
     
     try {
@@ -75,14 +83,8 @@ class _ModernLoginScreenState extends State<ModernLoginScreen> with TickerProvid
           socialUserData = await socialLoginService.signInWithKakao(context);
           break;
         case 'naver':
-          // Naver login temporarily disabled
-          if (mounted) {
-            ScaffoldMessenger.of(context).showSnackBar(
-              const SnackBar(content: Text('네이버 로그인은 준비 중입니다')),
-            );
-          }
-          setState(() => _isLoading = false);
-          return;
+          socialUserData = await socialLoginService.signInWithNaver(context);
+          break;
         case 'google':
           socialUserData = await socialLoginService.signInWithGoogle(context);
           break;
@@ -127,6 +129,7 @@ class _ModernLoginScreenState extends State<ModernLoginScreen> with TickerProvid
       if (mounted) {
         setState(() {
           _isLoading = false;
+          _isSocialLoginInProgress = false;
         });
       }
     }

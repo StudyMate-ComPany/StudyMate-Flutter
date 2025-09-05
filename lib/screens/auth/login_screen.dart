@@ -9,6 +9,7 @@ import '../../services/social_login_service.dart';
 import '../home/main_navigation_screen.dart';
 import 'signup_screen.dart';
 import 'login_success_screen.dart';
+// WebView 기반 네이버 로그인 제거
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -22,6 +23,7 @@ class _LoginScreenState extends State<LoginScreen> {
   final _passwordController = TextEditingController();
   bool _isPasswordVisible = false;
   bool _isLoading = false;
+  bool _isSocialLoginInProgress = false; // 소셜 로그인 진행 중 플래그
   final _emailFocusNode = FocusNode();
   final _passwordFocusNode = FocusNode();
 
@@ -91,8 +93,17 @@ class _LoginScreenState extends State<LoginScreen> {
   }
 
   Future<void> _handleSocialLogin(String provider) async {
+    // 이미 소셜 로그인이 진행 중이면 무시
+    if (_isSocialLoginInProgress) {
+      debugPrint('⚠️ 소셜 로그인이 이미 진행 중입니다');
+      return;
+    }
+    
     debugPrint('🔐 [LoginScreen] Starting social login: $provider');
-    setState(() => _isLoading = true);
+    setState(() {
+      _isLoading = true;
+      _isSocialLoginInProgress = true;
+    });
 
     try {
       // 소셜 로그인 서비스 사용
@@ -113,14 +124,8 @@ class _LoginScreenState extends State<LoginScreen> {
           }
           break;
         case 'naver':
-          // Naver login temporarily disabled
-          if (mounted) {
-            ScaffoldMessenger.of(context).showSnackBar(
-              const SnackBar(content: Text('네이버 로그인은 준비 중입니다')),
-            );
-          }
-          setState(() => _isLoading = false);
-          return;
+          socialUserData = await socialLoginService.signInWithNaver(context);
+          break;
         case 'google':
           socialUserData = await socialLoginService.signInWithGoogle(context);
           break;
@@ -162,7 +167,10 @@ class _LoginScreenState extends State<LoginScreen> {
       }
     } finally {
       if (mounted) {
-        setState(() => _isLoading = false);
+        setState(() {
+          _isLoading = false;
+          _isSocialLoginInProgress = false;
+        });
       }
     }
   }
